@@ -119,12 +119,20 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">P</div>
             <span className="font-bold text-lg tracking-tight">PatternVora</span>
           </div>
-          <button
-            onClick={onBack}
-            className="text-sm font-medium text-slate-500 hover:text-slate-900 flex items-center gap-1 transition-colors"
-          >
-            <ArrowLeft size={16} /> Back to Home
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={onBack}
+              className="text-sm font-medium text-slate-500 hover:text-slate-900 flex items-center gap-1 transition-colors"
+            >
+              <ArrowLeft size={16} /> Back to Home
+            </button>
+            <button
+              onClick={onStartFree}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-full transition-all shadow-lg shadow-indigo-600/20"
+            >
+              Open Studio
+            </button>
+          </div>
         </div>
       </nav>
 
