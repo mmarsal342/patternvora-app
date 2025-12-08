@@ -93,9 +93,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 console.warn('Export limit reached!');
             }
         } else {
-            // Fallback: increment locally for guests
-            const currentLocal = parseInt(localStorage.getItem(STORAGE_KEY) || '0');
-            const newCount = currentLocal + 1;
+            // Fallback: increment locally when backend fails
+            const currentCount = user?.exportCount || 0;
+            const newCount = currentCount + 1;
+
+            // Update user state so canExport() check works
+            setUser(prev => prev ? { ...prev, exportCount: newCount } : null);
             localStorage.setItem(STORAGE_KEY, String(newCount));
         }
     };
