@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { api, UserProfile } from '../services/api';
 import { STORAGE_KEY } from '../utils/gamification';
 
@@ -7,10 +7,12 @@ import { STORAGE_KEY } from '../utils/gamification';
 interface UserContextType {
     user: UserProfile | null;
     isLoading: boolean;
-    login: (googleToken?: string) => Promise<void>;
+    login: () => void;
     logout: () => void;
     isPro: boolean;
-    syncExportCount: () => void;
+    isGuest: boolean;
+    syncExportCount: () => Promise<void>;
+    refreshProfile: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -21,98 +23,97 @@ export const useUser = () => {
     return context;
 };
 
-// MOCK DATA FOR DEVELOPMENT (Until you connect real Antigravity URL)
-// Set this to FALSE when your backend is ready!
-const USE_MOCK_API = true;
-
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<UserProfile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Initial Load
-    useEffect(() => {
-        const init = async () => {
-            if (USE_MOCK_API) {
-                // Check local storage for mock session
-                const mockSession = localStorage.getItem('pv_mock_user');
-                if (mockSession) {
-                    const parsedUser = JSON.parse(mockSession);
-                    // Sync local storage count
-                    const localCount = parseInt(localStorage.getItem(STORAGE_KEY) || '0');
-                    setUser({ ...parsedUser, exportCount: localCount });
-                }
-            } else {
-                // Real API Call
-                const profile = await api.getProfile();
-                setUser(profile);
-            }
-            setIsLoading(false);
-        };
-        init();
+    // Fetch user profile from backend
+    const fetchProfile = useCallback(async () => {
+        const profile = await api.getProfile();
+        if (profile) {
+            setUser(profile);
+            // Sync local storage for gamification display
+            localStorage.setItem(STORAGE_KEY, String(profile.exportCount));
+        }
+        return profile;
     }, []);
 
-    const login = async (googleToken?: string) => {
-        setIsLoading(true);
-        try {
-            let profile: UserProfile;
+    // Initial Load - Check for auth callback token or existing session
+    useEffect(() => {
+        const init = async () => {
+            // 1. Check if this is an OAuth callback (has ?token= in URL)
+            const callbackToken = api.handleAuthCallback();
 
-            if (USE_MOCK_API) {
-                // Simulate network delay
-                await new Promise(r => setTimeout(r, 1000));
-                
-                const localCount = parseInt(localStorage.getItem(STORAGE_KEY) || '0');
-                profile = {
-                    id: 'user_mock_123',
-                    email: 'demo@patternvora.com',
-                    name: 'Demo Creator',
-                    tier: 'free',
-                    exportCount: localCount,
-                    avatarUrl: 'https://ui-avatars.com/api/?name=Demo+User'
-                };
-                localStorage.setItem('pv_mock_user', JSON.stringify(profile));
-            } else {
-                if (!googleToken) throw new Error("Google Token required for real API");
-                profile = await api.loginWithGoogle(googleToken);
+            if (callbackToken) {
+                // Token was found in URL and saved, now fetch profile
+                await fetchProfile();
+            } else if (api.hasAuthToken()) {
+                // Existing session - try to load profile
+                await fetchProfile();
             }
+            // Otherwise user is a guest (no token)
 
-            setUser(profile);
-        } catch (e) {
-            console.error(e);
-            alert("Login failed. Check console.");
-        } finally {
             setIsLoading(false);
-        }
+        };
+
+        init();
+    }, [fetchProfile]);
+
+    // Trigger Google OAuth redirect
+    const login = () => {
+        api.initiateGoogleLogin();
     };
 
     const logout = () => {
-        if (USE_MOCK_API) {
-            localStorage.removeItem('pv_mock_user');
-        } else {
-            api.logout();
-        }
+        api.logout();
         setUser(null);
+        localStorage.removeItem(STORAGE_KEY);
     };
 
-    // Helper to sync local gamification with DB
-    const syncExportCount = () => {
-        if (user) {
+    // Refresh profile from backend
+    const refreshProfile = async () => {
+        await fetchProfile();
+    };
+
+    // Sync export count with backend
+    const syncExportCount = async () => {
+        if (!user) return;
+
+        // Call backend to record export
+        const result = await api.recordExport();
+
+        if (result) {
+            // Update local state
+            setUser(prev => prev ? { ...prev, exportCount: result.count } : null);
+            localStorage.setItem(STORAGE_KEY, String(result.count));
+
+            // Check if user hit limit
+            if (!result.canExport) {
+                // Optional: Could show a modal here
+                console.warn('Export limit reached!');
+            }
+        } else {
+            // Fallback: increment locally for guests
             const currentLocal = parseInt(localStorage.getItem(STORAGE_KEY) || '0');
             const newCount = currentLocal + 1;
-            
-            // Update UI immediately
-            setUser({ ...user, exportCount: newCount });
-            
-            // Sync Backend
-            if (!USE_MOCK_API) {
-                api.incrementExportCount(1);
-            }
+            localStorage.setItem(STORAGE_KEY, String(newCount));
         }
     };
 
     const isPro = user ? (user.tier === 'pro' || user.tier === 'ltd') : false;
+    const isGuest = !user || user.tier === 'guest';
 
     return (
-        <UserContext.Provider value={{ user, isLoading, login, logout, isPro, syncExportCount }}>
+        <UserContext.Provider value={{
+            user,
+            isLoading,
+            login,
+            logout,
+            isPro,
+            isGuest,
+            syncExportCount,
+            refreshProfile
+        }}>
             {children}
         </UserContext.Provider>
     );

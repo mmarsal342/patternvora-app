@@ -15,38 +15,29 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
   const [isProcessing, setIsProcessing] = useState<string | null>(null); // Stores Plan Name being processed
 
   const handleSubscribe = async (planId: string, planName: string) => {
-      // 1. Require Login first
-      if (!user) {
-          const confirmLogin = window.confirm("You need to log in first to subscribe. Login as Demo User?");
-          if (confirmLogin) {
-              await login();
-          }
-          return;
+    // 1. Require Login first
+    if (!user) {
+      const confirmLogin = window.confirm("You need to log in with Google first to subscribe. Proceed to login?");
+      if (confirmLogin) {
+        login(); // This redirects to Google OAuth
       }
+      return;
+    }
 
-      setIsProcessing(planName);
+    setIsProcessing(planName);
 
-      try {
-          // 2. Mock Logic vs Real Logic
-          // In real implementation, we call api.createCheckoutSession
-          // For now, we simulate a redirect or success
-          
-          /* REAL CODE:
-          const checkoutUrl = await api.createCheckoutSession(planId, currency);
-          window.location.href = checkoutUrl;
-          */
+    try {
+      // Call Mayar/Payment API to get checkout URL
+      const checkoutUrl = await api.createCheckoutSession(planId, currency);
 
-          // SIMULATION:
-          await new Promise(r => setTimeout(r, 1500));
-          alert(`Redirecting to ${currency === 'IDR' ? 'Mayar.id' : 'Stripe'} checkout for ${planName}...`);
-          
-          // Simulate return
-          window.location.href = "/?payment_success=true";
+      // Redirect to payment page
+      window.location.href = checkoutUrl;
 
-      } catch (e) {
-          alert("Failed to initiate checkout.");
-          setIsProcessing(null);
-      }
+    } catch (e) {
+      console.error("Payment error:", e);
+      alert("Failed to initiate checkout. Please try again.");
+      setIsProcessing(null);
+    }
   };
 
   const plans = [
@@ -128,7 +119,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">P</div>
             <span className="font-bold text-lg tracking-tight">PatternVora</span>
           </div>
-          <button 
+          <button
             onClick={onBack}
             className="text-sm font-medium text-slate-500 hover:text-slate-900 flex items-center gap-1 transition-colors"
           >
@@ -148,23 +139,21 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
 
           {/* Currency Toggle */}
           <div className="inline-flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
-            <button 
+            <button
               onClick={() => setCurrency('USD')}
-              className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${
-                currency === 'USD' 
-                  ? 'bg-slate-900 text-white shadow-md' 
-                  : 'text-slate-500 hover:bg-slate-50'
-              }`}
+              className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${currency === 'USD'
+                ? 'bg-slate-900 text-white shadow-md'
+                : 'text-slate-500 hover:bg-slate-50'
+                }`}
             >
               USD ($)
             </button>
-            <button 
+            <button
               onClick={() => setCurrency('IDR')}
-              className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${
-                currency === 'IDR' 
-                  ? 'bg-indigo-600 text-white shadow-md' 
-                  : 'text-slate-500 hover:bg-slate-50'
-              }`}
+              className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${currency === 'IDR'
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'text-slate-500 hover:bg-slate-50'
+                }`}
             >
               IDR (Rp)
             </button>
@@ -173,13 +162,12 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
 
         <div className="grid md:grid-cols-3 gap-8 items-start">
           {plans.map((plan, index) => (
-            <div 
-              key={index} 
-              className={`relative bg-white rounded-2xl p-8 border transition-all duration-300 ${
-                plan.highlight 
-                  ? 'border-indigo-200 shadow-2xl scale-105 z-10' 
-                  : 'border-slate-200 shadow-xl hover:border-slate-300 hover:shadow-2xl'
-              }`}
+            <div
+              key={index}
+              className={`relative bg-white rounded-2xl p-8 border transition-all duration-300 ${plan.highlight
+                ? 'border-indigo-200 shadow-2xl scale-105 z-10'
+                : 'border-slate-200 shadow-xl hover:border-slate-300 hover:shadow-2xl'
+                }`}
             >
               {plan.popular && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg">
@@ -188,10 +176,9 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
               )}
 
               <div className="mb-6">
-                <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4 ${
-                  index === 0 ? 'bg-slate-100 text-slate-600' :
+                <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4 ${index === 0 ? 'bg-slate-100 text-slate-600' :
                   index === 1 ? 'bg-indigo-100 text-indigo-600' : 'bg-rose-100 text-rose-600'
-                }`}>
+                  }`}>
                   {plan.badge}
                 </span>
                 <h3 className="text-2xl font-bold text-slate-900">{plan.name}</h3>
@@ -227,15 +214,15 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
                 ))}
               </ul>
 
-              <button 
+              <button
                 onClick={plan.action}
                 disabled={!!isProcessing}
                 className={`w-full py-4 rounded-xl font-bold text-sm transition-all active:scale-95 flex items-center justify-center gap-2 ${plan.ctaStyle} ${isProcessing ? 'opacity-70 cursor-wait' : ''}`}
               >
                 {isProcessing === plan.name ? (
-                    <>
-                        <Loader2 size={16} className="animate-spin" /> Processing...
-                    </>
+                  <>
+                    <Loader2 size={16} className="animate-spin" /> Processing...
+                  </>
                 ) : plan.cta}
               </button>
             </div>
