@@ -69,7 +69,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
       id: 'pro_monthly',
       name: "Pro Monthly",
       badge: "The Creator",
-      price: currency === 'USD' ? '$4.99' : 'Rp 50.000',
+      price: currency === 'USD' ? '$4.90' : 'Rp 49.000',
       period: 'per month',
       description: "For consistent content production and high-quality assets.",
       features: [
@@ -89,10 +89,10 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
       popular: true
     },
     {
-      id: 'ltd_lifetime',
+      id: 'lifetime',
       name: "Lifetime Deal",
       badge: "The Agency",
-      price: currency === 'USD' ? '$49' : 'Rp 500.000',
+      price: currency === 'USD' ? '$49' : 'Rp 499.000',
       period: 'one-time payment',
       description: "Pay once, own it forever. The smartest investment for agencies.",
       features: [
@@ -106,7 +106,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
       limitations: [],
       cta: "Get Lifetime Access",
       ctaStyle: "bg-rose-500 text-white hover:bg-rose-600 shadow-lg shadow-rose-200",
-      action: () => handleSubscribe('ltd_lifetime', "Lifetime Deal"),
+      action: () => handleSubscribe('lifetime', "Lifetime Deal"),
       highlight: false
     }
   ];
