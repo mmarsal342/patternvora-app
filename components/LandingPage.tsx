@@ -401,58 +401,48 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing }) => {
             </div>
           </div>
         </section>
-
-        {/* FAQ Section */}
-        <section className="py-24 bg-white border-t border-slate-100">
-          <div className="max-w-4xl mx-auto px-6">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 mb-4">
-                <HelpCircle size={20} />
-              </div>
-              <h2 className="text-3xl font-bold text-slate-900">Frequently Asked Questions</h2>
-            </div>
-
-            <div className="grid gap-6">
-              {[
-                {
-                  q: "Can I sell these on stock marketplaces (Adobe Stock, etc)?",
-                  a: "Yes! You own the full IP. Important for Adobe Stock: You must check the 'Created using generative AI tools' box during submission. Adobe broadly classifies procedural/algorithmic tools under this label for transparency, even though PatternVora isn't neural AI."
-                },
-                {
-                  q: "Is this using AI (Generative AI)?",
-                  a: "No. PatternVora uses 'Algorithmic/Procedural Generation' (pure math & logic). No external APIs, no data training, and no hallucinations. It runs 100% offline."
-                },
-                {
-                  q: "How should I label this on Shutterstock?",
-                  a: "Shutterstock accepts procedural content but bans AI models trained on stolen art. Since PatternVora is procedural and IP-safe, it is allowed. We recommend adding 'Procedurally-generated pattern' in your item description."
-                },
-                {
-                  q: "Is PatternVora free to use?",
-                  a: "Yes, the basic editor is completely free to use directly in your browser. No account required."
-                },
-                {
-                  q: "Does it work offline?",
-                  a: "Yes! Once loaded, all generation happens locally on your device using your CPU/GPU."
-                }
-              ].map((item, i) => (
-                <div key={i} className="bg-slate-50 p-6 rounded-xl border border-slate-100">
-                  <h4 className="font-bold text-slate-900 mb-2">{item.q}</h4>
-                  <p className="text-slate-600 text-sm leading-relaxed">{item.a}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
       </main>
 
-      {/* FAQ Section */}
+      {/* FAQ Section - Collapsible Accordion */}
       <section className="bg-slate-50 py-20">
         <div className="max-w-3xl mx-auto px-6">
           <h2 className="text-3xl font-extrabold text-center text-slate-900 mb-4">Frequently Asked Questions</h2>
           <p className="text-center text-slate-500 mb-12">Got questions? We've got answers.</p>
 
           <div className="space-y-3">
+            {/* Stock/Commercial Questions */}
+            <FAQItem
+              question="Can I sell these on stock marketplaces (Adobe Stock, etc)?"
+              answer="Yes! You own the full IP. Important for Adobe Stock: You must check the 'Created using generative AI tools' box during submission. Adobe broadly classifies procedural/algorithmic tools under this label for transparency, even though PatternVora isn't neural AI."
+            />
+            <FAQItem
+              question="How should I label this on Shutterstock?"
+              answer="Shutterstock accepts procedural content but bans AI models trained on stolen art. Since PatternVora is procedural and IP-safe, it is allowed. We recommend adding 'Procedurally-generated pattern' in your item description."
+            />
+            <FAQItem
+              question="Is this using AI (Generative AI)?"
+              answer="No. PatternVora uses 'Algorithmic/Procedural Generation' (pure math & logic). No external APIs, no data training, and no hallucinations. It runs 100% offline."
+            />
+
+            {/* Pricing & Usage */}
+            <FAQItem
+              question="Is PatternVora free to use?"
+              answer="Yes, the basic editor is completely free to use directly in your browser. No account required. Free users get 10 exports per month with watermark. Pro users get unlimited exports, 4K resolution, and no watermark."
+            />
+            <FAQItem
+              question="How do export limits work?"
+              answer="Free users get 10 image exports per 30-day period, resetting from your sign-up date. Pro and Lifetime users have unlimited exports. Video recording and SVG export are Pro-only features."
+            />
+            <FAQItem
+              question="Can I use patterns commercially?"
+              answer="Yes! All patterns you create are 100% yours. Free users can use exports for personal and commercial projects. Pro users get additional benefits like no watermark and 4K resolution for professional stock assets."
+            />
+
+            {/* Technical */}
+            <FAQItem
+              question="Does it work offline?"
+              answer="Yes! Once loaded, all generation happens locally on your device using your CPU/GPU. No internet required after the initial page load."
+            />
             <FAQItem
               question="Why are my exported files smaller than expected?"
               answer="PatternVora generates geometric patterns with flat colors and gradients, which compress extremely efficiently. A 4K pattern file at 95% JPG quality might only be 0.5-1MB because there's less 'noise' compared to photos. This doesn't affect visual quality—your exports are still high-fidelity and print-ready!"
@@ -460,14 +450,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing }) => {
             <FAQItem
               question="What's the difference between PNG and JPG export?"
               answer="PNG is lossless (no quality loss) but larger files. JPG uses compression for smaller files with minimal visible quality loss. For patterns, JPG at 95% quality is virtually indistinguishable from PNG. Use PNG if you need transparency or plan to edit further."
-            />
-            <FAQItem
-              question="Can I use patterns commercially?"
-              answer="Yes! All patterns you create are 100% yours. Free users can use exports for personal and commercial projects. Pro users get additional benefits like no watermark and 4K resolution for professional stock assets."
-            />
-            <FAQItem
-              question="How do export limits work?"
-              answer="Free users get 10 image exports per 30-day period, resetting from your sign-up date. Pro and Lifetime users have unlimited exports. Video recording and SVG export are Pro-only features."
             />
             <FAQItem
               question="Is my data saved if I close the browser?"
