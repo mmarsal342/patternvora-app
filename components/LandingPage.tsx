@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Layers, Zap, Download, Repeat, ArrowRight, Layout, Palette, Film, HelpCircle, Bell, X, Sparkles, CheckCircle2, Clock, Trophy, LogOut, Loader2 } from 'lucide-react';
+import { Layers, Zap, Download, Repeat, ArrowRight, Layout, Palette, Film, HelpCircle, Bell, X, Sparkles, CheckCircle2, Clock, Trophy, LogOut, Loader2, ChevronDown } from 'lucide-react';
 import { getCurrentRank, getNextRank, getProgress, STORAGE_KEY, RANKS } from '../utils/gamification';
 import { useUser } from './UserContext';
 
@@ -13,6 +13,30 @@ const GoogleLogo = () => (
     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
   </svg>
 );
+
+// FAQ Accordion Item Component
+const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, answer }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-slate-50 transition-colors"
+      >
+        <span className="font-semibold text-slate-900">{question}</span>
+        <ChevronDown
+          size={18}
+          className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+        />
+      </button>
+      {isOpen && (
+        <div className="px-5 pb-4 text-sm text-slate-600 leading-relaxed animate-in slide-in-from-top-2 duration-200">
+          {answer}
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface LandingPageProps {
   onStart: () => void;
@@ -421,6 +445,37 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing }) => {
         </section>
 
       </main>
+
+      {/* FAQ Section */}
+      <section className="bg-slate-50 py-20">
+        <div className="max-w-3xl mx-auto px-6">
+          <h2 className="text-3xl font-extrabold text-center text-slate-900 mb-4">Frequently Asked Questions</h2>
+          <p className="text-center text-slate-500 mb-12">Got questions? We've got answers.</p>
+
+          <div className="space-y-3">
+            <FAQItem
+              question="Why are my exported files smaller than expected?"
+              answer="PatternVora generates geometric patterns with flat colors and gradients, which compress extremely efficiently. A 4K pattern file at 95% JPG quality might only be 0.5-1MB because there's less 'noise' compared to photos. This doesn't affect visual quality—your exports are still high-fidelity and print-ready!"
+            />
+            <FAQItem
+              question="What's the difference between PNG and JPG export?"
+              answer="PNG is lossless (no quality loss) but larger files. JPG uses compression for smaller files with minimal visible quality loss. For patterns, JPG at 95% quality is virtually indistinguishable from PNG. Use PNG if you need transparency or plan to edit further."
+            />
+            <FAQItem
+              question="Can I use patterns commercially?"
+              answer="Yes! All patterns you create are 100% yours. Free users can use exports for personal and commercial projects. Pro users get additional benefits like no watermark and 4K resolution for professional stock assets."
+            />
+            <FAQItem
+              question="How do export limits work?"
+              answer="Free users get 10 image exports per 30-day period, resetting from your sign-up date. Pro and Lifetime users have unlimited exports. Video recording and SVG export are Pro-only features."
+            />
+            <FAQItem
+              question="Is my data saved if I close the browser?"
+              answer="Your presets are saved locally in your browser using IndexedDB. However, we recommend exporting important presets to JSON files for backup. Your export count is synced to your account if you're logged in."
+            />
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="bg-slate-50 border-t border-slate-200 pt-16 pb-8">
