@@ -70,13 +70,18 @@ export const api = {
             }
 
             const data = await response.json();
+            // Backend returns { user: {...}, subscription: {...} }
+            const userData = data.user || data; // Fallback for backwards compatibility
+
+            console.log('[API] getProfile response:', { email: userData.email, tier: userData.tier });
+
             return {
-                id: data.id,
-                email: data.email,
-                name: data.name,
-                tier: data.tier || 'free',
-                exportCount: data.export_count || 0,
-                avatarUrl: data.avatar_url
+                id: userData.id,
+                email: userData.email,
+                name: userData.name,
+                tier: userData.tier || 'free',
+                exportCount: userData.export_count || 0,
+                avatarUrl: userData.avatar_url
             };
         } catch (e) {
             console.error('Failed to fetch profile', e);
