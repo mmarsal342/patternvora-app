@@ -426,6 +426,139 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin }
             </div>
           </div>
         </section>
+
+        {/* Pattern Gallery */}
+        <section className="py-24 bg-white">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">Stunning Patterns, Infinite Possibilities</h2>
+              <p className="text-slate-600 max-w-2xl mx-auto">Every pattern is unique. Here's a glimpse of what you can create in seconds.</p>
+            </div>
+
+            {/* Gallery Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {/* Pattern 1 - Geometric */}
+              <div className="group relative aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
+                  <div className="absolute inset-0 opacity-30" style={{
+                    backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,0.1) 20px, rgba(255,255,255,0.1) 40px)`
+                  }}></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 border-4 border-white/30 rotate-45"></div>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-end p-4 opacity-0 group-hover:opacity-100">
+                  <span className="text-white text-sm font-medium">Geometric</span>
+                </div>
+              </div>
+
+              {/* Pattern 2 - Abstract */}
+              <div className="group relative aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <div className="absolute inset-0 bg-gradient-to-tr from-amber-400 via-orange-500 to-rose-500">
+                  <div className="absolute top-1/4 left-1/4 w-20 h-20 bg-white/20 rounded-full blur-sm"></div>
+                  <div className="absolute bottom-1/3 right-1/4 w-16 h-16 bg-white/15 rounded-full blur-sm"></div>
+                  <div className="absolute top-1/2 right-1/3 w-12 h-12 border-2 border-white/30 rounded-lg rotate-12"></div>
+                </div>
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-end p-4 opacity-0 group-hover:opacity-100">
+                  <span className="text-white text-sm font-medium">Abstract</span>
+                </div>
+              </div>
+
+              {/* Pattern 3 - Minimal */}
+              <div className="group relative aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <div className="absolute inset-0 bg-slate-100">
+                  <div className="absolute inset-0" style={{
+                    backgroundImage: `radial-gradient(circle at 30% 40%, #e0e7ff 0%, transparent 50%), radial-gradient(circle at 70% 60%, #dbeafe 0%, transparent 50%)`
+                  }}></div>
+                  <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-24 h-1 bg-slate-900"></div>
+                  <div className="absolute top-1/2 left-1/3 w-1 h-20 bg-slate-900"></div>
+                  <div className="absolute bottom-1/4 right-1/4 w-8 h-8 border-2 border-slate-900 rounded-full"></div>
+                </div>
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-end p-4 opacity-0 group-hover:opacity-100">
+                  <span className="text-slate-900 text-sm font-medium">Minimal</span>
+                </div>
+              </div>
+
+              {/* Pattern 4 - Organic */}
+              <div className="group relative aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600">
+                  <div className="absolute inset-0" style={{
+                    backgroundImage: `radial-gradient(ellipse at 20% 30%, rgba(255,255,255,0.2) 0%, transparent 40%), radial-gradient(ellipse at 80% 70%, rgba(255,255,255,0.15) 0%, transparent 40%)`
+                  }}></div>
+                  <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path d="M20,50 Q30,20 50,30 T80,50 T50,80 T20,50" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+                  </svg>
+                </div>
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-end p-4 opacity-0 group-hover:opacity-100">
+                  <span className="text-white text-sm font-medium">Organic</span>
+                </div>
+              </div>
+
+              {/* Pattern 5 - Bold */}
+              <div className="group relative aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <div className="absolute inset-0 bg-slate-900">
+                  <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-yellow-400"></div>
+                  <div className="absolute bottom-0 right-0 w-1/2 h-1/2 bg-rose-500"></div>
+                  <div className="absolute top-1/4 left-1/4 w-1/2 h-1/2 bg-indigo-500 rounded-full"></div>
+                </div>
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-end p-4 opacity-0 group-hover:opacity-100">
+                  <span className="text-white text-sm font-medium">Bold</span>
+                </div>
+              </div>
+
+              {/* Pattern 6 - Retro */}
+              <div className="group relative aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <div className="absolute inset-0 bg-gradient-to-b from-orange-200 via-pink-200 to-purple-300">
+                  <div className="absolute inset-0" style={{
+                    backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 10px, rgba(0,0,0,0.03) 10px, rgba(0,0,0,0.03) 20px)`
+                  }}></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-slate-900 to-transparent"></div>
+                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-16 h-16 bg-yellow-400 rounded-full"></div>
+                </div>
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-end p-4 opacity-0 group-hover:opacity-100">
+                  <span className="text-white text-sm font-medium">Retro</span>
+                </div>
+              </div>
+
+              {/* Pattern 7 - Gradient Mesh */}
+              <div className="group relative aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <div className="absolute inset-0" style={{
+                  background: `linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)`
+                }}>
+                  <div className="absolute inset-0" style={{
+                    backgroundImage: `radial-gradient(circle at 20% 80%, rgba(120,119,198,0.8) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(244,114,182,0.6) 0%, transparent 50%)`
+                  }}></div>
+                </div>
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-end p-4 opacity-0 group-hover:opacity-100">
+                  <span className="text-white text-sm font-medium">Mesh</span>
+                </div>
+              </div>
+
+              {/* Pattern 8 - Monochrome */}
+              <div className="group relative aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <div className="absolute inset-0 bg-slate-200">
+                  <div className="absolute inset-0" style={{
+                    backgroundImage: `repeating-conic-gradient(#1e293b 0% 25%, transparent 0% 50%)`,
+                    backgroundSize: '20px 20px'
+                  }}></div>
+                </div>
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-end p-4 opacity-0 group-hover:opacity-100">
+                  <span className="text-slate-900 text-sm font-medium">Monochrome</span>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="mt-12 text-center">
+              <button
+                onClick={onStart}
+                className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-xl"
+              >
+                Create Your Own <ArrowRight size={20} />
+              </button>
+            </div>
+          </div>
+        </section>
       </main>
 
       {/* FAQ Section - Collapsible Accordion */}
