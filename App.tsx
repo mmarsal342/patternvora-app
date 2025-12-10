@@ -413,6 +413,15 @@ const App: React.FC = () => {
         syncExportCount();
     };
 
+    // Reset to fresh pattern state
+    const handleReset = useCallback(() => {
+        if (window.confirm('Are you sure you want to reset? All unsaved changes will be lost.')) {
+            initHistory(INITIAL_V2_STATE, {});
+            setLoadedImages({});
+            setIsEditMode(false);
+        }
+    }, [initHistory]);
+
     const handleDownloadPNG = useCallback((size: number) => {
         // Check if user can export at all
         const exportCheck = canExport();
@@ -764,6 +773,7 @@ const App: React.FC = () => {
                             if (!checkTierAccess('batch')) return;
                             setIsBatchModalOpen(true);
                         }}
+                        onReset={handleReset}
                     />
                 </div>
             </div>

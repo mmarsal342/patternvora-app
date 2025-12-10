@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import {
-    RefreshCw, Download, Video, MousePointer2, Dices, Sparkles, X, Wand2, Settings2, ChevronDown, ChevronUp
+    RefreshCw, Download, Video, MousePointer2, Dices, Sparkles, X, Wand2, Settings2, ChevronDown, ChevronUp, RotateCcw
 } from 'lucide-react';
 import { AppState, TextConfig, CustomImageConfig, AnimationConfig, Preset, FontDef, PatternStyle, CompositionType, LayerConfig, EXPORT_SIZES, ExportSize } from '../types';
 import { PALETTES } from '../utils/palettes';
@@ -43,6 +43,7 @@ interface SidebarProps {
     isEditMode?: boolean;
     onToggleEditMode?: () => void;
     onOpenBatchModal: () => void;
+    onReset: () => void;
 }
 
 const SidebarLayout: React.FC<Omit<SidebarProps, keyof SidebarContextType>> = (props) => {
@@ -50,7 +51,7 @@ const SidebarLayout: React.FC<Omit<SidebarProps, keyof SidebarContextType>> = (p
         onDownloadPNG, onDownloadJPG, onDownloadSVG,
         isGeneratingSVG, isExportingPNG, isExportingJPG,
         onRecordVideo, isRecording,
-        isEditMode, onToggleEditMode, onOpenBatchModal
+        isEditMode, onToggleEditMode, onOpenBatchModal, onReset
     } = props;
 
     const { state, activeLayerConfig, updateState, onGenerate } = useSidebar();
@@ -224,10 +225,10 @@ const SidebarLayout: React.FC<Omit<SidebarProps, keyof SidebarContextType>> = (p
                                 onClick={onRecordVideo}
                                 disabled={!isAnimEnabled && !isRecording}
                                 className={`py-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors ${isRecording
-                                        ? 'bg-rose-100 text-rose-500 animate-pulse'
-                                        : !isAnimEnabled
-                                            ? 'bg-slate-50 text-slate-300 cursor-not-allowed'
-                                            : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'
+                                    ? 'bg-rose-100 text-rose-500 animate-pulse'
+                                    : !isAnimEnabled
+                                        ? 'bg-slate-50 text-slate-300 cursor-not-allowed'
+                                        : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'
                                     }`}
                                 title={!isAnimEnabled ? "Enable Motion to Record" : "Record Seamless Loop"}
                             >
@@ -242,8 +243,8 @@ const SidebarLayout: React.FC<Omit<SidebarProps, keyof SidebarContextType>> = (p
                         <button
                             onClick={onToggleEditMode}
                             className={`w-full py-2 border rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-all ${isEditMode
-                                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm'
-                                    : 'bg-white border-slate-200 text-slate-500 hover:text-slate-800'
+                                ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm'
+                                : 'bg-white border-slate-200 text-slate-500 hover:text-slate-800'
                                 }`}
                         >
                             <MousePointer2 size={14} className={isEditMode ? "fill-indigo-700" : ""} />
@@ -255,6 +256,15 @@ const SidebarLayout: React.FC<Omit<SidebarProps, keyof SidebarContextType>> = (p
                             className="w-full py-2 bg-gradient-to-r from-rose-500 to-indigo-600 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-200 hover:shadow-xl hover:scale-[1.02] transition-all"
                         >
                             <Sparkles size={14} className="fill-white/30" /> Batch Studio (ZIP)
+                        </button>
+
+                        {/* Reset Pattern Button */}
+                        <button
+                            onClick={onReset}
+                            className="w-full py-2 bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
+                            title="Reset to a fresh pattern"
+                        >
+                            <RotateCcw size={14} /> Reset / New Pattern
                         </button>
                     </div>
                 )}
@@ -292,6 +302,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                 isEditMode={props.isEditMode}
                 onToggleEditMode={props.onToggleEditMode}
                 onOpenBatchModal={props.onOpenBatchModal}
+                onReset={props.onReset}
             />
         </SidebarProvider>
     );

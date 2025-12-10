@@ -73,7 +73,7 @@ export const api = {
             // Backend returns { user: {...}, subscription: {...} }
             const userData = data.user || data; // Fallback for backwards compatibility
 
-            console.log('[API] getProfile response:', { email: userData.email, tier: userData.tier });
+            console.log('[API] getProfile response:', { email: userData.email, tier: userData.tier, export_count: userData.export_count });
 
             return {
                 id: userData.id,
