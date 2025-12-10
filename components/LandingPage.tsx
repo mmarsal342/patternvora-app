@@ -99,11 +99,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin }
   const [showChangelog, setShowChangelog] = useState(false);
   const [hasUnread, setHasUnread] = useState(false);
 
-  // Check if current user is admin
-  const isAdmin = user && ADMIN_EMAILS.includes(user.email);
+  // Check if current user is admin (case-insensitive)
+  const userEmailNormalized = user?.email?.toLowerCase().trim() || '';
+  const isAdmin = user && ADMIN_EMAILS.some(email => email.toLowerCase().trim() === userEmailNormalized);
 
   // Debug log
-  console.log('[LandingPage Admin Debug] user:', user?.email, 'isAdmin:', isAdmin, 'ADMIN_EMAILS:', ADMIN_EMAILS);
+  console.log('[LandingPage Admin Debug] userEmail:', userEmailNormalized, 'isAdmin:', isAdmin, 'onAdmin:', !!onAdmin);
 
   // Gamification State
   const [exportCount, setExportCount] = useState(0);

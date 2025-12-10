@@ -24,8 +24,9 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
     const { user, isLoading } = useUser();
     const [activeTab, setActiveTab] = useState<TabType>('users');
 
-    // Check if current user is admin
-    const isAdmin = user && ADMIN_EMAILS.includes(user.email);
+    // Check if current user is admin (case-insensitive)
+    const userEmailNormalized = user?.email?.toLowerCase().trim() || '';
+    const isAdmin = user && ADMIN_EMAILS.some(email => email.toLowerCase().trim() === userEmailNormalized);
 
     if (isLoading) {
         return (
@@ -94,8 +95,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === tab.id
-                                        ? 'text-indigo-400 border-indigo-400 bg-indigo-500/10'
-                                        : 'text-slate-400 border-transparent hover:text-white hover:bg-slate-700/50'
+                                    ? 'text-indigo-400 border-indigo-400 bg-indigo-500/10'
+                                    : 'text-slate-400 border-transparent hover:text-white hover:bg-slate-700/50'
                                     }`}
                             >
                                 <tab.icon size={16} />
