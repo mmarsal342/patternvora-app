@@ -107,6 +107,8 @@ export const api = {
             if (!response.ok) return null;
 
             const data = await response.json();
+            console.log('[API recordExport] Raw response:', data);
+
             return {
                 canExport: data.can_export,
                 count: data.count,

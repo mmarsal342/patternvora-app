@@ -79,11 +79,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const syncExportCount = async () => {
         if (!user) return;
 
+        console.log('[syncExportCount] Starting, current user.exportCount:', user?.exportCount);
+
         // Call backend to record export
         const result = await api.recordExport();
 
+        console.log('[syncExportCount] API result:', result);
+
         if (result) {
             // Update local state
+            console.log('[syncExportCount] Updating state with count:', result.count);
             setUser(prev => prev ? { ...prev, exportCount: result.count } : null);
             localStorage.setItem(STORAGE_KEY, String(result.count));
 
@@ -96,6 +101,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Fallback: increment locally when backend fails
             const currentCount = user?.exportCount || 0;
             const newCount = currentCount + 1;
+
+            console.log('[syncExportCount] Backend failed, incrementing locally:', currentCount, '->', newCount);
 
             // Update user state so canExport() check works
             setUser(prev => prev ? { ...prev, exportCount: newCount } : null);
