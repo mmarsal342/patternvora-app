@@ -156,5 +156,109 @@ export const api = {
 
         const data = await response.json();
         return data.checkoutUrl;
+    },
+
+    // 4. PROMO CODE REDEMPTION (User-facing)
+    redeemPromoCode: async (code: string): Promise<{ success: boolean; message: string; tier?: string }> => {
+        const response = await fetch(`${API_BASE_URL}/user/redeem-promo`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ code })
+        });
+
+        const data = await response.json();
+        return {
+            success: response.ok,
+            message: data.message || (response.ok ? 'Code redeemed!' : 'Failed to redeem'),
+            tier: data.tier
+        };
+    },
+
+    // 5. ADMIN APIs (Protected by admin middleware on backend)
+    admin: {
+        // List all users
+        listUsers: async (): Promise<AdminUser[]> => {
+            const response = await fetch(`${API_BASE_URL}/admin/users`, {
+                headers: getHeaders()
+            });
+            if (!response.ok) throw new Error('Failed to fetch users');
+            const data = await response.json();
+            return data.users || [];
+        },
+
+        // Upgrade user tier
+        upgradeUser: async (userId: string, tier: string): Promise<void> => {
+            const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/upgrade`, {
+                method: 'POST',
+                headers: getHeaders(),
+                body: JSON.stringify({ tier })
+            });
+            if (!response.ok) throw new Error('Failed to upgrade user');
+        },
+
+        // Generate promo code
+        generatePromoCode: async (params: { code: string; tier: string; maxUses: number }): Promise<PromoCode> => {
+            const response = await fetch(`${API_BASE_URL}/admin/promo/generate`, {
+                method: 'POST',
+                headers: getHeaders(),
+                body: JSON.stringify(params)
+            });
+            if (!response.ok) throw new Error('Failed to generate code');
+            return response.json();
+        },
+
+        // List all promo codes
+        listPromoCodes: async (): Promise<PromoCode[]> => {
+            const response = await fetch(`${API_BASE_URL}/admin/promo/list`, {
+                headers: getHeaders()
+            });
+            if (!response.ok) throw new Error('Failed to fetch promo codes');
+            const data = await response.json();
+            return data.codes || [];
+        },
+
+        // Get analytics
+        getAnalytics: async (): Promise<AdminAnalytics> => {
+            const response = await fetch(`${API_BASE_URL}/admin/analytics`, {
+                headers: getHeaders()
+            });
+            if (!response.ok) throw new Error('Failed to fetch analytics');
+            return response.json();
+        }
     }
 };
+
+// Admin Types
+export interface AdminUser {
+    id: string;
+    email: string;
+    name: string | null;
+    avatar_url: string | null;
+    tier: string;
+    export_count: number;
+    created_at: string;
+}
+
+export interface PromoCode {
+    id: string;
+    code: string;
+    tier: string;
+    max_uses: number;
+    current_uses: number;
+    redeemed_by: string | null;
+    expires_at: string | null;
+    created_at: string;
+    created_by: string;
+}
+
+export interface AdminAnalytics {
+    totalUsers: number;
+    freeUsers: number;
+    lifetimeUsers: number;
+    totalExports: number;
+    promoStats: {
+        totalCodes: number;
+        usedCodes: number;
+        availableCodes: number;
+    };
+}

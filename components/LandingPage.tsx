@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Layers, Zap, Download, Repeat, ArrowRight, Layout, Palette, Film, HelpCircle, Bell, X, Sparkles, CheckCircle2, Clock, Trophy, LogOut, Loader2, ChevronDown } from 'lucide-react';
+import { Layers, Zap, Download, Repeat, ArrowRight, Layout, Palette, Film, HelpCircle, Bell, X, Sparkles, CheckCircle2, Clock, Trophy, LogOut, Loader2, ChevronDown, Shield } from 'lucide-react';
 import { getCurrentRank, getNextRank, getProgress, STORAGE_KEY, RANKS } from '../utils/gamification';
 import { useUser } from './UserContext';
 
@@ -41,7 +41,13 @@ const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, ans
 interface LandingPageProps {
   onStart: () => void;
   onPricing: () => void;
+  onAdmin?: () => void;
 }
+
+// Admin email whitelist (must match AdminPage.tsx)
+const ADMIN_EMAILS = [
+  'mmarsal.asia@gmail.com'
+];
 
 const CHANGELOGS = [
   {
@@ -88,10 +94,13 @@ const CHANGELOGS = [
 
 const CURRENT_VERSION = CHANGELOGS[0].version;
 
-const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin }) => {
   const { user, login, logout, isLoading } = useUser();
   const [showChangelog, setShowChangelog] = useState(false);
   const [hasUnread, setHasUnread] = useState(false);
+
+  // Check if current user is admin
+  const isAdmin = user && ADMIN_EMAILS.includes(user.email);
 
   // Gamification State
   const [exportCount, setExportCount] = useState(0);
@@ -164,6 +173,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing }) => {
             >
               Pricing
             </button>
+
+            {/* Admin Link - Only visible to admins */}
+            {isAdmin && onAdmin && (
+              <button
+                onClick={onAdmin}
+                className="flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+                title="Admin Panel"
+              >
+                <Shield size={16} />
+                <span className="hidden sm:inline">Admin</span>
+              </button>
+            )}
 
             <button
               onClick={handleOpenChangelog}

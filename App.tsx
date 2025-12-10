@@ -6,6 +6,7 @@ import FilmStrip from './components/FilmStrip';
 import LandingPage from './components/LandingPage';
 import BatchModal from './components/BatchModal';
 import PricingPage from './components/PricingPage';
+import AdminPage from './components/AdminPage';
 import { useHistory } from './hooks/useHistory';
 import { AppState, TextConfig, CustomImageConfig, AnimationConfig, Preset, FontDef, DEFAULT_FONTS, ShapeOverride, CustomAsset } from './types';
 import { renderToCanvas, generateSVG, getDimensions, createNoisePattern } from './utils/drawingEngine';
@@ -29,7 +30,7 @@ const App: React.FC = () => {
     const { user, isPro, syncExportCount, login, logout, isLoading, isGuest } = useUser();
 
     // Determine initial view (Default to Landing)
-    const [view, setView] = useState<'landing' | 'editor' | 'pricing'>('landing');
+    const [view, setView] = useState<'landing' | 'editor' | 'pricing' | 'admin'>('landing');
 
     // Handle Payment Return Logic
     useEffect(() => {
@@ -550,11 +551,16 @@ const App: React.FC = () => {
                 setView('editor');
             }}
             onPricing={() => setView('pricing')}
+            onAdmin={() => setView('admin')}
         />;
     }
 
     if (view === 'pricing') {
         return <PricingPage onBack={() => setView('landing')} onStartFree={() => setView('editor')} />;
+    }
+
+    if (view === 'admin') {
+        return <AdminPage onBack={() => setView('landing')} />;
     }
 
     return (
