@@ -102,6 +102,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin }
   // Check if current user is admin
   const isAdmin = user && ADMIN_EMAILS.includes(user.email);
 
+  // Debug log
+  console.log('[LandingPage Admin Debug] user:', user?.email, 'isAdmin:', isAdmin, 'ADMIN_EMAILS:', ADMIN_EMAILS);
+
   // Gamification State
   const [exportCount, setExportCount] = useState(0);
 

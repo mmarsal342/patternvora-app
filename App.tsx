@@ -29,8 +29,21 @@ const AppWrapper: React.FC = () => {
 const App: React.FC = () => {
     const { user, isPro, syncExportCount, login, logout, isLoading, isGuest } = useUser();
 
-    // Determine initial view (Default to Landing)
-    const [view, setView] = useState<'landing' | 'editor' | 'pricing' | 'admin'>('landing');
+    // Determine initial view based on URL path
+    const getInitialView = (): 'landing' | 'editor' | 'pricing' | 'admin' => {
+        const path = window.location.pathname;
+        if (path === '/admin') return 'admin';
+        if (path === '/pricing') return 'pricing';
+        if (path === '/editor' || path === '/studio') return 'editor';
+        return 'landing';
+    };
+
+    const [view, setView] = useState<'landing' | 'editor' | 'pricing' | 'admin'>(getInitialView);
+
+    // Debug admin detection
+    useEffect(() => {
+        console.log('[Admin Debug] User:', user?.email, 'isLoading:', isLoading);
+    }, [user, isLoading]);
 
     // Handle Payment Return Logic
     useEffect(() => {
