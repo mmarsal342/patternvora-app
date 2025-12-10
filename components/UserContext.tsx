@@ -103,7 +103,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    const isPro = user ? (user.tier === 'pro' || user.tier === 'ltd') : false;
+    const isPro = user ? (user.tier === 'pro' || user.tier === 'ltd' || user.tier === 'lifetime') : false;
     const isGuest = !user || user.tier === 'guest';
 
     return (

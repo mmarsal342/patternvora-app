@@ -143,7 +143,7 @@ const UserManagement: React.FC = () => {
         fetchUsers();
     }, [fetchUsers]);
 
-    const handleUpgrade = async (userId: string, tier: 'free' | 'pro' | 'ltd') => {
+    const handleUpgrade = async (userId: string, tier: 'free' | 'pro' | 'ltd' | 'lifetime') => {
         setUpgradingUserId(userId);
         try {
             await api.admin.upgradeUser(userId, tier);
@@ -230,7 +230,7 @@ const UserManagement: React.FC = () => {
                 <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
                     <p className="text-slate-400 text-sm">Lifetime Users</p>
                     <p className="text-2xl font-bold text-amber-400">
-                        {users.filter(u => u.tier === 'ltd' || u.tier === 'pro').length}
+                        {users.filter(u => u.tier === 'ltd' || u.tier === 'pro' || u.tier === 'lifetime').length}
                     </p>
                 </div>
                 <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
@@ -281,9 +281,9 @@ const UserManagement: React.FC = () => {
                                     {user.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}
                                 </td>
                                 <td className="px-4 py-3 text-right">
-                                    {user.tier !== 'ltd' && user.tier !== 'pro' ? (
+                                    {user.tier !== 'ltd' && user.tier !== 'pro' && user.tier !== 'lifetime' ? (
                                         <button
-                                            onClick={() => handleUpgrade(user.id, 'ltd')}
+                                            onClick={() => handleUpgrade(user.id, 'lifetime')}
                                             disabled={upgradingUserId === user.id}
                                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-yellow-900 text-xs font-bold rounded-lg transition-all disabled:opacity-50"
                                         >
@@ -359,7 +359,7 @@ const PromoCodeManagement: React.FC = () => {
         try {
             await api.admin.generatePromoCode({
                 code: newCodeName.toUpperCase().replace(/\s+/g, '-'),
-                tier: 'ltd',
+                tier: 'lifetime',
                 maxUses: 1,
             });
             setNewCodeName('');

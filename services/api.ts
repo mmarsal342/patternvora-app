@@ -20,7 +20,7 @@ export interface UserProfile {
     id: string;
     email: string;
     name: string;
-    tier: 'guest' | 'free' | 'pro' | 'ltd';
+    tier: 'guest' | 'free' | 'pro' | 'ltd' | 'lifetime';
     exportCount: number;
     avatarUrl?: string;
 }
@@ -132,7 +132,7 @@ export const api = {
             if (!profile) return { canExport: true, count: 0, limit: null, resetsAt: null };
 
             // Pro/LTD users have no limits
-            if (profile.tier === 'pro' || profile.tier === 'ltd') {
+            if (profile.tier === 'pro' || profile.tier === 'ltd' || profile.tier === 'lifetime') {
                 return { canExport: true, count: profile.exportCount, limit: null, resetsAt: null };
             }
 
