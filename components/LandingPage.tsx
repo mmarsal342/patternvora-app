@@ -49,13 +49,16 @@ const ADMIN_EMAILS = [
   'mmarsal.asia@gmail.com'
 ];
 
-// Gallery images with labels
+// Gallery images
 const GALLERY_IMAGES = [
-  { src: '/gallery/pattern-1.jpg', label: 'Memphis Style' },
-  { src: '/gallery/pattern-2.jpg', label: 'Dark Isometric' },
-  { src: '/gallery/pattern-3.png', label: 'Typo Pattern' },
-  { src: '/gallery/pattern-4.png', label: 'Confetti Neon' },
-  { src: '/gallery/pattern-5.png', label: 'Bauhaus Hex' },
+  '/gallery/pattern-1.jpg',
+  '/gallery/pattern-2.jpg',
+  '/gallery/pattern-3.png',
+  '/gallery/pattern-4.png',
+  '/gallery/pattern-5.png',
+  '/gallery/pattern-6.jpg',
+  '/gallery/pattern-7.png',
+  '/gallery/pattern-8.png',
 ];
 
 // Gallery Carousel Component
@@ -92,19 +95,15 @@ const GalleryCarousel: React.FC<{ onStart: () => void }> = ({ onStart }) => {
             <div
               key={index}
               className={`absolute inset-0 transition-all duration-700 ease-out ${index === currentIndex
-                  ? 'opacity-100 scale-100'
-                  : 'opacity-0 scale-105 pointer-events-none'
+                ? 'opacity-100 scale-100'
+                : 'opacity-0 scale-105 pointer-events-none'
                 }`}
             >
               <img
-                src={image.src}
-                alt={image.label}
+                src={image}
+                alt={`Pattern example ${index + 1}`}
                 className="w-full h-full object-cover"
               />
-              {/* Label overlay */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
-                <span className="text-white font-bold text-xl">{image.label}</span>
-              </div>
             </div>
           ))}
         </div>
@@ -135,8 +134,8 @@ const GalleryCarousel: React.FC<{ onStart: () => void }> = ({ onStart }) => {
             key={index}
             onClick={() => goToSlide(index)}
             className={`transition-all duration-300 rounded-full ${index === currentIndex
-                ? 'w-8 h-3 bg-indigo-600'
-                : 'w-3 h-3 bg-slate-300 hover:bg-slate-400'
+              ? 'w-8 h-3 bg-indigo-600'
+              : 'w-3 h-3 bg-slate-300 hover:bg-slate-400'
               }`}
           />
         ))}
@@ -513,19 +512,19 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin }
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4 translate-y-8">
-                  <div className="bg-white p-4 rounded-xl shadow-lg border border-slate-100 aspect-square flex items-center justify-center">
-                    <Layout className="w-8 h-8 text-indigo-300" />
+                  <div className="rounded-xl shadow-lg border border-slate-100 aspect-square overflow-hidden">
+                    <img src="/gallery/pattern-1.jpg" alt="Pattern example" className="w-full h-full object-cover" />
                   </div>
-                  <div className="bg-indigo-600 p-4 rounded-xl shadow-lg shadow-indigo-200 aspect-square flex items-center justify-center">
-                    <Palette className="w-8 h-8 text-white" />
+                  <div className="rounded-xl shadow-lg shadow-indigo-200 aspect-square overflow-hidden">
+                    <img src="/gallery/pattern-5.png" alt="Pattern example" className="w-full h-full object-cover" />
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <div className="bg-rose-50 p-4 rounded-xl border border-rose-100 aspect-square flex items-center justify-center">
-                    <Film className="w-8 h-8 text-rose-400" />
+                  <div className="rounded-xl border border-slate-100 aspect-square overflow-hidden">
+                    <img src="/gallery/pattern-6.jpg" alt="Pattern example" className="w-full h-full object-cover" />
                   </div>
-                  <div className="bg-white p-4 rounded-xl shadow-lg border border-slate-100 aspect-square flex items-center justify-center">
-                    <Download className="w-8 h-8 text-slate-300" />
+                  <div className="rounded-xl shadow-lg border border-slate-100 aspect-square overflow-hidden">
+                    <img src="/gallery/pattern-8.png" alt="Pattern example" className="w-full h-full object-cover" />
                   </div>
                 </div>
               </div>
