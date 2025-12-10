@@ -436,12 +436,19 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin }
             {/* Editor Preview Mockup */}
             <div className="mt-20 relative mx-auto max-w-5xl rounded-2xl border border-slate-200 shadow-2xl bg-white p-2 overflow-hidden">
               <div className="bg-slate-100 rounded-xl aspect-[16/9] flex items-center justify-center overflow-hidden relative">
-                <div className="absolute inset-0 grid grid-cols-4 gap-4 p-8 opacity-50">
-                  {[...Array(12)].map((_, i) => (
-                    <div key={i} className="rounded-lg bg-indigo-100" style={{ height: 100 + Math.random() * 100 }}></div>
-                  ))}
+                {/* Pattern Grid Background */}
+                <div className="absolute inset-0 grid grid-cols-4 gap-3 p-6">
+                  <div className="rounded-lg overflow-hidden shadow-sm"><img src="/gallery/asset-1.png" alt="" className="w-full h-full object-cover" /></div>
+                  <div className="rounded-lg overflow-hidden shadow-sm"><img src="/gallery/asset-2.png" alt="" className="w-full h-full object-cover" /></div>
+                  <div className="rounded-lg overflow-hidden shadow-sm"><img src="/gallery/pattern-3.png" alt="" className="w-full h-full object-cover" /></div>
+                  <div className="rounded-lg overflow-hidden shadow-sm"><img src="/gallery/asset-5.png" alt="" className="w-full h-full object-cover" /></div>
+                  <div className="rounded-lg overflow-hidden shadow-sm"><img src="/gallery/pattern-4.png" alt="" className="w-full h-full object-cover" /></div>
+                  <div className="rounded-lg overflow-hidden shadow-sm"><img src="/gallery/asset-3.png" alt="" className="w-full h-full object-cover" /></div>
+                  <div className="rounded-lg overflow-hidden shadow-sm"><img src="/gallery/pattern-1.jpg" alt="" className="w-full h-full object-cover" /></div>
+                  <div className="rounded-lg overflow-hidden shadow-sm"><img src="/gallery/asset-4.png" alt="" className="w-full h-full object-cover" /></div>
                 </div>
-                <div className="z-10 bg-white/80 backdrop-blur-xl border border-white/50 px-8 py-12 rounded-2xl shadow-xl text-center">
+                {/* Overlay Text */}
+                <div className="z-10 bg-white/90 backdrop-blur-xl border border-white/50 px-8 py-12 rounded-2xl shadow-xl text-center">
                   <h3 className="text-2xl font-bold text-slate-800 mb-2">Instant Asset Generation</h3>
                   <p className="text-slate-600">Geometric, Organic, Abstract, Motion.</p>
                 </div>
