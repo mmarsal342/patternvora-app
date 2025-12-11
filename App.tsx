@@ -89,9 +89,7 @@ const App: React.FC = () => {
         canRedo
     } = useHistory(initialHistoryState);
 
-    const [isGeneratingSVG, setIsGeneratingSVG] = useState(false);
-    const [isExportingPNG, setIsExportingPNG] = useState(false);
-    const [isExportingJPG, setIsExportingJPG] = useState(false);
+    // Export states provided by useExport hook below
     const [isRecording, setIsRecording] = useState(false);
 
     // Edit Mode Toggle (Mouse/Pointer)
@@ -139,6 +137,27 @@ const App: React.FC = () => {
         loadedImages,
         pushState,
         updateStateDirectly
+    });
+
+    // Export hook - replaces inline export handlers and tier checking
+    const {
+        isExportingPNG,
+        isExportingJPG,
+        isGeneratingSVG,
+        handleDownloadPNG,
+        handleDownloadJPG,
+        handleDownloadSVG,
+        checkTierAccess
+    } = useExport({
+        state,
+        loadedImages,
+        customFonts,
+        user,
+        isPro,
+        isGuest,
+        onLogin: login,
+        onShowPricing: () => setView('pricing'),
+        onExportComplete: syncExportCount
     });
 
     const handleStateUpdate = useCallback((updates: Partial<AppState>, immediateHistory: boolean = false) => {
@@ -315,69 +334,8 @@ const App: React.FC = () => {
         reader.readAsDataURL(file);
     }, [state.layers, state.activeLayerId, handleStateUpdate]);
 
-    // ========== FEATURE GATING SYSTEM ==========
-    // Guest: No export at all
-    // Free: 10 exports/30 days, max 720p, watermark
-    // Pro/LTD: Unlimited, 4K, no watermark, SVG, Video, Batch
-
-    const FREE_EXPORT_LIMIT = 10;
-    const FREE_MAX_SIZE = 720; // Max resolution for free users
-
-    // Check if user can export based on tier
-    const canExport = (): { allowed: boolean; reason?: string } => {
-        // Guest cannot export at all
-        if (isGuest) {
-            return {
-                allowed: false,
-                reason: "Please sign in with Google to export your creations. It's free!"
-            };
-        }
-
-        // Pro/LTD can always export
-        if (isPro) {
-            return { allowed: true };
-        }
-
-        // Free user - check export limit
-        const currentCount = user?.exportCount || 0;
-        if (currentCount >= FREE_EXPORT_LIMIT) {
-            return {
-                allowed: false,
-                reason: `You've reached your free limit of ${FREE_EXPORT_LIMIT} exports this month. Upgrade to Pro for unlimited exports!`
-            };
-        }
-
-        return { allowed: true };
-    };
-
-    // Check tier access for specific premium features
-    const checkTierAccess = (feature: '4k' | 'svg' | 'video' | 'batch' | 'custom_font' | 'custom_asset'): boolean => {
-        const featureNames: Record<string, string> = {
-            '4k': '4K Export',
-            'svg': 'SVG Export',
-            'video': 'Video Export',
-            'batch': 'Batch Export',
-            'custom_font': 'Custom Font Upload',
-            'custom_asset': 'Custom Asset Upload'
-        };
-
-        if (!isPro) {
-            alert(`${featureNames[feature]} is a Pro Feature. Upgrade to unlock!`);
-            setView('pricing');
-            return false;
-        }
-        return true;
-    };
-
-    // Clamp export size for free users
-    const getExportSize = (requestedSize: number): number => {
-        if (isPro) return requestedSize;
-        return Math.min(requestedSize, FREE_MAX_SIZE);
-    };
-
-    const incrementExportCount = () => {
-        syncExportCount();
-    };
+    // Export handlers (handleDownloadPNG, handleDownloadJPG, handleDownloadSVG, checkTierAccess)
+    // are now provided by useExport hook above
 
     // Reset to fresh pattern state
     const handleReset = useCallback(() => {
@@ -387,145 +345,6 @@ const App: React.FC = () => {
             setIsEditMode(false);
         }
     }, [initHistory]);
-
-    const handleDownloadPNG = useCallback((size: number) => {
-        // Check if user can export at all
-        const exportCheck = canExport();
-        if (!exportCheck.allowed) {
-            alert(exportCheck.reason);
-            if (isGuest) {
-                login(); // Redirect to Google login for guests
-            } else {
-                setView('pricing'); // Show pricing for limit-reached free users
-            }
-            return;
-        }
-
-        // Check 4K access for Pro only
-        if (size > 2000 && !checkTierAccess('4k')) return;
-
-        // Clamp size for free users
-        const actualSize = getExportSize(size);
-
-        setIsExportingPNG(true);
-        setTimeout(() => {
-            try {
-                const canvas = document.createElement('canvas');
-                const dims = getDimensions(state.aspectRatio, actualSize);
-                canvas.width = dims.width;
-                canvas.height = dims.height;
-                const ctx = canvas.getContext('2d');
-
-                const noisePattern = createNoisePattern(50);
-
-                if (ctx) {
-                    renderToCanvas(ctx, dims.width, dims.height, state, loadedImages, 0, noisePattern, true);
-
-                    // Watermark for Free Users
-                    if (!isPro) {
-                        ctx.save();
-                        ctx.font = `bold ${actualSize * 0.03}px sans-serif`;
-                        ctx.fillStyle = 'rgba(0,0,0,0.3)';
-                        ctx.textAlign = 'right';
-                        ctx.textBaseline = 'bottom';
-                        ctx.fillText('Made with PatternVora (Free)', dims.width - 20, dims.height - 20);
-                        ctx.restore();
-                    }
-
-                    const link = document.createElement('a');
-                    link.download = `patternvora-${Date.now()}.png`;
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-                    incrementExportCount();
-                }
-            } catch (e) {
-                console.error("Export failed", e);
-                alert("Failed to export image.");
-            } finally {
-                setIsExportingPNG(false);
-            }
-        }, 100);
-    }, [state, loadedImages, isPro, isGuest, user, login]);
-
-    const handleDownloadJPG = useCallback((size: number) => {
-        // Check if user can export at all
-        const exportCheck = canExport();
-        if (!exportCheck.allowed) {
-            alert(exportCheck.reason);
-            if (isGuest) {
-                login();
-            } else {
-                setView('pricing');
-            }
-            return;
-        }
-
-        // Check 4K access for Pro only
-        if (size > 2000 && !checkTierAccess('4k')) return;
-
-        // Clamp size for free users
-        const actualSize = getExportSize(size);
-
-        setIsExportingJPG(true);
-        setTimeout(() => {
-            try {
-                const canvas = document.createElement('canvas');
-                const dims = getDimensions(state.aspectRatio, actualSize);
-                canvas.width = dims.width;
-                canvas.height = dims.height;
-                const ctx = canvas.getContext('2d');
-                const noisePattern = createNoisePattern(50);
-
-                if (ctx) {
-                    renderToCanvas(ctx, dims.width, dims.height, state, loadedImages, 0, noisePattern);
-
-                    // Watermark for Free Users
-                    if (!isPro) {
-                        ctx.save();
-                        ctx.font = `bold ${actualSize * 0.03}px sans-serif`;
-                        ctx.fillStyle = 'rgba(0,0,0,0.3)';
-                        ctx.textAlign = 'right';
-                        ctx.textBaseline = 'bottom';
-                        ctx.fillText('Made with PatternVora (Free)', dims.width - 20, dims.height - 20);
-                        ctx.restore();
-                    }
-
-                    const link = document.createElement('a');
-                    link.download = `patternvora-${Date.now()}.jpg`;
-                    link.href = canvas.toDataURL('image/jpeg', 0.95);
-                    link.click();
-                    incrementExportCount();
-                }
-            } catch (e) {
-                console.error("Export failed", e);
-                alert("Failed to export JPG.");
-            } finally {
-                setIsExportingJPG(false);
-            }
-        }, 100);
-    }, [state, loadedImages, isPro, isGuest, user, login]);
-
-    const handleDownloadSVG = useCallback(async () => {
-        if (!checkTierAccess('svg')) return;
-
-        setIsGeneratingSVG(true);
-        try {
-            const dims = getDimensions(state.aspectRatio, 1000);
-            const allFonts = [...DEFAULT_FONTS, ...customFonts];
-            const svgString = await generateSVG(dims.width, dims.height, state, allFonts);
-            const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `patternvora-${Date.now()}.svg`;
-            link.click();
-            incrementExportCount();
-        } catch (error) {
-            console.error("Failed to generate SVG", error);
-        } finally {
-            setIsGeneratingSVG(false);
-        }
-    }, [state, customFonts, isPro]);
 
     // Gamification Data Helpers
     const currentRank = getCurrentRank(exportCount);
