@@ -99,7 +99,9 @@ const App: React.FC = () => {
     const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
 
-    const [presets, setPresets] = useState<Preset[]>([]);
+    // Using usePresets hook for preset management
+    // presets, handleSavePreset, handleLoadPreset, handleImportPreset provided by hook below
+
     const [customFonts, setCustomFonts] = useState<FontDef[]>([]);
 
     // Gamification State (Syncs with User Context now)
@@ -126,21 +128,18 @@ const App: React.FC = () => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [undo, redo]);
 
-    // LOAD PRESETS (Async via IndexedDB)
-    useEffect(() => {
-        const load = async () => {
-            const loaded = await loadPresetsFromStorage();
-            setPresets(loaded);
-        };
-        load();
-    }, []);
-
-    // SAVE PRESETS (Async via IndexedDB)
-    useEffect(() => {
-        if (presets.length > 0) {
-            savePresetsToStorage(presets);
-        }
-    }, [presets]);
+    // Presets hook - replaces inline load/save useEffects and handlers
+    const {
+        presets,
+        handleSavePreset,
+        handleLoadPreset,
+        handleImportPreset
+    } = usePresets({
+        state,
+        loadedImages,
+        pushState,
+        updateStateDirectly
+    });
 
     const handleStateUpdate = useCallback((updates: Partial<AppState>, immediateHistory: boolean = false) => {
         updateStateDirectly(updates);
@@ -206,44 +205,8 @@ const App: React.FC = () => {
         handleStateUpdate({ layers: newLayers }, true); // Force immediate history push on drop/finish
     }, [state.layers, state.activeLayerId, handleStateUpdate]);
 
-    const handleSavePreset = useCallback((name: string) => {
-        const newPreset: Preset = {
-            id: Date.now().toString(),
-            name,
-            createdAt: Date.now(),
-            state: state
-        };
-        setPresets(prev => [newPreset, ...prev]);
-    }, [state]);
-
-    const handleLoadPreset = useCallback((preset: Preset) => {
-        pushState(preset.state, loadedImages);
-        updateStateDirectly(preset.state);
-    }, [pushState, updateStateDirectly, loadedImages]);
-
-    const handleImportPreset = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            try {
-                if (ev.target?.result) {
-                    const imported = JSON.parse(ev.target.result as string) as Preset;
-                    if (imported.state) {
-                        const migratedState = migrateToV2(imported.state);
-                        const finalPreset = { ...imported, state: migratedState };
-
-                        setPresets(prev => [finalPreset, ...prev]);
-                        pushState(migratedState, loadedImages);
-                        updateStateDirectly(migratedState);
-                    }
-                }
-            } catch (err) {
-                alert("Invalid Preset JSON");
-            }
-        };
-        reader.readAsText(file);
-    }, [pushState, updateStateDirectly, loadedImages]);
+    // Preset handlers (handleSavePreset, handleLoadPreset, handleImportPreset) 
+    // are now provided by usePresets hook above
 
     const handleFontUpload = useCallback(async (file: File) => {
         // Custom font upload is Pro only
