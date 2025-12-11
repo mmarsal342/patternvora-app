@@ -211,8 +211,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin }
   // Debug log
   console.log('[LandingPage Admin Debug] userEmail:', userEmailNormalized, 'isAdmin:', isAdmin, 'onAdmin:', !!onAdmin);
 
-  // Gamification State
-  const [exportCount, setExportCount] = useState(0);
+  // Gamification State - use user context exportCount (clears on logout)
+  const exportCount = user?.exportCount || 0;
 
   // Realtime Clock State
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
@@ -225,10 +225,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin }
       setHasUnread(true);
     }
 
-    // Get personal stats
-    const count = parseInt(localStorage.getItem(STORAGE_KEY) || '0');
-    setExportCount(count);
-
     // Initialize Clock (Client-side only to avoid hydration mismatch if SSR)
     setCurrentTime(new Date());
     const timer = setInterval(() => {
@@ -237,6 +233,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin }
 
     return () => clearInterval(timer);
   }, []);
+
 
   const handleOpenChangelog = () => {
     setShowChangelog(true);
