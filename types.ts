@@ -2,7 +2,7 @@
 
 export type AspectRatio = '1:1' | '16:9' | '9:16' | '4:5' | '3:4';
 
-export type PatternStyle = 'geometric' | 'organic' | 'grid' | 'bauhaus' | 'confetti' | 'custom-image' | 'radial' | 'typo' | 'mosaic' | 'hex' | 'waves' | 'memphis' | 'isometric';
+export type PatternStyle = 'geometric' | 'organic' | 'grid' | 'bauhaus' | 'confetti' | 'custom-image' | 'radial' | 'typo' | 'mosaic' | 'hex' | 'waves' | 'memphis' | 'isometric' | 'seasonal-cny' | 'seasonal-christmas' | 'seasonal-newyear' | 'seasonal-valentine';
 
 export type CompositionType = 'random' | 'center' | 'frame' | 'diagonal' | 'thirds' | 'bottom' | 'cross' | 'ring' | 'x-shape' | 'split-v' | 'split-h' | 'corners';
 
@@ -62,16 +62,16 @@ export type AnimationConfig = {
 };
 
 export interface ShapeOverride {
-    x?: number; // percentage 0-100
-    y?: number; // percentage 0-100
-    size?: number; // multiplier of original size (e.g., 1.0, 1.5)
-    rotation?: number; // absolute degrees
-    color?: string;
-    hidden?: boolean;
+  x?: number; // percentage 0-100
+  y?: number; // percentage 0-100
+  size?: number; // multiplier of original size (e.g., 1.0, 1.5)
+  rotation?: number; // absolute degrees
+  color?: string;
+  hidden?: boolean;
 }
 
 export interface ShapeData {
-  type: 'circle' | 'rect' | 'triangle' | 'arc' | 'line' | 'image' | 'star' | 'polygon' | 'blob' | 'char' | 'wave' | 'zigzag' | 'cross' | 'donut' | 'pill' | 'cube';
+  type: 'circle' | 'rect' | 'triangle' | 'arc' | 'line' | 'image' | 'star' | 'polygon' | 'blob' | 'char' | 'wave' | 'zigzag' | 'cross' | 'donut' | 'pill' | 'cube' | 'lantern' | 'dragon' | 'angpao' | 'cloud-cn' | 'firecracker' | 'fan' | 'xmas-tree' | 'gift' | 'snowflake' | 'bell' | 'candycane' | 'santa-hat' | 'firework' | 'champagne' | 'clock-ny' | 'balloon' | 'party-hat' | 'party-popper' | 'starburst' | 'heart' | 'rose' | 'love-letter' | 'cupid-arrow' | 'bow' | 'ring';
   x: number;
   y: number;
   size: number;
@@ -104,19 +104,19 @@ export type HistoryItem = {
 // --- LAYER SYSTEM TYPES ---
 
 export interface StyleOptions {
-    shapeTypes: string[]; // Specific shapes allowed for the current style (empty = all)
-    gridGap: number; // Gap for grid/mosaic styles (0-100)
+  shapeTypes: string[]; // Specific shapes allowed for the current style (empty = all)
+  gridGap: number; // Gap for grid/mosaic styles (0-100)
 }
 
 export interface CompositionOptions {
-    direction: 'tl-br' | 'tr-bl'; // For diagonal
-    margin: number; // For frame (0-50 percentage)
+  direction: 'tl-br' | 'tr-bl'; // For diagonal
+  margin: number; // For frame (0-50 percentage)
 }
 
 export interface LayerConfig {
   seed: number;
   style: PatternStyle;
-  composition: CompositionType; 
+  composition: CompositionType;
   complexity: number; // 10-200
   scale: number; // 0.5 - 3.0
   palette: Palette;
@@ -132,13 +132,13 @@ export interface LayerConfig {
 }
 
 export interface Layer {
-    id: string;
-    name: string;
-    visible: boolean;
-    locked: boolean;
-    blendMode: GlobalCompositeOperation;
-    opacity: number;
-    config: LayerConfig;
+  id: string;
+  name: string;
+  visible: boolean;
+  locked: boolean;
+  blendMode: GlobalCompositeOperation;
+  opacity: number;
+  config: LayerConfig;
 }
 
 export type AppState = {
@@ -152,51 +152,51 @@ export type AppState = {
 export type ExportSize = 1000 | 2000 | 4096; // 720p(ish), 1080p(ish), 4K
 
 export const EXPORT_SIZES: { label: string; value: ExportSize; badge?: string }[] = [
-    { label: 'SD (1000px)', value: 1000 },
-    { label: 'HD (2000px)', value: 2000 },
-    { label: '4K (4096px)', value: 4096, badge: 'PRO' },
+  { label: 'SD (1000px)', value: 1000 },
+  { label: 'HD (2000px)', value: 2000 },
+  { label: '4K (4096px)', value: 4096, badge: 'PRO' },
 ];
 
 // Added direct URLs for opentype.js to parse
 export const DEFAULT_FONTS: FontDef[] = [
-  { 
-    name: 'Modern Sans', 
+  {
+    name: 'Modern Sans',
     value: "'Inter', sans-serif",
     url: "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff",
     type: 'google'
   },
-  { 
-    name: 'Montserrat', 
+  {
+    name: 'Montserrat',
     value: "'Montserrat', sans-serif",
     url: "https://fonts.gstatic.com/s/montserrat/v25/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCu17356.woff",
     type: 'google'
   },
-  { 
-    name: 'Elegant Serif', 
+  {
+    name: 'Elegant Serif',
     value: "'Playfair Display', serif",
     url: "https://fonts.gstatic.com/s/playfairdisplay/v37/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvXDXbtM.woff",
     type: 'google'
   },
-  { 
-    name: 'Tech Mono', 
+  {
+    name: 'Tech Mono',
     value: "'Space Mono', monospace",
     url: "https://fonts.gstatic.com/s/spacemono/v13/i7dPIFZifjKcF5tHCS8GS88.woff",
     type: 'google'
   },
-  { 
-    name: 'Righteous', 
+  {
+    name: 'Righteous',
     value: "'Righteous', cursive",
     url: "https://fonts.gstatic.com/s/righteous/v13/1cXxaUPXBpj2rGoU7C9WhnGFucE.woff",
     type: 'google'
   },
-  { 
-    name: 'Perm Marker', 
+  {
+    name: 'Perm Marker',
     value: "'Permanent Marker', cursive",
     url: "https://fonts.gstatic.com/s/permanentmarker/v16/Fh4uPib9Iyv2ucM6pGOQEimGtES02lP2s6Q.woff",
     type: 'google'
   },
-  { 
-    name: 'System', 
+  {
+    name: 'System',
     value: "sans-serif",
     url: null, // Fallback to font mode for system fonts
     type: 'system'

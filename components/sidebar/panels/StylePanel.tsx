@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Layers, ChevronDown, ChevronUp, Grid, X, Plus, Lock, Circle, Square, Triangle, Hexagon, Star, Spline, Minus, Activity, MousePointer2, Image as ImageIcon } from 'lucide-react';
+import { Layers, ChevronDown, ChevronUp, Grid, X, Plus, Lock, Circle, Square, Triangle, Hexagon, Star, Spline, Minus, Activity, MousePointer2, Image as ImageIcon, Lamp, Flame, Gift, Cloud, Sparkles, Fan, TreePine, Snowflake, Bell, Candy, PartyPopper, Wine, Clock, CircleDot, Heart, Flower2, Mail, Ribbon } from 'lucide-react';
 import { useSidebar } from '../SidebarContext';
 import CollapsibleSection from '../../common/CollapsibleSection';
 import { PatternStyle, CompositionType } from '../../../types';
@@ -91,7 +91,7 @@ const StylePanel: React.FC = () => {
     };
 
     const isCompositionDisabled = ['grid', 'radial', 'mosaic', 'hex', 'waves', 'isometric'].includes(activeLayerConfig.style);
-    const isShapesSupported = ['geometric', 'organic', 'memphis', 'bauhaus', 'confetti', 'grid', 'mosaic', 'radial'].includes(activeLayerConfig.style);
+    const isShapesSupported = ['geometric', 'organic', 'memphis', 'bauhaus', 'confetti', 'grid', 'mosaic', 'radial', 'seasonal-cny', 'seasonal-christmas', 'seasonal-newyear', 'seasonal-valentine'].includes(activeLayerConfig.style);
 
     // Helpers to define available shapes per style for UI rendering
     const getAvailableShapes = () => {
@@ -121,6 +121,41 @@ const StylePanel: React.FC = () => {
             shapes.push({ id: 'zigzag', icon: Activity });
             shapes.push({ id: 'cross', icon: Plus });
             shapes.push({ id: 'pill', icon: MousePointer2 }); // Approximation
+        }
+        // CNY Seasonal Shapes
+        if (s === 'seasonal-cny') {
+            shapes.push({ id: 'lantern', icon: Lamp });
+            shapes.push({ id: 'dragon', icon: Flame });
+            shapes.push({ id: 'angpao', icon: Gift });
+            shapes.push({ id: 'cloud-cn', icon: Cloud });
+            shapes.push({ id: 'firecracker', icon: Sparkles });
+            shapes.push({ id: 'fan', icon: Fan });
+        }
+        // Christmas Seasonal Shapes
+        if (s === 'seasonal-christmas') {
+            shapes.push({ id: 'xmas-tree', icon: TreePine });
+            shapes.push({ id: 'gift', icon: Gift });
+            shapes.push({ id: 'snowflake', icon: Snowflake });
+            shapes.push({ id: 'bell', icon: Bell });
+            shapes.push({ id: 'candycane', icon: Candy });
+            shapes.push({ id: 'santa-hat', icon: Activity }); // Santa hat icon placeholder
+        }
+        // New Year Seasonal Shapes
+        if (s === 'seasonal-newyear') {
+            shapes.push({ id: 'firework', icon: Sparkles });
+            shapes.push({ id: 'champagne', icon: Wine });
+            shapes.push({ id: 'clock-ny', icon: Clock });
+            shapes.push({ id: 'balloon', icon: CircleDot });
+            shapes.push({ id: 'party-hat', icon: Triangle });
+            shapes.push({ id: 'party-popper', icon: PartyPopper });
+            shapes.push({ id: 'starburst', icon: Star });
+        }
+        // Valentine Seasonal Shapes
+        if (s === 'seasonal-valentine') {
+            shapes.push({ id: 'heart', icon: Heart });
+            shapes.push({ id: 'rose', icon: Flower2 });
+            shapes.push({ id: 'love-letter', icon: Mail });
+            shapes.push({ id: 'ring', icon: CircleDot });
         }
         return shapes;
     };
@@ -233,6 +268,12 @@ const StylePanel: React.FC = () => {
                             <option value="confetti">Confetti</option>
                             <option value="radial">Radial Mandala</option>
                             <option value="typo">Typo Texture</option>
+                            <optgroup label="💕 Seasonal">
+                                <option value="seasonal-cny">🐉 Chinese New Year</option>
+                                <option value="seasonal-christmas">🎄 Christmas</option>
+                                <option value="seasonal-newyear">🎉 New Year</option>
+                                <option value="seasonal-valentine">💕 Valentine's Day</option>
+                            </optgroup>
                             <option value="custom-image" disabled={activeLayerConfig.customImage.assets.length === 0}>Custom Brand Asset</option>
                         </select>
                         <ChevronDown size={14} className="absolute right-3 top-3 text-slate-500 pointer-events-none" />
@@ -252,8 +293,8 @@ const StylePanel: React.FC = () => {
                                         key={shape.id}
                                         onClick={() => toggleShapeType(shape.id)}
                                         className={`p-2 rounded-md border transition-all ${isActive
-                                                ? 'bg-indigo-50 border-indigo-200 text-indigo-600'
-                                                : 'bg-white border-slate-200 text-slate-300 hover:border-slate-300'
+                                            ? 'bg-indigo-50 border-indigo-200 text-indigo-600'
+                                            : 'bg-white border-slate-200 text-slate-300 hover:border-slate-300'
                                             }`}
                                         title={`Toggle ${shape.id}`}
                                     >

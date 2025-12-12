@@ -2,6 +2,50 @@
 import { Palette } from '../types';
 
 export const PALETTES: Palette[] = [
+  // Seasonal - CNY
+  {
+    name: '🐉 CNY Classic',
+    bg: '#FFF8E7',
+    colors: ['#D32F2F', '#C62828', '#FFD700', '#FFA000', '#B71C1C']
+  },
+  {
+    name: '🧧 CNY Modern',
+    bg: '#1A1A2E',
+    colors: ['#E94560', '#FF6B6B', '#FFD93D', '#FF8C00', '#C70039']
+  },
+  // Seasonal - Christmas
+  {
+    name: '🎄 Xmas Classic',
+    bg: '#FDF8F3',
+    colors: ['#165B33', '#146B3A', '#BB2528', '#F8B229', '#EA4630']
+  },
+  {
+    name: '❄️ Nordic Xmas',
+    bg: '#0C1929',
+    colors: ['#A5D8FF', '#74C0FC', '#FFFFFF', '#FFE066', '#4DABF7']
+  },
+  // Seasonal - New Year
+  {
+    name: '🎉 Party Glam',
+    bg: '#1A1A2E',
+    colors: ['#FFD700', '#FF6B6B', '#4ECDC4', '#A855F7', '#EC4899']
+  },
+  {
+    name: '🥂 Midnight Celebration',
+    bg: '#0D0D1A',
+    colors: ['#FFD700', '#C0C0C0', '#FFFFFF', '#4F46E5', '#7C3AED']
+  },
+  // Seasonal - Valentine
+  {
+    name: '💕 Romantic Pink',
+    bg: '#FFF0F5',
+    colors: ['#E91E63', '#F8BBD9', '#FF69B4', '#C2185B', '#FCE4EC']
+  },
+  {
+    name: '❤️ Passion Red',
+    bg: '#1A0505',
+    colors: ['#E53935', '#FF5252', '#FF8A80', '#D32F2F', '#FFCDD2']
+  },
   {
     name: 'Swiss Style',
     bg: '#f4f4f0',

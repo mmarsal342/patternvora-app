@@ -50,10 +50,15 @@ const ColorPanel: React.FC = () => {
                             onClick={() => { updateState({ palette }, true); setBgHex(palette.bg); }}
                             className={`group relative h-9 rounded-lg overflow-hidden ring-2 ring-offset-1 transition-all shadow-sm ${activeLayerConfig.palette.name === palette.name ? 'ring-indigo-500 ring-offset-white scale-105 z-10' : 'ring-transparent hover:ring-slate-200'
                                 }`}
-                            title={palette.name}
                         >
                             <div className="flex h-full w-full">
                                 {palette.colors.map((c, j) => <div key={j} style={{ backgroundColor: c }} className="flex-1 h-full" />)}
+                            </div>
+                            {/* Tooltip - appears as overlay inside button */}
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span className="text-white text-[8px] font-bold px-1 text-center leading-tight">
+                                    {palette.name}
+                                </span>
                             </div>
                         </button>
                     ))}

@@ -3,6 +3,7 @@ import { AppState, ShapeData, LayerConfig, TextConfig, ShapeOverride } from '../
 import { adjustColor } from './math';
 import { generateShapeData } from './generators';
 import { applyAnimation } from './animator';
+import { drawSeasonalShape, SEASONAL_SHAPES } from './seasonalShapes';
 
 // Helper to create canvas in any environment (Browser or Worker)
 const createOffscreenCanvas = (width: number, height: number): OffscreenCanvas | HTMLCanvasElement => {
@@ -22,21 +23,21 @@ const createOffscreenCanvas = (width: number, height: number): OffscreenCanvas |
 
 export const createNoisePattern = (opacity: number): HTMLCanvasElement | OffscreenCanvas | null => {
     if (opacity <= 0) return null;
-    
+
     // Create pattern canvas
     const canvas = createOffscreenCanvas(200, 200);
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
     if (!ctx) return null;
-    
+
     const imageData = ctx.createImageData(200, 200);
     const buffer = new Uint32Array(imageData.data.buffer);
-    
+
     for (let i = 0; i < buffer.length; i++) {
         const val = Math.random() * 255;
         buffer[i] = (255 << 24) | (val << 16) | (val << 8) | val;
     }
     ctx.putImageData(imageData, 0, 0);
-    
+
     return canvas;
 };
 
@@ -52,45 +53,45 @@ export const drawShape = (
     offsetY: number = 0
 ) => {
     ctx.save();
-    
+
     // Check if wave (waves generally handle their own full-width drawing, but might need offset if vertical wrapping needed)
     if (shape.type === 'wave') {
         ctx.translate(offsetX, offsetY);
-        
+
         ctx.fillStyle = shape.color;
         let speedMultiplier = 1;
         const anim = config.animation;
 
         if (anim.enabled && (anim.primary === 'orbit' || anim.primary === 'scan')) {
-             speedMultiplier = Math.max(1, Math.round(anim.intensity));
+            speedMultiplier = Math.max(1, Math.round(anim.intensity));
         }
 
         const direction = anim.direction === 'normal' ? 1 : -1;
         const t = (anim.enabled ? progress * Math.PI * 2 : 0) * shape.speedFactor * speedMultiplier * direction;
-        
-        let amplitude = shape.size * 0.3; 
+
+        let amplitude = shape.size * 0.3;
         if (anim.enabled && anim.secondary === 'pulse') {
-             const pulseScale = 1 + Math.sin(t + shape.phaseOffset) * (0.3 * anim.intensity);
-             amplitude *= pulseScale;
+            const pulseScale = 1 + Math.sin(t + shape.phaseOffset) * (0.3 * anim.intensity);
+            amplitude *= pulseScale;
         }
 
         // --- SEAMLESS WAVE LOGIC ---
         // Calculate Integer Cycles for Seamless Loop based on Scale
-        const baseCycles = 3; 
+        const baseCycles = 3;
         const cycles = Math.max(1, Math.round(baseCycles * config.scale));
         // Frequency: ensures exactly 'cycles' sine waves fit in 'width'
         // Formula: width * freq = cycles * 2PI  => freq = (cycles * 2PI) / width
         const frequency = (cycles * Math.PI * 2) / width;
-        const baseY = shape.y; 
+        const baseY = shape.y;
 
         ctx.beginPath();
         // Extend drawing slightly beyond bounds to prevent gaps
         const startX = -50;
         const endX = width + 50;
         const step = 10;
-        
+
         // Ribbon Thickness
-        const thickness = shape.size; 
+        const thickness = shape.size;
 
         // 1. Draw Top Curve (Forward)
         ctx.moveTo(startX, baseY + Math.sin(startX * frequency + shape.phaseOffset + t) * amplitude);
@@ -107,18 +108,18 @@ export const drawShape = (
 
         ctx.closePath();
         ctx.fill();
-        
+
     } else {
         // Apply Wrapping Offset + Shape Position
         ctx.translate(shape.x + offsetX, shape.y + offsetY);
         ctx.rotate(shape.rotation * Math.PI / 180);
-        
+
         ctx.fillStyle = shape.color;
         ctx.strokeStyle = shape.color;
-        ctx.lineWidth = config.strokeWidth * (width / 1000); 
+        ctx.lineWidth = config.strokeWidth * (width / 1000);
 
         const size = shape.size;
-        
+
         if (shape.type === 'circle') {
             ctx.beginPath();
             ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
@@ -140,7 +141,7 @@ export const drawShape = (
             try {
                 const img = loadedImages[shape.assetId];
                 if (config.customImage.originalColors) {
-                    ctx.drawImage(img as any, -size/2, -size/2, size, size);
+                    ctx.drawImage(img as any, -size / 2, -size / 2, size, size);
                 } else {
                     const tempCanvas = createOffscreenCanvas(size, size);
                     const tempCtx = tempCanvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
@@ -149,18 +150,18 @@ export const drawShape = (
                         tempCtx.globalCompositeOperation = 'source-in';
                         tempCtx.fillStyle = shape.color;
                         tempCtx.fillRect(0, 0, size, size);
-                        ctx.drawImage(tempCanvas, -size/2, -size/2);
+                        ctx.drawImage(tempCanvas, -size / 2, -size / 2);
                     }
                 }
-            } catch(e) {}
+            } catch (e) { }
         } else if (shape.type === 'arc') {
             ctx.beginPath();
-            ctx.arc(0, 0, size/2, 0, Math.PI, false); 
+            ctx.arc(0, 0, size / 2, 0, Math.PI, false);
             shape.stroke ? ctx.stroke() : ctx.fill();
         } else if (shape.type === 'line') {
             ctx.beginPath();
-            ctx.moveTo(-size/2, 0);
-            ctx.lineTo(size/2, 0);
+            ctx.moveTo(-size / 2, 0);
+            ctx.lineTo(size / 2, 0);
             ctx.lineWidth = Math.max(2, config.strokeWidth * 2);
             ctx.stroke();
         } else if (shape.type === 'star') {
@@ -168,10 +169,10 @@ export const drawShape = (
             const outerRadius = size / 2;
             const innerRadius = size / 4;
             ctx.beginPath();
-            for(let i=0; i<spikes*2; i++){
+            for (let i = 0; i < spikes * 2; i++) {
                 const r = (i % 2 === 0) ? outerRadius : innerRadius;
-                const a = (i / (spikes*2)) * Math.PI * 2 - Math.PI/2;
-                ctx.lineTo(Math.cos(a)*r, Math.sin(a)*r);
+                const a = (i / (spikes * 2)) * Math.PI * 2 - Math.PI / 2;
+                ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
             }
             ctx.closePath();
             shape.stroke ? ctx.stroke() : ctx.fill();
@@ -179,20 +180,20 @@ export const drawShape = (
             const sides = shape.points || 6;
             const radius = size / 2;
             ctx.beginPath();
-            for(let i=0; i<sides; i++) {
+            for (let i = 0; i < sides; i++) {
                 const angle = (i / sides) * Math.PI * 2 - (Math.PI / 2);
                 ctx.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
             }
             ctx.closePath();
             shape.stroke ? ctx.stroke() : ctx.fill();
         } else if (shape.type === 'blob') {
-            const r = size/2;
+            const r = size / 2;
             ctx.beginPath();
             ctx.moveTo(r, 0);
-            ctx.bezierCurveTo(r, r*0.5, r*0.5, r, 0, r);
-            ctx.bezierCurveTo(-r*0.5, r, -r, r*0.5, -r, 0);
-            ctx.bezierCurveTo(-r, -r*0.5, -r*0.5, -r, 0, -r);
-            ctx.bezierCurveTo(r*0.5, -r, r, -r*0.5, r, 0);
+            ctx.bezierCurveTo(r, r * 0.5, r * 0.5, r, 0, r);
+            ctx.bezierCurveTo(-r * 0.5, r, -r, r * 0.5, -r, 0);
+            ctx.bezierCurveTo(-r, -r * 0.5, -r * 0.5, -r, 0, -r);
+            ctx.bezierCurveTo(r * 0.5, -r, r, -r * 0.5, r, 0);
             ctx.fill();
         } else if (shape.type === 'char') {
             ctx.font = `bold ${size}px sans-serif`;
@@ -200,76 +201,79 @@ export const drawShape = (
             ctx.textBaseline = 'middle';
             ctx.fillText(shape.char || 'A', 0, 0);
         } else if (shape.type === 'cube') {
-             const r = size / 2;
-             const angle30 = Math.PI / 6;
-             const dx = Math.cos(angle30) * r;
-             const dy = Math.sin(angle30) * r;
-             ctx.beginPath();
-             ctx.moveTo(0, -r);
-             ctx.lineTo(dx, -dy);
-             ctx.lineTo(0, 0);
-             ctx.lineTo(-dx, -dy);
-             ctx.closePath();
-             ctx.fillStyle = adjustColor(shape.color, 40); 
-             ctx.fill();
+            const r = size / 2;
+            const angle30 = Math.PI / 6;
+            const dx = Math.cos(angle30) * r;
+            const dy = Math.sin(angle30) * r;
+            ctx.beginPath();
+            ctx.moveTo(0, -r);
+            ctx.lineTo(dx, -dy);
+            ctx.lineTo(0, 0);
+            ctx.lineTo(-dx, -dy);
+            ctx.closePath();
+            ctx.fillStyle = adjustColor(shape.color, 40);
+            ctx.fill();
 
-             ctx.beginPath();
-             ctx.moveTo(0, 0);
-             ctx.lineTo(dx, -dy);
-             ctx.lineTo(dx, r - dy);
-             ctx.lineTo(0, r);
-             ctx.closePath();
-             ctx.fillStyle = shape.color; 
-             ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(dx, -dy);
+            ctx.lineTo(dx, r - dy);
+            ctx.lineTo(0, r);
+            ctx.closePath();
+            ctx.fillStyle = shape.color;
+            ctx.fill();
 
-             ctx.beginPath();
-             ctx.moveTo(0, 0);
-             ctx.lineTo(-dx, -dy);
-             ctx.lineTo(-dx, r - dy);
-             ctx.lineTo(0, r);
-             ctx.closePath();
-             ctx.fillStyle = adjustColor(shape.color, -40); 
-             ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-dx, -dy);
+            ctx.lineTo(-dx, r - dy);
+            ctx.lineTo(0, r);
+            ctx.closePath();
+            ctx.fillStyle = adjustColor(shape.color, -40);
+            ctx.fill();
         } else if (shape.type === 'zigzag') {
-             ctx.beginPath();
-             const w = size;
-             const h = size/3;
-             ctx.moveTo(-w/2, 0);
-             const zigs = 4;
-             const step = w / zigs;
-             for(let i=0; i<zigs; i++) {
-                 const x = -w/2 + step * i;
-                 ctx.lineTo(x + step/2, (i%2===0) ? -h : h);
-                 ctx.lineTo(x + step, 0);
-             }
-             ctx.lineCap = 'round';
-             ctx.lineJoin = 'round';
-             ctx.lineWidth = Math.max(2, size/10);
-             ctx.stroke();
+            ctx.beginPath();
+            const w = size;
+            const h = size / 3;
+            ctx.moveTo(-w / 2, 0);
+            const zigs = 4;
+            const step = w / zigs;
+            for (let i = 0; i < zigs; i++) {
+                const x = -w / 2 + step * i;
+                ctx.lineTo(x + step / 2, (i % 2 === 0) ? -h : h);
+                ctx.lineTo(x + step, 0);
+            }
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = Math.max(2, size / 10);
+            ctx.stroke();
         } else if (shape.type === 'cross') {
-             const thick = size / 3;
-             ctx.fillStyle = shape.color;
-             ctx.beginPath();
-             ctx.rect(-thick/2, -size/2, thick, size);
-             ctx.rect(-size/2, -thick/2, size, thick);
-             ctx.fill();
+            const thick = size / 3;
+            ctx.fillStyle = shape.color;
+            ctx.beginPath();
+            ctx.rect(-thick / 2, -size / 2, thick, size);
+            ctx.rect(-size / 2, -thick / 2, size, thick);
+            ctx.fill();
         } else if (shape.type === 'donut') {
-             ctx.beginPath();
-             ctx.arc(0, 0, size/2, 0, Math.PI * 2);
-             ctx.lineWidth = size/4;
-             ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
+            ctx.lineWidth = size / 4;
+            ctx.stroke();
         } else if (shape.type === 'pill') {
-             const w = size;
-             const h = size/2;
-             const r = h/2;
-             ctx.beginPath();
-             ctx.moveTo(-w/2 + r, -h/2);
-             ctx.lineTo(w/2 - r, -h/2);
-             ctx.arc(w/2 - r, 0, r, -Math.PI/2, Math.PI/2);
-             ctx.lineTo(-w/2 + r, h/2);
-             ctx.arc(-w/2 + r, 0, r, Math.PI/2, -Math.PI/2);
-             ctx.closePath();
-             shape.stroke ? ctx.stroke() : ctx.fill();
+            const w = size;
+            const h = size / 2;
+            const r = h / 2;
+            ctx.beginPath();
+            ctx.moveTo(-w / 2 + r, -h / 2);
+            ctx.lineTo(w / 2 - r, -h / 2);
+            ctx.arc(w / 2 - r, 0, r, -Math.PI / 2, Math.PI / 2);
+            ctx.lineTo(-w / 2 + r, h / 2);
+            ctx.arc(-w / 2 + r, 0, r, Math.PI / 2, -Math.PI / 2);
+            ctx.closePath();
+            shape.stroke ? ctx.stroke() : ctx.fill();
+        } else if (SEASONAL_SHAPES.includes(shape.type as any)) {
+            // Draw seasonal shapes (CNY, Valentine, etc.)
+            drawSeasonalShape(ctx, shape.type as any, size, shape.color, shape.stroke);
         }
     }
     ctx.restore();
@@ -285,7 +289,7 @@ export const drawText = (
         ctx.save();
         const tx = (textConfig.x / 100) * width;
         const ty = (textConfig.y / 100) * height;
-        
+
         const fontSizePx = textConfig.fontSize * (width / 1000);
         ctx.font = `bold ${fontSizePx}px ${textConfig.fontFamily}`;
         ctx.textAlign = 'center';
@@ -293,19 +297,19 @@ export const drawText = (
         ctx.translate(tx, ty);
 
         if (textConfig.masking) {
-           ctx.fillStyle = '#000000'; 
-           ctx.globalAlpha = 1; 
+            ctx.fillStyle = '#000000';
+            ctx.globalAlpha = 1;
         } else {
-           ctx.globalCompositeOperation = textConfig.blendMode;
-           ctx.globalAlpha = textConfig.opacity;
-           ctx.fillStyle = textConfig.color;
+            ctx.globalCompositeOperation = textConfig.blendMode;
+            ctx.globalAlpha = textConfig.opacity;
+            ctx.fillStyle = textConfig.color;
         }
 
         const lines = textConfig.content.split('\n');
         const lineHeight = fontSizePx * 1.2;
         const totalH = lines.length * lineHeight;
         lines.forEach((line, i) => {
-            ctx.fillText(line, 0, (i * lineHeight) - (totalH/2) + (lineHeight/2));
+            ctx.fillText(line, 0, (i * lineHeight) - (totalH / 2) + (lineHeight / 2));
         });
         ctx.restore();
     }
@@ -323,7 +327,7 @@ const renderLayer = (
     transientOverrides?: Record<number, Partial<ShapeOverride>>
 ) => {
     const shapes = generateShapeData(width, height, config);
-  
+
     // SEAMLESS WRAPPING LOGIC
     // We iterate through shapes and check if they overlap the canvas edges.
     // If they do, we draw them again on the opposite side.
@@ -339,7 +343,7 @@ const renderLayer = (
         const renderX = override.x !== undefined ? (override.x / 100) * width : shape.x;
         const renderY = override.y !== undefined ? (override.y / 100) * height : shape.y;
         const renderSize = override.size !== undefined ? shape.size * override.size : shape.size;
-        
+
         // Mutate the shape object just for this render call context (it's safe as shapes are regenerated per frame)
         shape.x = renderX;
         shape.y = renderY;
@@ -357,10 +361,10 @@ const renderLayer = (
         // 2. Seamless Wrapping Checks
         // Only needed for scatter/random styles where shapes might cross edges arbitrarily.
         // Grid/Hex/Mosaic usually handle their own tiling, but wrapping them ensures perfect seams if they are offset.
-        
+
         // Use a safe bounding radius. For waves, size is essentially the thickness.
-        const radius = shape.type === 'wave' ? shape.size : Math.max(shape.size / 1.5, 1); 
-        
+        const radius = shape.type === 'wave' ? shape.size : Math.max(shape.size / 1.5, 1);
+
         const wrapsRight = shape.x + radius > width;
         const wrapsLeft = shape.x - radius < 0;
         const wrapsBottom = shape.y + radius > height;
@@ -400,7 +404,7 @@ const renderLayer = (
             if (noisePattern) {
                 ctx.save();
                 ctx.globalAlpha = config.texture / 200;
-                ctx.globalCompositeOperation = 'source-atop'; 
+                ctx.globalCompositeOperation = 'source-atop';
                 ctx.fillStyle = noisePattern;
                 ctx.fillRect(0, 0, width, height);
                 ctx.restore();
@@ -413,7 +417,7 @@ const renderLayer = (
             ctx.fillStyle = config.palette.bg;
             ctx.fillRect(0, 0, width, height);
         }
-        
+
         shapes.forEach(shape => renderShapeWithWrapping(shape));
 
         if (config.texture > 0 && noisePatternSource) {
@@ -435,52 +439,52 @@ const renderLayer = (
 }
 
 export const renderToCanvas = (
-  ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
-  width: number,
-  height: number,
-  state: AppState,
-  loadedImages: Record<string, HTMLImageElement | ImageBitmap>,
-  timestamp: number,
-  noisePatternSource: HTMLCanvasElement | OffscreenCanvas | null,
-  transparentBackground: boolean = false,
-  tempCanvas: HTMLCanvasElement | OffscreenCanvas | null = null,
-  transientOverrides?: Record<number, Partial<ShapeOverride>> // Added: Logic for optimized dragging
+    ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
+    width: number,
+    height: number,
+    state: AppState,
+    loadedImages: Record<string, HTMLImageElement | ImageBitmap>,
+    timestamp: number,
+    noisePatternSource: HTMLCanvasElement | OffscreenCanvas | null,
+    transparentBackground: boolean = false,
+    tempCanvas: HTMLCanvasElement | OffscreenCanvas | null = null,
+    transientOverrides?: Record<number, Partial<ShapeOverride>> // Added: Logic for optimized dragging
 ) => {
-  if (width <= 0 || height <= 0) return;
+    if (width <= 0 || height <= 0) return;
 
-  ctx.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0, width, height);
 
-  let layerCanvas = tempCanvas;
-  if (!layerCanvas) {
-      layerCanvas = createOffscreenCanvas(width, height);
-  } else if (layerCanvas.width !== width || layerCanvas.height !== height) {
-      layerCanvas.width = width;
-      layerCanvas.height = height;
-  }
+    let layerCanvas = tempCanvas;
+    if (!layerCanvas) {
+        layerCanvas = createOffscreenCanvas(width, height);
+    } else if (layerCanvas.width !== width || layerCanvas.height !== height) {
+        layerCanvas.width = width;
+        layerCanvas.height = height;
+    }
 
-  const layerCtx = layerCanvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+    const layerCtx = layerCanvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
 
-  state.layers.forEach((layer) => {
-      if (!layer.visible) return;
+    state.layers.forEach((layer) => {
+        if (!layer.visible) return;
 
-      const durationMs = layer.config.animation.duration * 1000;
-      const layerProgress = durationMs > 0 ? (timestamp % durationMs) / durationMs : 0;
+        const durationMs = layer.config.animation.duration * 1000;
+        const layerProgress = durationMs > 0 ? (timestamp % durationMs) / durationMs : 0;
 
-      layerCtx.globalAlpha = 1;
-      layerCtx.globalCompositeOperation = 'source-over';
-      layerCtx.clearRect(0, 0, width, height);
-      if (layerCtx.setTransform) layerCtx.setTransform(1, 0, 0, 1, 0, 0);
-      if (layerCtx.filter) layerCtx.filter = 'none';
+        layerCtx.globalAlpha = 1;
+        layerCtx.globalCompositeOperation = 'source-over';
+        layerCtx.clearRect(0, 0, width, height);
+        if (layerCtx.setTransform) layerCtx.setTransform(1, 0, 0, 1, 0, 0);
+        if (layerCtx.filter) layerCtx.filter = 'none';
 
-      // Pass transient overrides ONLY if this is the active layer (optimized for editing)
-      const overridesForLayer = (layer.id === state.activeLayerId) ? transientOverrides : undefined;
+        // Pass transient overrides ONLY if this is the active layer (optimized for editing)
+        const overridesForLayer = (layer.id === state.activeLayerId) ? transientOverrides : undefined;
 
-      renderLayer(layerCtx, width, height, layer.config, loadedImages, layerProgress, noisePatternSource, overridesForLayer);
+        renderLayer(layerCtx, width, height, layer.config, loadedImages, layerProgress, noisePatternSource, overridesForLayer);
 
-      ctx.save();
-      ctx.globalAlpha = layer.opacity;
-      ctx.globalCompositeOperation = layer.blendMode;
-      ctx.drawImage(layerCanvas as any, 0, 0);
-      ctx.restore();
-  });
+        ctx.save();
+        ctx.globalAlpha = layer.opacity;
+        ctx.globalCompositeOperation = layer.blendMode;
+        ctx.drawImage(layerCanvas as any, 0, 0);
+        ctx.restore();
+    });
 };
