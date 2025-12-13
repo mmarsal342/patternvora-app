@@ -1,42 +1,45 @@
 
 import React, { useState } from 'react';
-import { Check, X, ArrowLeft, Loader2 } from 'lucide-react';
+import { Check, X, ArrowLeft, AlertCircle } from 'lucide-react';
 import { useUser } from './UserContext';
-import { api } from '../services/api';
 
 interface PricingPageProps {
   onBack: () => void;
   onStartFree: () => void;
 }
 
+// Lynk.id checkout URLs
+const LYNK_MONTHLY_URL = 'https://lynk.id/mma267/3kevpmq25r77/checkout';
+const LYNK_LIFETIME_URL = 'https://lynk.id/mma267/vqdp1njd69qn/checkout';
+
 const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
   const { user, login } = useUser();
-  const [currency, setCurrency] = useState<'USD' | 'IDR'>('USD');
-  const [isProcessing, setIsProcessing] = useState<string | null>(null); // Stores Plan Name being processed
+  const [showEmailModal, setShowEmailModal] = useState<string | null>(null); // Stores which plan's modal to show
 
-  const handleSubscribe = async (planId: string, planName: string) => {
+  const handleSubscribe = (planId: string) => {
     // 1. Require Login first
     if (!user) {
-      const confirmLogin = window.confirm("You need to log in with Google first to subscribe. Proceed to login?");
+      const confirmLogin = window.confirm(
+        "You need to log in with Google first to subscribe.\n\nIMPORTANT: Use the same email address when completing checkout!\n\nProceed to login?"
+      );
       if (confirmLogin) {
         login(); // This redirects to Google OAuth
       }
       return;
     }
 
-    setIsProcessing(planName);
+    // 2. Show email reminder modal
+    setShowEmailModal(planId);
+  };
 
-    try {
-      // Call Mayar/Payment API to get checkout URL
-      const checkoutUrl = await api.createCheckoutSession(planId, currency);
+  const proceedToCheckout = (planId: string) => {
+    setShowEmailModal(null);
 
-      // Redirect to payment page
-      window.location.href = checkoutUrl;
-
-    } catch (e) {
-      console.error("Payment error:", e);
-      alert("Failed to initiate checkout. Please try again.");
-      setIsProcessing(null);
+    // Redirect to Lynk.id checkout
+    if (planId === 'lifetime') {
+      window.location.href = LYNK_LIFETIME_URL;
+    } else {
+      window.location.href = LYNK_MONTHLY_URL;
     }
   };
 
@@ -45,7 +48,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
       id: 'free',
       name: "Free",
       badge: "The Hobbyist",
-      price: currency === 'USD' ? '$0' : 'Rp 0',
+      price: 'Rp 0',
       period: 'forever',
       description: "Perfect for testing the waters and personal exploration.",
       features: [
@@ -69,7 +72,8 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
       id: 'pro_monthly',
       name: "Pro Monthly",
       badge: "The Creator",
-      price: currency === 'USD' ? '$4.90' : 'Rp 49.000',
+      price: 'Rp 89.000',
+      originalPrice: 'Rp 149.000',
       period: 'per month',
       description: "For consistent content production and high-quality assets.",
       features: [
@@ -82,9 +86,9 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
         "Priority Rendering Queue"
       ],
       limitations: [],
-      cta: "Subscribe Monthly",
+      cta: "✨ Launch 40% OFF - Subscribe",
       ctaStyle: "bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200",
-      action: () => handleSubscribe('pro_monthly', "Pro Monthly"),
+      action: () => handleSubscribe('pro_monthly'),
       highlight: true,
       popular: true
     },
@@ -92,7 +96,8 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
       id: 'lifetime',
       name: "Lifetime Deal",
       badge: "The Agency",
-      price: currency === 'USD' ? '$49' : 'Rp 499.000',
+      price: 'Rp 749.000',
+      originalPrice: 'Rp 1.499.000',
       period: 'one-time payment',
       description: "Pay once, own it forever. The smartest investment for agencies.",
       features: [
@@ -104,15 +109,58 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
         "Early access to new features"
       ],
       limitations: [],
-      cta: "Get Lifetime Access",
+      cta: "🔥 Early Bird 50% OFF",
       ctaStyle: "bg-rose-500 text-white hover:bg-rose-600 shadow-lg shadow-rose-200",
-      action: () => handleSubscribe('lifetime', "Lifetime Deal"),
+      action: () => handleSubscribe('lifetime'),
       highlight: false
     }
   ];
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-indigo-100">
+      {/* Email Reminder Modal */}
+      {showEmailModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+                <AlertCircle className="w-6 h-6 text-amber-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg text-slate-900">Before you proceed...</h3>
+                <p className="text-sm text-slate-500">Important checkout reminder</p>
+              </div>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+              <p className="text-sm text-amber-800 mb-3">
+                <strong>Your PatternVora account email:</strong>
+              </p>
+              <code className="block bg-white px-3 py-2 rounded-lg text-indigo-600 font-mono text-sm border border-amber-200">
+                {user?.email}
+              </code>
+              <p className="text-xs text-amber-700 mt-3">
+                ⚠️ Please use <strong>this exact email</strong> when completing payment on Lynk.id to ensure your account is upgraded.
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowEmailModal(null)}
+                className="flex-1 px-4 py-3 border border-slate-300 text-slate-600 rounded-xl font-medium hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => proceedToCheckout(showEmailModal)}
+                className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors"
+              >
+                I Understand →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <nav className="border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={onBack}>
@@ -145,26 +193,10 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
             No hidden fees. Cancel anytime. Choose the plan that fits your workflow.
           </p>
 
-          {/* Currency Toggle */}
-          <div className="inline-flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
-            <button
-              onClick={() => setCurrency('USD')}
-              className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${currency === 'USD'
-                ? 'bg-slate-900 text-white shadow-md'
-                : 'text-slate-500 hover:bg-slate-50'
-                }`}
-            >
-              USD ($)
-            </button>
-            <button
-              onClick={() => setCurrency('IDR')}
-              className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${currency === 'IDR'
-                ? 'bg-indigo-600 text-white shadow-md'
-                : 'text-slate-500 hover:bg-slate-50'
-                }`}
-            >
-              IDR (Rp)
-            </button>
+          {/* Early Bird Banner */}
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-100 to-rose-100 px-4 py-2 rounded-full text-sm font-medium text-amber-800 border border-amber-200">
+            <span>🎉</span>
+            <span>Launch Special: Up to 50% OFF for Early Birds!</span>
           </div>
         </div>
 
@@ -224,14 +256,9 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
 
               <button
                 onClick={plan.action}
-                disabled={!!isProcessing}
-                className={`w-full py-4 rounded-xl font-bold text-sm transition-all active:scale-95 flex items-center justify-center gap-2 ${plan.ctaStyle} ${isProcessing ? 'opacity-70 cursor-wait' : ''}`}
+                className={`w-full py-4 rounded-xl font-bold text-sm transition-all active:scale-95 flex items-center justify-center gap-2 ${plan.ctaStyle}`}
               >
-                {isProcessing === plan.name ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" /> Processing...
-                  </>
-                ) : plan.cta}
+                {plan.cta}
               </button>
             </div>
           ))}
@@ -248,7 +275,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
 
       <footer className="bg-slate-50 border-t border-slate-200 py-12 text-center text-sm text-slate-500">
         <p>&copy; {new Date().getFullYear()} VoraLab. All rights reserved.</p>
-        <p className="mt-2">Secure payments processed by Antigravity (Stripe/Mayar).</p>
+        <p className="mt-2">Secure payments processed by Lynk.id.</p>
       </footer>
     </div>
   );
