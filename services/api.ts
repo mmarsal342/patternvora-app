@@ -231,6 +231,26 @@ export const api = {
             });
             if (!response.ok) throw new Error('Failed to fetch analytics');
             return response.json();
+        },
+
+        // Grant trial PRO access
+        grantTrial: async (userId: string, duration: '12h' | '24h' | '3d' | '7d'): Promise<{ pro_expires_at: string }> => {
+            const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/grant-trial`, {
+                method: 'POST',
+                headers: getHeaders(),
+                body: JSON.stringify({ duration })
+            });
+            if (!response.ok) throw new Error('Failed to grant trial');
+            return response.json();
+        },
+
+        // Revoke PRO access
+        revokePro: async (userId: string): Promise<void> => {
+            const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/revoke-pro`, {
+                method: 'POST',
+                headers: getHeaders()
+            });
+            if (!response.ok) throw new Error('Failed to revoke PRO');
         }
     }
 };
@@ -242,6 +262,7 @@ export interface AdminUser {
     name: string | null;
     avatar_url: string | null;
     tier: string;
+    pro_expires_at: string | null;
     export_count: number;
     created_at: string;
 }

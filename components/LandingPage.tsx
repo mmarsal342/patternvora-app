@@ -372,11 +372,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin }
               </div>
             )}
 
-            {/* GAMIFICATION CARD */}
+            {/* GAMIFICATION CARD - Hidden temporarily */}
+            {/* 
             <div className="flex justify-center mb-8">
               <div className={`relative group bg-white border ${currentRank.border} rounded-2xl p-1.5 shadow-xl ${currentRank.shadow} animate-in zoom-in duration-500`}>
                 <div className="flex items-center gap-3 pr-4 pl-1.5 py-1">
-                  {/* Rank Icon */}
                   <div className={`w-12 h-12 rounded-xl ${currentRank.bgColor} ${currentRank.color} flex items-center justify-center shadow-inner`}>
                     <RankIcon size={24} strokeWidth={2.5} />
                   </div>
@@ -396,7 +396,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin }
                       <span className="text-[10px] text-slate-400 font-bold uppercase">Assets Created</span>
                     </div>
 
-                    {/* Progress Bar */}
                     <div className="mt-1.5 w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all duration-1000 ${currentRank.bgColor.replace('bg-', 'bg-') === 'bg-white' ? 'bg-slate-900' : currentRank.color.replace('text-', 'bg-')}`}
@@ -410,6 +409,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin }
                 </div>
               </div>
             </div>
+            */}
 
 
             <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 mb-6">

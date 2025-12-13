@@ -484,7 +484,8 @@ const App: React.FC = () => {
                         <ArrowLeft size={16} /> <span className="hidden sm:inline">Back to Home</span>
                     </button>
 
-                    {/* RANK WIDGET IN HEADER */}
+                    {/* RANK WIDGET IN HEADER - Hidden temporarily */}
+                    {/*
                     <div className={`hidden sm:flex flex-col items-center justify-center relative group`}>
                         <div
                             className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${currentRank.bgColor} ${currentRank.color} ${currentRank.border}`}
@@ -496,13 +497,13 @@ const App: React.FC = () => {
                             <span>{exportCount}</span>
                         </div>
 
-                        {/* Mini Progress Bar inside Header */}
                         {nextRank && (
                             <div className="absolute -bottom-1.5 left-2 right-2 h-0.5 bg-slate-100 rounded-full overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity">
                                 <div className={`h-full ${currentRank.color.replace('text-', 'bg-')}`} style={{ width: `${progressPercent}%` }}></div>
                             </div>
                         )}
                     </div>
+                    */}
                 </div>
             </header>
 

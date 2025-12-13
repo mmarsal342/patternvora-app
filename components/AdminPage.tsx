@@ -157,16 +157,66 @@ const UserManagement: React.FC = () => {
         }
     };
 
+    const handleGrantTrial = async (userId: string, duration: '12h' | '24h' | '3d' | '7d') => {
+        setUpgradingUserId(userId);
+        try {
+            await api.admin.grantTrial(userId, duration);
+            await fetchUsers();
+        } catch (err) {
+            alert('Failed to grant trial');
+            console.error(err);
+        } finally {
+            setUpgradingUserId(null);
+        }
+    };
+
+    const handleRevokePro = async (userId: string) => {
+        if (!confirm('Are you sure you want to revoke PRO access?')) return;
+        setUpgradingUserId(userId);
+        try {
+            await api.admin.revokePro(userId);
+            await fetchUsers();
+        } catch (err) {
+            alert('Failed to revoke PRO');
+            console.error(err);
+        } finally {
+            setUpgradingUserId(null);
+        }
+    };
+
     const filteredUsers = users.filter(u =>
         u.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
         u.name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const getTierBadge = (tier: string) => {
+    const getTierBadge = (user: AdminUser) => {
+        const tier = user.tier;
+        const expiresAt = user.pro_expires_at;
+
+        // Check if PRO trial
+        if (tier === 'pro' && expiresAt) {
+            const expiry = new Date(expiresAt);
+            const now = new Date();
+            const hoursLeft = Math.max(0, Math.round((expiry.getTime() - now.getTime()) / (1000 * 60 * 60)));
+            const isExpired = expiry < now;
+
+            if (isExpired) {
+                return <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-xs font-medium rounded-full">EXPIRED</span>;
+            }
+
+            return (
+                <span className="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 text-xs font-medium rounded-full">
+                    PRO Trial ({hoursLeft}h left)
+                </span>
+            );
+        }
+
         switch (tier) {
             case 'ltd':
-            case 'pro':
+            case 'lifetime':
                 return <span className="px-2 py-0.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-yellow-900 text-xs font-bold rounded-full">LIFETIME</span>;
+            case 'pro':
+                return <span className="px-2 py-0.5 bg-gradient-to-r from-indigo-400 to-purple-500 text-white text-xs font-bold rounded-full">PRO</span>;
             case 'free':
                 return <span className="px-2 py-0.5 bg-slate-600 text-slate-200 text-xs font-medium rounded-full">FREE</span>;
             default:
@@ -272,7 +322,7 @@ const UserManagement: React.FC = () => {
                                     </div>
                                 </td>
                                 <td className="px-4 py-3">
-                                    {getTierBadge(user.tier)}
+                                    {getTierBadge(user)}
                                 </td>
                                 <td className="px-4 py-3 text-slate-300">
                                     {user.export_count || 0}
@@ -281,31 +331,72 @@ const UserManagement: React.FC = () => {
                                     {user.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}
                                 </td>
                                 <td className="px-4 py-3 text-right">
-                                    {user.tier !== 'ltd' && user.tier !== 'pro' && user.tier !== 'lifetime' ? (
-                                        <button
-                                            onClick={() => handleUpgrade(user.id, 'lifetime')}
-                                            disabled={upgradingUserId === user.id}
-                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-yellow-900 text-xs font-bold rounded-lg transition-all disabled:opacity-50"
-                                        >
-                                            {upgradingUserId === user.id ? (
-                                                <Loader2 size={12} className="animate-spin" />
-                                            ) : (
-                                                <Crown size={12} />
-                                            )}
-                                            Upgrade to Lifetime
-                                        </button>
-                                    ) : (
-                                        <button
-                                            onClick={() => handleUpgrade(user.id, 'free')}
-                                            disabled={upgradingUserId === user.id}
-                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-600 hover:bg-slate-500 text-slate-200 text-xs font-medium rounded-lg transition-all disabled:opacity-50"
-                                        >
-                                            {upgradingUserId === user.id ? (
-                                                <Loader2 size={12} className="animate-spin" />
-                                            ) : null}
-                                            Downgrade
-                                        </button>
-                                    )}
+                                    <div className="flex items-center justify-end gap-2">
+                                        {/* Grant Trial Dropdown - for free users */}
+                                        {user.tier === 'free' && (
+                                            <select
+                                                onChange={(e) => {
+                                                    if (e.target.value) {
+                                                        handleGrantTrial(user.id, e.target.value as '12h' | '24h' | '3d' | '7d');
+                                                        e.target.value = '';
+                                                    }
+                                                }}
+                                                disabled={upgradingUserId === user.id}
+                                                className="px-2 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-lg cursor-pointer disabled:opacity-50"
+                                                defaultValue=""
+                                            >
+                                                <option value="" disabled>Grant Trial</option>
+                                                <option value="12h">12 Hours</option>
+                                                <option value="24h">24 Hours</option>
+                                                <option value="3d">3 Days</option>
+                                                <option value="7d">7 Days</option>
+                                            </select>
+                                        )}
+
+                                        {/* Upgrade to Lifetime - for free users */}
+                                        {user.tier === 'free' && (
+                                            <button
+                                                onClick={() => handleUpgrade(user.id, 'lifetime')}
+                                                disabled={upgradingUserId === user.id}
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-yellow-900 text-xs font-bold rounded-lg transition-all disabled:opacity-50"
+                                            >
+                                                {upgradingUserId === user.id ? (
+                                                    <Loader2 size={12} className="animate-spin" />
+                                                ) : (
+                                                    <Crown size={12} />
+                                                )}
+                                                Lifetime
+                                            </button>
+                                        )}
+
+                                        {/* Revoke PRO - for pro/trial users */}
+                                        {user.tier === 'pro' && (
+                                            <button
+                                                onClick={() => handleRevokePro(user.id)}
+                                                disabled={upgradingUserId === user.id}
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-400 text-xs font-medium rounded-lg transition-all disabled:opacity-50"
+                                            >
+                                                {upgradingUserId === user.id ? (
+                                                    <Loader2 size={12} className="animate-spin" />
+                                                ) : null}
+                                                Revoke
+                                            </button>
+                                        )}
+
+                                        {/* Downgrade - for lifetime/ltd users */}
+                                        {(user.tier === 'ltd' || user.tier === 'lifetime') && (
+                                            <button
+                                                onClick={() => handleUpgrade(user.id, 'free')}
+                                                disabled={upgradingUserId === user.id}
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-600 hover:bg-slate-500 text-slate-200 text-xs font-medium rounded-lg transition-all disabled:opacity-50"
+                                            >
+                                                {upgradingUserId === user.id ? (
+                                                    <Loader2 size={12} className="animate-spin" />
+                                                ) : null}
+                                                Downgrade
+                                            </button>
+                                        )}
+                                    </div>
                                 </td>
                             </tr>
                         ))}
