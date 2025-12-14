@@ -1,11 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-    RefreshCw, Download, Video, MousePointer2, Dices, Sparkles, X, Wand2, Settings2, ChevronDown, ChevronUp, RotateCcw
+    RefreshCw, Download, Video, MousePointer2, Dices, Sparkles, X, Wand2, Settings2, ChevronDown, ChevronUp, RotateCcw, Bookmark, Loader2
 } from 'lucide-react';
 import { AppState, TextConfig, CustomImageConfig, AnimationConfig, Preset, FontDef, PatternStyle, CompositionType, LayerConfig, EXPORT_SIZES, ExportSize } from '../types';
 import { PALETTES } from '../utils/palettes';
 import { SidebarProvider, useSidebar, SidebarContextType } from './sidebar/SidebarContext';
+import { useUser } from './UserContext';
+import { presetsApi } from '../services/api';
 
 // Import Panels
 import LayersPanel from './sidebar/panels/LayersPanel';
@@ -57,8 +59,39 @@ const SidebarLayout: React.FC<Omit<SidebarProps, keyof SidebarContextType>> = (p
     } = props;
 
     const { state, activeLayerConfig, updateState, onGenerate } = useSidebar();
+    const { isPro, isGuest } = useUser();
     const [exportSize, setExportSize] = useState<ExportSize>(4096);
     const [isFooterOpen, setIsFooterOpen] = useState(true);
+
+    // Quick Save Preset state
+    const [showSaveForm, setShowSaveForm] = useState(false);
+    const [presetName, setPresetName] = useState('');
+    const [isSaving, setIsSaving] = useState(false);
+    const [presetCount, setPresetCount] = useState(0);
+    const presetLimit = isPro ? 50 : 10;
+
+    // Fetch preset count on mount
+    useEffect(() => {
+        if (!isGuest) {
+            presetsApi.list().then(data => setPresetCount(data.presets.length)).catch(() => { });
+        }
+    }, [isGuest]);
+
+    const handleQuickSavePreset = async () => {
+        if (!presetName.trim() || isSaving) return;
+        setIsSaving(true);
+        try {
+            const configJson = JSON.stringify(activeLayerConfig);
+            await presetsApi.save(presetName.trim(), configJson);
+            setPresetCount(prev => prev + 1);
+            setPresetName('');
+            setShowSaveForm(false);
+        } catch (err: any) {
+            alert(err.message || 'Failed to save preset');
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     // Helper to generate a random configuration update
     const getRandomConfigUpdate = (currentConfig: LayerConfig): Partial<LayerConfig> => {
@@ -247,13 +280,55 @@ const SidebarLayout: React.FC<Omit<SidebarProps, keyof SidebarContextType>> = (p
                         <button
                             onClick={onToggleEditMode}
                             className={`w-full py-2 border rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-all ${isEditMode
-                                ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm'
-                                : 'bg-white border-slate-200 text-slate-500 hover:text-slate-800'
+                                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm'
+                                    : 'bg-white border-slate-200 text-slate-500 hover:text-slate-800'
                                 }`}
                         >
                             <MousePointer2 size={14} className={isEditMode ? "fill-indigo-700" : ""} />
                             {isEditMode ? 'Exit Edit Mode' : 'Edit Shapes'}
                         </button>
+
+                        {/* Quick Save Preset */}
+                        {!isGuest && (
+                            !showSaveForm ? (
+                                <button
+                                    onClick={() => setShowSaveForm(true)}
+                                    disabled={presetCount >= presetLimit}
+                                    className="w-full py-2 bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    title={`Save current config as preset (${presetCount}/${presetLimit} used)`}
+                                >
+                                    <Bookmark size={14} />
+                                    Save to Presets
+                                    <span className="text-[10px] bg-amber-200/60 px-1.5 py-0.5 rounded-full">{presetCount}/{presetLimit}</span>
+                                </button>
+                            ) : (
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={presetName}
+                                        onChange={(e) => setPresetName(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleQuickSavePreset()}
+                                        placeholder="Preset name..."
+                                        maxLength={50}
+                                        className="flex-1 px-2 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500"
+                                        autoFocus
+                                    />
+                                    <button
+                                        onClick={handleQuickSavePreset}
+                                        disabled={isSaving || !presetName.trim()}
+                                        className="px-3 py-2 bg-amber-500 text-white text-xs font-semibold rounded-lg hover:bg-amber-600 disabled:opacity-50 flex items-center gap-1"
+                                    >
+                                        {isSaving ? <Loader2 size={14} className="animate-spin" /> : 'Save'}
+                                    </button>
+                                    <button
+                                        onClick={() => { setShowSaveForm(false); setPresetName(''); }}
+                                        className="px-2 py-2 text-slate-400 hover:text-slate-600"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            )
+                        )}
 
                         <button
                             onClick={onOpenBatchModal}
