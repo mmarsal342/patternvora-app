@@ -46,7 +46,7 @@ export type CustomImageConfig = {
 export type PrimaryAnimationType = 'none' | 'orbit' | 'float' | 'scan';
 export type SecondaryAnimationType = 'none' | 'pulse' | 'spin';
 
-export type VideoResolution = 'HD' | 'SD';
+export type VideoResolution = 'SD' | 'HD' | '4K';
 
 export type AnimationDirection = 'normal' | 'reverse';
 
