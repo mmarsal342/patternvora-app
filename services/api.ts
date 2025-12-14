@@ -292,3 +292,55 @@ export interface AdminAnalytics {
         availableCodes: number;
     };
 }
+
+// Preset Types
+export interface Preset {
+    id: string;
+    name: string;
+    config: string;
+    thumbnail?: string | null;
+    created_at: string;
+    updated_at?: string;
+}
+
+export interface PresetsResponse {
+    presets: Preset[];
+    count: number;
+    limit: number;
+}
+
+// Presets API
+export const presetsApi = {
+    // List user's presets
+    list: async (): Promise<PresetsResponse> => {
+        const response = await fetch(`${API_BASE_URL}/presets`, {
+            headers: getHeaders()
+        });
+        if (!response.ok) throw new Error('Failed to load presets');
+        return response.json();
+    },
+
+    // Save a new preset
+    save: async (name: string, config: string, thumbnail?: string): Promise<{ success: boolean; preset: Preset }> => {
+        const response = await fetch(`${API_BASE_URL}/presets`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ name, config, thumbnail })
+        });
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Failed to save preset');
+        }
+        return response.json();
+    },
+
+    // Delete a preset
+    delete: async (presetId: string): Promise<void> => {
+        const response = await fetch(`${API_BASE_URL}/presets/${presetId}`, {
+            method: 'DELETE',
+            headers: getHeaders()
+        });
+        if (!response.ok) throw new Error('Failed to delete preset');
+    }
+};
+

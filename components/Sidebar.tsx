@@ -16,6 +16,7 @@ import DetailPanel from './sidebar/panels/DetailPanel';
 import TextPanel from './sidebar/panels/TextPanel';
 import MotionPanel from './sidebar/panels/MotionPanel';
 import LibraryPanel from './sidebar/panels/LibraryPanel';
+import PresetsPanel from './sidebar/panels/PresetsPanel';
 import SeasonalBanner from './SeasonalBanner';
 
 // Define the full props interface
@@ -118,6 +119,7 @@ const SidebarLayout: React.FC<Omit<SidebarProps, keyof SidebarContextType>> = (p
             <div className="flex-1 overflow-y-auto custom-scrollbar">
                 <SeasonalBanner onApplyStyle={(style) => updateState({ style: style as any }, true)} />
                 <LayersPanel />
+                <PresetsPanel />
                 <div className="px-4 py-2 bg-slate-50 border-y border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center">
                     Editing Active Layer
                 </div>
