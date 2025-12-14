@@ -23,6 +23,7 @@ export interface UserProfile {
     tier: 'guest' | 'free' | 'pro' | 'ltd' | 'lifetime';
     exportCount: number;
     avatarUrl?: string;
+    proExpiresAt?: string | null;
 }
 
 export const api = {
@@ -81,7 +82,8 @@ export const api = {
                 name: userData.name,
                 tier: userData.tier || 'free',
                 exportCount: userData.export_count || 0,
-                avatarUrl: userData.avatar_url
+                avatarUrl: userData.avatar_url,
+                proExpiresAt: userData.pro_expires_at || null
             };
         } catch (e) {
             console.error('Failed to fetch profile', e);

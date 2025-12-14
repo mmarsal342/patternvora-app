@@ -381,7 +381,16 @@ const App: React.FC = () => {
                     </div>
 
                     {isPro && (
-                        <span className="ml-2 px-2 py-0.5 bg-gradient-to-r from-amber-200 to-yellow-400 text-yellow-900 text-[10px] font-bold uppercase rounded-full shadow-sm">PRO</span>
+                        <span
+                            className="ml-2 px-2 py-0.5 bg-gradient-to-r from-amber-200 to-yellow-400 text-yellow-900 text-[10px] font-bold uppercase rounded-full shadow-sm cursor-default"
+                            title={user?.proExpiresAt ? `Subscription until ${new Date(user.proExpiresAt).toLocaleDateString()}` : 'Lifetime Access'}
+                        >
+                            {user?.tier === 'lifetime' || user?.tier === 'ltd' ? 'LIFETIME' : (
+                                user?.proExpiresAt ? (
+                                    <>PRO · {new Date(user.proExpiresAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</>
+                                ) : 'PRO'
+                            )}
+                        </span>
                     )}
 
                     {/* LOGIN/LOGOUT BUTTON */}
