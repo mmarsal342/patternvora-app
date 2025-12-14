@@ -36,6 +36,7 @@ export const DEFAULT_LAYER_CONFIG: LayerConfig = {
     scale: 1,
     palette: PALETTES[0],
     strokeWidth: 2,
+    strokeMode: 'random',
     texture: 0,
     customImage: { assets: [], originalColors: false },
     animation: {
@@ -81,12 +82,13 @@ export const migrateToV2 = (oldState: any): AppState => {
             config: {
                 ...l.config,
                 transparentBackground: l.config.transparentBackground ?? false,
+                strokeMode: l.config.strokeMode ?? 'random',
                 text: l.config.text || { ...DEFAULT_TEXT_CONFIG },
                 styleOptions: l.config.styleOptions || { ...DEFAULT_STYLE_OPTIONS },
                 compositionOptions: l.config.compositionOptions || { ...DEFAULT_COMPOSITION_OPTIONS }
             }
         }));
-        
+
         const { text, ...rest } = oldState;
         return { ...rest, layers };
     }
@@ -95,7 +97,7 @@ export const migrateToV2 = (oldState: any): AppState => {
 
     // Extract global props
     const aspectRatio = oldState.aspectRatio || '1:1';
-    
+
     // Extract global text from V1 or use default
     const textConfig = oldState.text || DEFAULT_TEXT_CONFIG;
 
@@ -108,6 +110,7 @@ export const migrateToV2 = (oldState: any): AppState => {
         scale: oldState.scale ?? 1,
         palette: oldState.palette ?? PALETTES[0],
         strokeWidth: oldState.strokeWidth ?? 2,
+        strokeMode: oldState.strokeMode ?? 'random',
         texture: oldState.texture ?? 0,
         customImage: oldState.customImage ?? { assets: [], originalColors: false },
         animation: oldState.animation ?? DEFAULT_LAYER_CONFIG.animation,

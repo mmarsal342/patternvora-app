@@ -48,6 +48,8 @@ export type SecondaryAnimationType = 'none' | 'pulse' | 'spin';
 
 export type VideoResolution = 'SD' | 'HD' | '4K';
 
+export type StrokeMode = 'random' | 'fill' | 'stroke';
+
 export type AnimationDirection = 'normal' | 'reverse';
 
 export type AnimationConfig = {
@@ -121,6 +123,7 @@ export interface LayerConfig {
   scale: number; // 0.5 - 3.0
   palette: Palette;
   strokeWidth: number;
+  strokeMode: StrokeMode; // 'random' | 'fill' | 'stroke'
   texture: number; // 0 - 100 opacity of noise
   customImage: CustomImageConfig;
   animation: AnimationConfig;

@@ -1,7 +1,33 @@
 
 
-import { AppState, CompositionType, ShapeData, LayerConfig, CompositionOptions } from '../../types';
+import { AppState, CompositionType, ShapeData, LayerConfig, CompositionOptions, StrokeMode } from '../../types';
 import { RNG } from '../rng';
+
+// Shapes that cannot be stroke-only (always force fill)
+const FILL_ONLY_SHAPES = ['image', 'char', 'wave', 'zigzag', 'blob'];
+
+// Helper to determine stroke value based on strokeMode and shape type
+export const getStrokeValue = (
+    strokeMode: StrokeMode,
+    shapeType: string,
+    rng: RNG,
+    randomThreshold: number = 0.7
+): boolean => {
+    // Some shapes can't be stroke - always return false
+    if (FILL_ONLY_SHAPES.includes(shapeType)) {
+        return false;
+    }
+
+    switch (strokeMode) {
+        case 'fill':
+            return false;
+        case 'stroke':
+            return true;
+        case 'random':
+        default:
+            return rng.nextFloat() > randomThreshold;
+    }
+};
 
 // Composition Algorithms
 export const getPosition = (
@@ -199,7 +225,7 @@ export const generateGrid = (width: number, height: number, baseSize: number, co
                 size: (Math.min(cellW, cellH) * config.scale) * rng.nextRange(0.2, 0.8),
                 rotation: rng.nextRange(0, 360),
                 color: rng.nextItem(config.palette.colors),
-                stroke: !config.customImage.assets.length && rng.nextFloat() > 0.7,
+                stroke: getStrokeValue(config.strokeMode, config.customImage.assets.length > 0 ? 'image' : rng.nextItem(allowedTypes), rng),
                 speedFactor: Math.floor(rng.nextRange(1, 4)),
                 phaseOffset: rng.nextFloat() * Math.PI * 2,
                 points: Math.floor(rng.nextRange(5, 8)),
@@ -236,7 +262,7 @@ export const generateHex = (width: number, height: number, baseSize: number, con
                 size: size * 1.8,
                 rotation: 30,
                 color: rng.nextItem(config.palette.colors),
-                stroke: rng.nextFloat() > 0.7,
+                stroke: getStrokeValue(config.strokeMode, 'polygon', rng),
                 points: 6,
                 speedFactor: Math.floor(rng.nextRange(1, 4)),
                 phaseOffset: (c + r) * 0.5
@@ -374,7 +400,7 @@ export const generateRadial = (width: number, height: number, baseSize: number, 
                 size: baseSize * rng.nextRange(0.5, 1.5) * (1 + r / rings),
                 rotation: (angle * 180 / Math.PI) + 90,
                 color: rng.nextItem(config.palette.colors),
-                stroke: rng.nextFloat() > 0.6,
+                stroke: getStrokeValue(config.strokeMode, rng.nextItem(allowedTypes), rng, 0.6),
                 speedFactor: Math.floor(rng.nextRange(1, 4)),
                 phaseOffset: rng.nextFloat() * Math.PI * 2
             });
@@ -427,7 +453,7 @@ export const generateStandardScatter = (width: number, height: number, baseSize:
             size: baseSize * rng.nextRange(0.5, 2.0),
             rotation: rng.nextRange(0, 360),
             color: rng.nextItem(config.palette.colors),
-            stroke: config.style === 'bauhaus' || config.style === 'geometric' ? rng.nextFloat() > 0.6 : false,
+            stroke: getStrokeValue(config.strokeMode, type, rng, 0.6),
             speedFactor: Math.floor(rng.nextRange(1, 4)),
             phaseOffset: rng.nextFloat() * Math.PI * 2,
             points: Math.floor(rng.nextRange(3, 8)),
