@@ -72,8 +72,8 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
       id: 'pro_monthly',
       name: "Pro Monthly",
       badge: "The Creator",
-      price: 'Rp 89.000',
-      originalPrice: 'Rp 149.000',
+      price: 'Rp 49.000',
+      originalPrice: 'Rp 99.000',
       period: 'per month',
       description: "For consistent content production and high-quality assets.",
       features: [
@@ -86,7 +86,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
         "Priority Rendering Queue"
       ],
       limitations: [],
-      cta: "✨ Launch 40% OFF - Subscribe",
+      cta: "Subscribe Now",
       ctaStyle: "bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200",
       action: () => handleSubscribe('pro_monthly'),
       highlight: true,
@@ -96,8 +96,8 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
       id: 'lifetime',
       name: "Lifetime Deal",
       badge: "The Agency",
-      price: 'Rp 749.000',
-      originalPrice: 'Rp 1.499.000',
+      price: 'Rp 490.000',
+      originalPrice: 'Rp 990.000',
       period: 'one-time payment',
       description: "Pay once, own it forever. The smartest investment for agencies.",
       features: [
@@ -109,7 +109,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
         "Early access to new features"
       ],
       limitations: [],
-      cta: "🔥 Early Bird 50% OFF",
+      cta: "🔥 Best Value - Get Lifetime",
       ctaStyle: "bg-rose-500 text-white hover:bg-rose-600 shadow-lg shadow-rose-200",
       action: () => handleSubscribe('lifetime'),
       highlight: false
