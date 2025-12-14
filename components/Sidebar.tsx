@@ -15,7 +15,7 @@ import ColorPanel from './sidebar/panels/ColorPanel';
 import DetailPanel from './sidebar/panels/DetailPanel';
 import TextPanel from './sidebar/panels/TextPanel';
 import MotionPanel from './sidebar/panels/MotionPanel';
-import LibraryPanel from './sidebar/panels/LibraryPanel';
+
 import PresetsPanel from './sidebar/panels/PresetsPanel';
 import SeasonalBanner from './SeasonalBanner';
 
@@ -131,7 +131,7 @@ const SidebarLayout: React.FC<Omit<SidebarProps, keyof SidebarContextType>> = (p
 
                 <ColorPanel />
                 <DetailPanel />
-                <LibraryPanel />
+
             </div>
 
             {/* Footer / Actions - Now Collapsible */}
