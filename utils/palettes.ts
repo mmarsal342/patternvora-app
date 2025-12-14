@@ -46,6 +46,17 @@ export const PALETTES: Palette[] = [
     bg: '#1A0505',
     colors: ['#E53935', '#FF5252', '#FF8A80', '#D32F2F', '#FFCDD2']
   },
+  // Seasonal - Ramadan/Eid
+  {
+    name: '🌙 Ramadan Green',
+    bg: '#0D1F17',
+    colors: ['#1B4332', '#40916C', '#74C69D', '#D4A574', '#FFD700']
+  },
+  {
+    name: '🕌 Eid Gold',
+    bg: '#F5F0E8',
+    colors: ['#4A154B', '#7B2CBF', '#C9A227', '#2D5A3D', '#1B4332']
+  },
   {
     name: 'Swiss Style',
     bg: '#f4f4f0',

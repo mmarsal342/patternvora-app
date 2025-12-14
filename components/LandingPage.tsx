@@ -42,6 +42,7 @@ interface LandingPageProps {
   onStart: () => void;
   onPricing: () => void;
   onAdmin?: () => void;
+  onLegal?: () => void;
 }
 
 // Admin email whitelist (must match AdminPage.tsx)
@@ -199,7 +200,7 @@ const CHANGELOGS = [
 
 const CURRENT_VERSION = CHANGELOGS[0].version;
 
-const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin, onLegal }) => {
   const { user, login, logout, isLoading } = useUser();
   const [showChangelog, setShowChangelog] = useState(false);
   const [hasUnread, setHasUnread] = useState(false);
@@ -632,6 +633,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin }
           {/* Subfooter / Attribution */}
           <div className="pt-8 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
             <p>&copy; {new Date().getFullYear()} VoraLab. All rights reserved.</p>
+            <div className="flex items-center gap-4">
+              {onLegal && (
+                <>
+                  <button onClick={onLegal} className="hover:text-indigo-600 transition-colors">Privacy Policy</button>
+                  <span className="text-slate-300">·</span>
+                  <button onClick={onLegal} className="hover:text-indigo-600 transition-colors">Terms of Service</button>
+                </>
+              )}
+            </div>
             <p className="font-medium text-slate-500">Built by the grace of God.</p>
           </div>
         </div>

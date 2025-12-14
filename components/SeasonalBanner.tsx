@@ -71,6 +71,16 @@ const getSeasonalEvents = (): SeasonalEvent[] => {
             style: 'seasonal-cny',
             colors: ['#D32F2F', '#FFD700', '#FF6F00']
         },
+        {
+            id: 'ramadan',
+            // Dynamic name: Ramadan before Mar 23, Eid after
+            name: now.getMonth() < 2 || (now.getMonth() === 2 && now.getDate() < 23) ? 'Ramadan Mubarak' : 'Eid Mubarak',
+            emoji: now.getMonth() < 2 || (now.getMonth() === 2 && now.getDate() < 23) ? '🌙' : '🎉',
+            // Ramadan 2026: Feb 18 - Apr 6 (covers both Ramadan and Eid period)
+            date: new Date(getDaysUntil(new Date(year, 1, 18)) < 0 && getDaysUntil(new Date(year, 3, 6)) < 0 ? nextYear : year, 1, 18),
+            style: 'seasonal-ramadan',
+            colors: ['#1B4332', '#40916C', '#D4A574', '#C9A227']
+        },
     ];
 };
 

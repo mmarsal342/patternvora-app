@@ -7,6 +7,7 @@ import LandingPage from './components/LandingPage';
 import BatchModal from './components/BatchModal';
 import PricingPage from './components/PricingPage';
 import AdminPage from './components/AdminPage';
+import LegalPage from './components/LegalPage';
 import { useHistory } from './hooks/useHistory';
 import { useExport, FREE_EXPORT_LIMIT } from './hooks/useExport';
 import { usePresets } from './hooks/usePresets';
@@ -33,15 +34,16 @@ const App: React.FC = () => {
     const { user, isPro, syncExportCount, login, logout, isLoading, isGuest } = useUser();
 
     // Determine initial view based on URL path
-    const getInitialView = (): 'landing' | 'editor' | 'pricing' | 'admin' => {
+    const getInitialView = (): 'landing' | 'editor' | 'pricing' | 'admin' | 'legal' => {
         const path = window.location.pathname;
         if (path === '/admin') return 'admin';
         if (path === '/pricing') return 'pricing';
+        if (path === '/legal' || path === '/terms' || path === '/privacy') return 'legal';
         if (path === '/editor' || path === '/studio') return 'editor';
         return 'landing';
     };
 
-    const [view, setView] = useState<'landing' | 'editor' | 'pricing' | 'admin'>(getInitialView);
+    const [view, setView] = useState<'landing' | 'editor' | 'pricing' | 'admin' | 'legal'>(getInitialView);
 
     // Debug admin detection
     useEffect(() => {
@@ -359,6 +361,7 @@ const App: React.FC = () => {
             }}
             onPricing={() => setView('pricing')}
             onAdmin={() => setView('admin')}
+            onLegal={() => setView('legal')}
         />;
     }
 
@@ -368,6 +371,10 @@ const App: React.FC = () => {
 
     if (view === 'admin') {
         return <AdminPage onBack={() => setView('landing')} />;
+    }
+
+    if (view === 'legal') {
+        return <LegalPage onBack={() => setView('landing')} />;
     }
 
     return (

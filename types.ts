@@ -73,7 +73,7 @@ export interface ShapeOverride {
 }
 
 export interface ShapeData {
-  type: 'circle' | 'rect' | 'triangle' | 'arc' | 'line' | 'image' | 'star' | 'polygon' | 'blob' | 'char' | 'wave' | 'zigzag' | 'cross' | 'donut' | 'pill' | 'cube' | 'lantern' | 'dragon' | 'angpao' | 'cloud-cn' | 'firecracker' | 'fan' | 'xmas-tree' | 'gift' | 'snowflake' | 'bell' | 'candycane' | 'santa-hat' | 'firework' | 'champagne' | 'clock-ny' | 'balloon' | 'party-hat' | 'party-popper' | 'starburst' | 'heart' | 'rose' | 'love-letter' | 'cupid-arrow' | 'bow' | 'ring';
+  type: 'circle' | 'rect' | 'triangle' | 'arc' | 'line' | 'image' | 'star' | 'polygon' | 'blob' | 'char' | 'wave' | 'zigzag' | 'cross' | 'donut' | 'pill' | 'cube' | 'lantern' | 'dragon' | 'angpao' | 'cloud-cn' | 'firecracker' | 'fan' | 'xmas-tree' | 'gift' | 'snowflake' | 'bell' | 'candycane' | 'santa-hat' | 'firework' | 'champagne' | 'clock-ny' | 'balloon' | 'party-hat' | 'party-popper' | 'starburst' | 'heart' | 'rose' | 'love-letter' | 'cupid-arrow' | 'bow' | 'ring' | 'crescent' | 'star-islamic' | 'mosque' | 'lantern-ramadan' | 'ketupat' | 'dates';
   x: number;
   y: number;
   size: number;

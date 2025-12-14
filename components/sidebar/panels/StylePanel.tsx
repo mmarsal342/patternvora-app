@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Layers, ChevronDown, ChevronUp, Grid, X, Plus, Lock, Circle, Square, Triangle, Hexagon, Star, Spline, Minus, Activity, MousePointer2, Image as ImageIcon, Lamp, Flame, Gift, Cloud, Sparkles, Fan, TreePine, Snowflake, Bell, Candy, PartyPopper, Wine, Clock, CircleDot, Heart, Flower2, Mail, Ribbon } from 'lucide-react';
+import { Layers, ChevronDown, ChevronUp, Grid, X, Plus, Lock, Circle, Square, Triangle, Hexagon, Star, Spline, Minus, Activity, MousePointer2, Image as ImageIcon, Lamp, Flame, Gift, Cloud, Sparkles, Fan, TreePine, Snowflake, Bell, Candy, PartyPopper, Wine, Clock, CircleDot, Heart, Flower2, Mail, Ribbon, Moon, Building2, Diamond } from 'lucide-react';
 import { useSidebar } from '../SidebarContext';
 import CollapsibleSection from '../../common/CollapsibleSection';
 import { PatternStyle, CompositionType } from '../../../types';
@@ -91,7 +91,7 @@ const StylePanel: React.FC = () => {
     };
 
     const isCompositionDisabled = ['grid', 'radial', 'mosaic', 'hex', 'waves', 'isometric'].includes(activeLayerConfig.style);
-    const isShapesSupported = ['geometric', 'organic', 'memphis', 'bauhaus', 'confetti', 'grid', 'mosaic', 'radial', 'seasonal-cny', 'seasonal-christmas', 'seasonal-newyear', 'seasonal-valentine'].includes(activeLayerConfig.style);
+    const isShapesSupported = ['geometric', 'organic', 'memphis', 'bauhaus', 'confetti', 'grid', 'mosaic', 'radial', 'seasonal-cny', 'seasonal-christmas', 'seasonal-newyear', 'seasonal-valentine', 'seasonal-ramadan'].includes(activeLayerConfig.style);
 
     // Helpers to define available shapes per style for UI rendering
     const getAvailableShapes = () => {
@@ -156,6 +156,15 @@ const StylePanel: React.FC = () => {
             shapes.push({ id: 'rose', icon: Flower2 });
             shapes.push({ id: 'love-letter', icon: Mail });
             shapes.push({ id: 'ring', icon: CircleDot });
+        }
+        // Ramadan/Eid Seasonal Shapes
+        if (s === 'seasonal-ramadan') {
+            shapes.push({ id: 'crescent', icon: Moon });
+            shapes.push({ id: 'star-islamic', icon: Star });
+            shapes.push({ id: 'mosque', icon: Building2 });
+            shapes.push({ id: 'lantern-ramadan', icon: Lamp });
+            shapes.push({ id: 'ketupat', icon: Gift });
+            shapes.push({ id: 'dates', icon: CircleDot });
         }
         return shapes;
     };
@@ -273,6 +282,7 @@ const StylePanel: React.FC = () => {
                                 <option value="seasonal-christmas">🎄 Christmas</option>
                                 <option value="seasonal-newyear">🎉 New Year</option>
                                 <option value="seasonal-valentine">💕 Valentine's Day</option>
+                                <option value="seasonal-ramadan">🌙 Ramadan & Eid</option>
                             </optgroup>
                             <option value="custom-image" disabled={activeLayerConfig.customImage.assets.length === 0}>Custom Brand Asset</option>
                         </select>

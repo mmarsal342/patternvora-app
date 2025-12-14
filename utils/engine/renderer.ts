@@ -3,7 +3,7 @@ import { AppState, ShapeData, LayerConfig, TextConfig, ShapeOverride } from '../
 import { adjustColor } from './math';
 import { generateShapeData } from './generators';
 import { applyAnimation } from './animator';
-import { drawSeasonalShape, SEASONAL_SHAPES } from './seasonalShapes';
+import { drawSeasonalShape, SEASONAL_SHAPES } from './shapes';
 
 // Helper to create canvas in any environment (Browser or Worker)
 const createOffscreenCanvas = (width: number, height: number): OffscreenCanvas | HTMLCanvasElement => {

@@ -426,6 +426,7 @@ export const generateStandardScatter = (width: number, height: number, baseSize:
     else if ((config.style as string) === 'seasonal-christmas') allowedTypes = ['xmas-tree', 'gift', 'snowflake', 'bell', 'candycane', 'santa-hat'];
     else if ((config.style as string) === 'seasonal-newyear') allowedTypes = ['firework', 'champagne', 'clock-ny', 'balloon', 'party-hat', 'party-popper', 'starburst'];
     else if ((config.style as string) === 'seasonal-valentine') allowedTypes = ['heart', 'rose', 'love-letter', 'ring'];
+    else if ((config.style as string) === 'seasonal-ramadan') allowedTypes = ['crescent', 'star-islamic', 'mosque', 'lantern-ramadan', 'ketupat', 'dates'];
 
     // Filter if user has selected specific shapes
     if (config.styleOptions.shapeTypes.length > 0) {
