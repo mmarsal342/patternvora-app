@@ -420,10 +420,19 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({ state, loadedImages, setRecordi
                         try { stream.getTracks().forEach(track => track.stop()); } catch (e) { }
                         const blob = new Blob(chunksRef.current, { type: mimeType });
                         if (blob.size > 0) {
+                            // Calculate actual bitrate from file size
+                            const durationSec = activeLayer.config.animation.duration;
+                            const fileSizeMB = blob.size / (1024 * 1024);
+                            const actualBitrateMbps = (fileSizeMB * 8) / durationSec;
+                            const bitrateStr = actualBitrateMbps.toFixed(1);
+
+                            // Resolution label
+                            const resLabel = resolution === 'SD' ? '720p' : resolution === '4K' ? '4K' : '1080p';
+
                             const url = URL.createObjectURL(blob);
                             const a = document.createElement('a');
                             a.href = url;
-                            a.download = `patternvora-loop-${resolution}-${Date.now()}.${ext}`;
+                            a.download = `patternvora-${resLabel}-${bitrateStr}mbps-${Date.now()}.${ext}`;
                             a.click();
                         }
                         setRecordingState(false);
