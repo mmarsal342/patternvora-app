@@ -140,17 +140,36 @@ export const drawShape = (
         } else if (shape.type === 'image' && shape.assetId && loadedImages[shape.assetId]) {
             try {
                 const img = loadedImages[shape.assetId];
-                if (config.customImage.originalColors) {
-                    ctx.drawImage(img as any, -size / 2, -size / 2, size, size);
+                // Get actual image dimensions
+                const imgWidth = (img as HTMLImageElement).naturalWidth || (img as ImageBitmap).width || size;
+                const imgHeight = (img as HTMLImageElement).naturalHeight || (img as ImageBitmap).height || size;
+
+                // Calculate dimensions preserving aspect ratio
+                const aspectRatio = imgWidth / imgHeight;
+                let drawWidth: number;
+                let drawHeight: number;
+
+                if (aspectRatio >= 1) {
+                    // Wider than tall - fit to width
+                    drawWidth = size;
+                    drawHeight = size / aspectRatio;
                 } else {
-                    const tempCanvas = createOffscreenCanvas(size, size);
+                    // Taller than wide - fit to height
+                    drawHeight = size;
+                    drawWidth = size * aspectRatio;
+                }
+
+                if (config.customImage.originalColors) {
+                    ctx.drawImage(img as any, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+                } else {
+                    const tempCanvas = createOffscreenCanvas(drawWidth, drawHeight);
                     const tempCtx = tempCanvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
                     if (tempCtx) {
-                        tempCtx.drawImage(img as any, 0, 0, size, size);
+                        tempCtx.drawImage(img as any, 0, 0, drawWidth, drawHeight);
                         tempCtx.globalCompositeOperation = 'source-in';
                         tempCtx.fillStyle = shape.color;
-                        tempCtx.fillRect(0, 0, size, size);
-                        ctx.drawImage(tempCanvas, -size / 2, -size / 2);
+                        tempCtx.fillRect(0, 0, drawWidth, drawHeight);
+                        ctx.drawImage(tempCanvas, -drawWidth / 2, -drawHeight / 2);
                     }
                 }
             } catch (e) { }
