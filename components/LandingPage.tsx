@@ -642,6 +642,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin, 
               question="Is my data saved if I close the browser?"
               answer="Your presets are saved locally in your browser using IndexedDB. However, we recommend exporting important presets to JSON files for backup. Your export count is synced to your account if you're logged in."
             />
+            <FAQItem
+              question="Why does my video export look lower quality than the preview?"
+              answer="Video (MP4) export quality depends on your device's hardware and browser. Unlike PNG/JPG/SVG exports which render a single frame perfectly, video requires real-time encoding of hundreds of frames. For best results: use Google Chrome, close other browser tabs, don't minimize the window during recording, and choose HD (1080p) for most devices. The filename shows your actual output bitrate (e.g., 12.5mbps) so you can verify quality. PNG, JPG, and SVG exports work perfectly at all resolutions including 4K."
+            />
           </div>
         </div>
       </section>
