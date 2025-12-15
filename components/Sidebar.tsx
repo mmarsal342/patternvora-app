@@ -259,7 +259,22 @@ const SidebarLayout: React.FC<Omit<SidebarProps, keyof SidebarContextType>> = (p
                                 <span>SVG</span>
                             </button>
                             <button
-                                onClick={onRecordVideo}
+                                onClick={() => {
+                                    if (!isRecording) {
+                                        const proceed = window.confirm(
+                                            '🎬 Recording Tips\n\n' +
+                                            'For best quality:\n' +
+                                            '• Use Google Chrome (recommended)\n' +
+                                            '• Close other browser tabs\n' +
+                                            '• Don\'t minimize the window during recording\n' +
+                                            '• HD (1080p) works on most devices\n\n' +
+                                            'Start recording?'
+                                        );
+                                        if (proceed) onRecordVideo();
+                                    } else {
+                                        onRecordVideo();
+                                    }
+                                }}
                                 disabled={!isAnimEnabled && !isRecording}
                                 className={`py-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors ${isRecording
                                     ? 'bg-rose-100 text-rose-500 animate-pulse'
@@ -280,8 +295,8 @@ const SidebarLayout: React.FC<Omit<SidebarProps, keyof SidebarContextType>> = (p
                         <button
                             onClick={onToggleEditMode}
                             className={`w-full py-2 border rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-all ${isEditMode
-                                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm'
-                                    : 'bg-white border-slate-200 text-slate-500 hover:text-slate-800'
+                                ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm'
+                                : 'bg-white border-slate-200 text-slate-500 hover:text-slate-800'
                                 }`}
                         >
                             <MousePointer2 size={14} className={isEditMode ? "fill-indigo-700" : ""} />

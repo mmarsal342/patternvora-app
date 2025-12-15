@@ -407,7 +407,7 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({ state, loadedImages, setRecordi
                     let mimeType = mimeOptions.find(type => MediaRecorder.isTypeSupported(type)) || 'video/webm';
                     let ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
 
-                    const bitrate = resolution === 'SD' ? 4000000 : resolution === '4K' ? 25000000 : 8000000;
+                    const bitrate = resolution === 'SD' ? 6000000 : resolution === '4K' ? 35000000 : 15000000;
 
                     const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: bitrate });
                     chunksRef.current = [];
