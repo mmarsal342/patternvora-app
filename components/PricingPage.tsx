@@ -48,11 +48,15 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
 
     // Redirect to appropriate checkout based on currency
     const urls = CHECKOUT_URLS[currency];
-    if (planId === 'lifetime') {
-      window.location.href = urls.lifetime;
-    } else {
-      window.location.href = urls.pro_monthly;
+    const checkoutUrl = planId === 'lifetime' ? urls.lifetime : urls.pro_monthly;
+
+    // Validate URL before redirect
+    if (!checkoutUrl || !checkoutUrl.startsWith('http')) {
+      alert('Checkout is temporarily unavailable. Please try again later or contact support.');
+      return;
     }
+
+    window.location.href = checkoutUrl;
   };
 
   // Price configuration for each currency

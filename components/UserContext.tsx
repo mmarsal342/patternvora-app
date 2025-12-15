@@ -110,7 +110,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    const isPro = user ? (user.tier === 'pro' || user.tier === 'ltd' || user.tier === 'lifetime') : false;
+    const isPro = user ? (
+        // Lifetime users always have access
+        user.tier === 'lifetime' || user.tier === 'ltd' ||
+        // Pro users need valid (non-expired) subscription
+        (user.tier === 'pro' && (!user.proExpiresAt || new Date(user.proExpiresAt) > new Date()))
+    ) : false;
     const isGuest = !user || user.tier === 'guest';
 
     return (
