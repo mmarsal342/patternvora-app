@@ -1,8 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
-import { Layers, Zap, Download, Repeat, ArrowRight, Layout, Palette, Film, HelpCircle, Bell, X, Sparkles, CheckCircle2, Clock, Trophy, LogOut, Loader2, ChevronDown, Shield } from 'lucide-react';
+import { Layers, Zap, Download, Repeat, ArrowRight, Layout, Palette, Film, HelpCircle, Bell, X, Sparkles, CheckCircle2, Clock, Trophy, LogOut, Loader2, ChevronDown, Shield, Chrome, Info } from 'lucide-react';
 import { getCurrentRank, getNextRank, getProgress, STORAGE_KEY, RANKS } from '../utils/gamification';
 import { useUser } from './UserContext';
+
+// Browser detection helper
+const isChrome = (): boolean => {
+  if (typeof navigator === 'undefined') return true;
+  const ua = navigator.userAgent;
+  return /Chrome/.test(ua) && !/Edge|Edg|OPR|Opera/.test(ua);
+};
 
 // Google Logo SVG Component
 const GoogleLogo = () => (
@@ -204,6 +211,20 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin, 
   const { user, login, logout, isLoading } = useUser();
   const [showChangelog, setShowChangelog] = useState(false);
   const [hasUnread, setHasUnread] = useState(false);
+  const [showBrowserBanner, setShowBrowserBanner] = useState(false);
+
+  // Check browser on mount
+  useEffect(() => {
+    const dismissed = localStorage.getItem('pv_browser_banner_dismissed');
+    if (!dismissed && !isChrome()) {
+      setShowBrowserBanner(true);
+    }
+  }, []);
+
+  const dismissBrowserBanner = () => {
+    setShowBrowserBanner(false);
+    localStorage.setItem('pv_browser_banner_dismissed', 'true');
+  };
 
   // Check if current user is admin (case-insensitive)
   const userEmailNormalized = user?.email?.toLowerCase().trim() || '';
@@ -264,6 +285,24 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin, 
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-rose-200">
+      {/* Browser Recommendation Banner */}
+      {showBrowserBanner && (
+        <div className="bg-amber-50 border-b border-amber-200">
+          <div className="max-w-7xl mx-auto px-6 py-2 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-sm text-amber-800">
+              <Info size={16} className="text-amber-600" />
+              <span>For the best experience, we recommend using <strong>Google Chrome</strong>.</span>
+            </div>
+            <button
+              onClick={dismissBrowserBanner}
+              className="p-1 text-amber-600 hover:text-amber-800 hover:bg-amber-100 rounded transition-colors"
+              title="Dismiss"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      )}
       {/* Navbar */}
       <nav className="border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -642,7 +681,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin, 
                 </>
               )}
             </div>
-            <p className="font-medium text-slate-500">Built by the grace of God.</p>
+            <div className="flex items-center gap-4">
+              <p className="font-medium text-slate-500">Built by the grace of God.</p>
+              <span className="text-slate-300">·</span>
+              <p className="flex items-center gap-1 text-slate-400">
+                <Chrome size={12} />
+                Best on Chrome
+              </p>
+            </div>
           </div>
         </div>
       </footer>
