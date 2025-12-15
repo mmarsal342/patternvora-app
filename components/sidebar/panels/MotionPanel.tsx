@@ -78,7 +78,7 @@ const MotionPanel: React.FC = () => {
                                         onChange={(e) => {
                                             const val = e.target.value as VideoResolution;
                                             if (val === '4K') {
-                                                if (window.confirm('⚠️ 4K video export may be slow on older devices and uses more memory.\n\nContinue with 4K?')) {
+                                                if (window.confirm('⚠️ 4K Video Recording\n\nRequirements:\n• Modern desktop/laptop with dedicated GPU\n• At least 8GB RAM\n• Not recommended for mobile or tablet\n\n4K recording may cause lag or browser crash on older devices.\n\nContinue?')) {
                                                     updateAnimation({ resolution: val });
                                                 }
                                             } else {
@@ -94,7 +94,7 @@ const MotionPanel: React.FC = () => {
                                     <ChevronDown size={10} className="absolute right-1.5 top-2 text-slate-500 pointer-events-none" />
                                 </div>
                                 {anim.resolution === '4K' && (
-                                    <p className="text-[9px] text-amber-600 mt-1">⚠️ Slower render, PRO only</p>
+                                    <p className="text-[9px] text-amber-600 mt-1">⚠️ High-end desktop only</p>
                                 )}
                             </div>
                         </div>
