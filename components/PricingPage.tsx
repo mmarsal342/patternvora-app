@@ -15,9 +15,8 @@ const CHECKOUT_URLS = {
     lifetime: 'https://lynk.id/mma267/vqdp1njd69qn/checkout',
   },
   USD: {
-    // TODO: Replace with actual LemonSqueezy checkout URLs
-    pro_monthly: 'https://patternvora.lemonsqueezy.com/buy/YOUR_MONTHLY_PRODUCT_ID',
-    lifetime: 'https://patternvora.lemonsqueezy.com/buy/YOUR_LIFETIME_PRODUCT_ID',
+    pro_monthly: 'https://patternvora.lemonsqueezy.com/buy/de19f34a-1e18-4096-a8f0-3f5ff51e0d1e',
+    lifetime: 'https://patternvora.lemonsqueezy.com/buy/b53c3319-7352-423a-99be-a245f8ccf5c9',
   },
 };
 
