@@ -3,11 +3,11 @@ import { ArrowLeft, Check, X } from 'lucide-react';
 
 interface LegalPageProps {
     onBack: () => void;
-    initialTab?: 'tos' | 'privacy';
+    initialTab?: 'tos' | 'privacy' | 'refund';
 }
 
 const LegalPage: React.FC<LegalPageProps> = ({ onBack, initialTab = 'tos' }) => {
-    const [activeTab, setActiveTab] = useState<'tos' | 'privacy'>(initialTab);
+    const [activeTab, setActiveTab] = useState<'tos' | 'privacy' | 'refund'>(initialTab);
 
     return (
         <div className="min-h-screen bg-white">
@@ -34,8 +34,8 @@ const LegalPage: React.FC<LegalPageProps> = ({ onBack, initialTab = 'tos' }) => 
                     <button
                         onClick={() => setActiveTab('tos')}
                         className={`px-6 py-3 rounded-lg font-semibold text-sm transition-all ${activeTab === 'tos'
-                                ? 'bg-indigo-600 text-white'
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                            ? 'bg-indigo-600 text-white'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                             }`}
                     >
                         Terms of Service
@@ -43,11 +43,20 @@ const LegalPage: React.FC<LegalPageProps> = ({ onBack, initialTab = 'tos' }) => 
                     <button
                         onClick={() => setActiveTab('privacy')}
                         className={`px-6 py-3 rounded-lg font-semibold text-sm transition-all ${activeTab === 'privacy'
-                                ? 'bg-indigo-600 text-white'
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                            ? 'bg-indigo-600 text-white'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                             }`}
                     >
                         Privacy Policy
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('refund')}
+                        className={`px-6 py-3 rounded-lg font-semibold text-sm transition-all ${activeTab === 'refund'
+                            ? 'bg-indigo-600 text-white'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                            }`}
+                    >
+                        Refund Policy
                     </button>
                 </div>
             </div>
@@ -55,7 +64,9 @@ const LegalPage: React.FC<LegalPageProps> = ({ onBack, initialTab = 'tos' }) => 
             {/* Content */}
             <div className="max-w-4xl mx-auto px-6 py-8">
                 <div className="bg-slate-50 rounded-2xl border border-slate-200 p-8 md:p-12">
-                    {activeTab === 'tos' ? <TermsOfService /> : <PrivacyPolicy />}
+                    {activeTab === 'tos' && <TermsOfService />}
+                    {activeTab === 'privacy' && <PrivacyPolicy />}
+                    {activeTab === 'refund' && <RefundPolicy />}
                 </div>
             </div>
 
@@ -132,8 +143,12 @@ const TermsOfService: React.FC = () => {
 
             <h2 className="text-xl font-bold text-slate-900 mt-8 mb-4">4. Payments & Refunds</h2>
             <p className="text-slate-600">
-                Subscriptions are billed in advance. You may cancel Pro subscriptions at any time. Lifetime Deal purchases are final and non-refundable unless the service is terminated by us within 30 days of purchase.
+                We offer a <strong>14-day money-back guarantee</strong> on all purchases. See our <strong>Refund Policy</strong> tab for full details.
             </p>
+            <ul className="list-disc pl-5 space-y-2 text-slate-600 mt-3">
+                <li><strong>Monthly Subscriptions:</strong> Billed in advance. Cancel anytime. Refund available within 14 days of purchase or renewal.</li>
+                <li><strong>Lifetime Deals:</strong> One-time payment. Refund available within 14 days of purchase.</li>
+            </ul>
 
             <h2 className="text-xl font-bold text-slate-900 mt-8 mb-4">5. Limitation of Liability</h2>
             <p className="text-slate-600">
@@ -195,6 +210,66 @@ const PrivacyPolicy: React.FC = () => {
             <h2 className="text-xl font-bold text-slate-900 mt-8 mb-4">6. Contact</h2>
             <p className="text-slate-600">
                 For any privacy concerns, please contact us at contact@voralab.com.
+            </p>
+        </div>
+    );
+};
+
+const RefundPolicy: React.FC = () => {
+    return (
+        <div className="prose prose-slate max-w-none">
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">Refund Policy</h1>
+            <p className="text-sm text-slate-500 mb-8">Last Updated: December 15, 2025</p>
+
+            {/* Guarantee Badge */}
+            <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8 text-center">
+                <div className="text-4xl mb-2">🛡️</div>
+                <h3 className="text-xl font-bold text-green-700">14-Day Money-Back Guarantee</h3>
+                <p className="text-green-600 mt-2">No questions asked. Full refund within 14 days.</p>
+            </div>
+
+            <p className="text-slate-600">
+                We want you to be completely satisfied with PatternVora. If for any reason you're not happy with your purchase, we offer a full refund within 14 days.
+            </p>
+
+            <h2 className="text-xl font-bold text-slate-900 mt-8 mb-4">Monthly Subscriptions (Pro Monthly)</h2>
+            <ul className="list-disc pl-5 space-y-2 text-slate-600">
+                <li>Request a refund within <strong>14 days</strong> of your initial purchase or any renewal.</li>
+                <li>Refund will be processed within 5-7 business days.</li>
+                <li>Your subscription will be cancelled immediately upon refund.</li>
+                <li>You will lose access to Pro features after the refund is processed.</li>
+            </ul>
+
+            <h2 className="text-xl font-bold text-slate-900 mt-8 mb-4">Lifetime Deal</h2>
+            <ul className="list-disc pl-5 space-y-2 text-slate-600">
+                <li>Request a refund within <strong>14 days</strong> of purchase.</li>
+                <li>After 14 days, Lifetime purchases are final and non-refundable.</li>
+                <li>This is because Lifetime access is heavily discounted and intended for committed users.</li>
+            </ul>
+
+            <h2 className="text-xl font-bold text-slate-900 mt-8 mb-4">How to Request a Refund</h2>
+            <p className="text-slate-600">
+                To request a refund, simply email us at <strong>support@patternvora.com</strong> with:
+            </p>
+            <ul className="list-disc pl-5 space-y-2 text-slate-600 mt-3">
+                <li>The email address used for purchase</li>
+                <li>Your order number (from your receipt)</li>
+                <li>Reason for refund (optional, but helps us improve)</li>
+            </ul>
+
+            <h2 className="text-xl font-bold text-slate-900 mt-8 mb-4">Exceptions</h2>
+            <p className="text-slate-600">
+                Refunds will <strong>not</strong> be granted in the following cases:
+            </p>
+            <ul className="list-disc pl-5 space-y-2 text-slate-600 mt-3">
+                <li>Request made after the 14-day window</li>
+                <li>Account terminated due to violation of Terms of Service</li>
+                <li>Evidence of abuse or fraudulent activity</li>
+            </ul>
+
+            <h2 className="text-xl font-bold text-slate-900 mt-8 mb-4">Contact</h2>
+            <p className="text-slate-600">
+                Questions about refunds? Email us at <strong>support@patternvora.com</strong> and we'll respond within 24-48 hours.
             </p>
         </div>
     );

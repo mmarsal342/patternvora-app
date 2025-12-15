@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Check, X, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Check, X, ArrowLeft, AlertCircle, Globe } from 'lucide-react';
 import { useUser } from './UserContext';
 
 interface PricingPageProps {
@@ -8,12 +8,24 @@ interface PricingPageProps {
   onStartFree: () => void;
 }
 
-// Lynk.id checkout URLs
-const LYNK_MONTHLY_URL = 'https://lynk.id/mma267/3kevpmq25r77/checkout';
-const LYNK_LIFETIME_URL = 'https://lynk.id/mma267/vqdp1njd69qn/checkout';
+// Payment URLs by currency
+const CHECKOUT_URLS = {
+  IDR: {
+    pro_monthly: 'https://lynk.id/mma267/3kevpmq25r77/checkout',
+    lifetime: 'https://lynk.id/mma267/vqdp1njd69qn/checkout',
+  },
+  USD: {
+    // TODO: Replace with actual LemonSqueezy checkout URLs
+    pro_monthly: 'https://patternvora.lemonsqueezy.com/buy/YOUR_MONTHLY_PRODUCT_ID',
+    lifetime: 'https://patternvora.lemonsqueezy.com/buy/YOUR_LIFETIME_PRODUCT_ID',
+  },
+};
+
+type Currency = 'IDR' | 'USD';
 
 const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
   const { user, login } = useUser();
+  const [currency, setCurrency] = useState<Currency>('IDR');
   const [showEmailModal, setShowEmailModal] = useState<string | null>(null); // Stores which plan's modal to show
 
   const handleSubscribe = (planId: string) => {
@@ -35,20 +47,42 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
   const proceedToCheckout = (planId: string) => {
     setShowEmailModal(null);
 
-    // Redirect to Lynk.id checkout
+    // Redirect to appropriate checkout based on currency
+    const urls = CHECKOUT_URLS[currency];
     if (planId === 'lifetime') {
-      window.location.href = LYNK_LIFETIME_URL;
+      window.location.href = urls.lifetime;
     } else {
-      window.location.href = LYNK_MONTHLY_URL;
+      window.location.href = urls.pro_monthly;
     }
   };
+
+  // Price configuration for each currency
+  const prices = {
+    IDR: {
+      free: 'Rp 0',
+      pro_monthly: 'Rp 49.000',
+      pro_monthly_original: 'Rp 99.000',
+      lifetime: 'Rp 490.000',
+      lifetime_original: 'Rp 990.000',
+    },
+    USD: {
+      free: '$0',
+      pro_monthly: '$4.90',
+      pro_monthly_original: '$9.90',
+      lifetime: '$49',
+      lifetime_original: '$99',
+    },
+  };
+
+  const currentPrices = prices[currency];
+  const paymentProvider = currency === 'IDR' ? 'Lynk.id' : 'LemonSqueezy';
 
   const plans = [
     {
       id: 'free',
       name: "Free",
       badge: "The Hobbyist",
-      price: 'Rp 0',
+      price: currentPrices.free,
       period: 'forever',
       description: "Perfect for testing the waters and personal exploration.",
       features: [
@@ -72,8 +106,8 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
       id: 'pro_monthly',
       name: "Pro Monthly",
       badge: "The Creator",
-      price: 'Rp 49.000',
-      originalPrice: 'Rp 99.000',
+      price: currentPrices.pro_monthly,
+      originalPrice: currentPrices.pro_monthly_original,
       period: 'per month',
       description: "For consistent content production and high-quality assets.",
       features: [
@@ -96,8 +130,8 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
       id: 'lifetime',
       name: "Lifetime Deal",
       badge: "The Agency",
-      price: 'Rp 490.000',
-      originalPrice: 'Rp 990.000',
+      price: currentPrices.lifetime,
+      originalPrice: currentPrices.lifetime_original,
       period: 'one-time payment',
       description: "Pay once, own it forever. The smartest investment for agencies.",
       features: [
@@ -140,7 +174,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
                 {user?.email}
               </code>
               <p className="text-xs text-amber-700 mt-3">
-                ⚠️ Please use <strong>this exact email</strong> when completing payment on Lynk.id to ensure your account is upgraded.
+                ⚠️ Please use <strong>this exact email</strong> when completing payment on {paymentProvider} to ensure your account is upgraded.
               </p>
             </div>
 
@@ -192,6 +226,27 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
           <p className="text-xl text-slate-600 mb-8">
             No hidden fees. Cancel anytime. Choose the plan that fits your workflow.
           </p>
+
+          {/* Currency Toggle */}
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <span className={`text-sm font-medium transition-colors ${currency === 'IDR' ? 'text-slate-900' : 'text-slate-400'}`}>
+              🇮🇩 IDR
+            </span>
+            <button
+              onClick={() => setCurrency(currency === 'IDR' ? 'USD' : 'IDR')}
+              className="relative w-14 h-7 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full p-1 transition-all shadow-lg shadow-indigo-200 hover:shadow-indigo-300"
+              aria-label="Toggle currency"
+            >
+              <div
+                className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 flex items-center justify-center ${currency === 'USD' ? 'translate-x-7' : 'translate-x-0'}`}
+              >
+                <Globe size={12} className="text-indigo-600" />
+              </div>
+            </button>
+            <span className={`text-sm font-medium transition-colors ${currency === 'USD' ? 'text-slate-900' : 'text-slate-400'}`}>
+              🌍 USD
+            </span>
+          </div>
 
           {/* Early Bird Banner */}
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-100 to-rose-100 px-4 py-2 rounded-full text-sm font-medium text-amber-800 border border-amber-200">
@@ -275,7 +330,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
 
       <footer className="bg-slate-50 border-t border-slate-200 py-12 text-center text-sm text-slate-500">
         <p>&copy; {new Date().getFullYear()} VoraLab. All rights reserved.</p>
-        <p className="mt-2">Secure payments processed by Lynk.id.</p>
+        <p className="mt-2">Secure payments processed by {currency === 'IDR' ? 'Lynk.id' : 'LemonSqueezy'}.</p>
       </footer>
     </div>
   );
