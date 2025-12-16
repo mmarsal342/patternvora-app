@@ -93,16 +93,25 @@ const getSingleShapeSVG = (
     const cy = shape.y + offsetY;
     const size = shape.size;
     const rot = shape.rotation;
+    const isStroke = shape.stroke;
+    const strokeWidth = config.strokeWidth * (1000 / 1000); // Normalized stroke width
 
     const transform = `transform="translate(${cx}, ${cy}) rotate(${rot})"`;
 
+    // Helper for fill vs stroke attributes
+    const getFillOrStroke = () => isStroke
+        ? `fill="none" stroke="${color}" stroke-width="${Math.max(2, strokeWidth * 2)}"`
+        : `fill="${color}"`;
+
     let content = '';
 
-    if (shape.type === 'circle') content += `<circle r="${size / 2}" fill="${color}" />`;
-    else if (shape.type === 'rect') content += `<rect x="${-size / 2}" y="${-size / 2}" width="${size}" height="${size}" fill="${color}" />`;
-    else if (shape.type === 'triangle') {
+    if (shape.type === 'circle') {
+        content += `<circle r="${size / 2}" ${getFillOrStroke()} />`;
+    } else if (shape.type === 'rect') {
+        content += `<rect x="${-size / 2}" y="${-size / 2}" width="${size}" height="${size}" ${getFillOrStroke()} />`;
+    } else if (shape.type === 'triangle') {
         const h = size * Math.sqrt(3) / 2;
-        content += `<polygon points="0,${-h / 2} ${size / 2},${h / 2} ${-size / 2},${h / 2}" fill="${color}" />`;
+        content += `<polygon points="0,${-h / 2} ${size / 2},${h / 2} ${-size / 2},${h / 2}" ${getFillOrStroke()} />`;
     } else if (shape.type === 'polygon') {
         const sides = shape.points || 6;
         const radius = size / 2;
@@ -111,16 +120,17 @@ const getSingleShapeSVG = (
             const angle = (i / sides) * Math.PI * 2 - (Math.PI / 2);
             points += `${Math.cos(angle) * radius},${Math.sin(angle) * radius} `;
         }
-        content += `<polygon points="${points.trim()}" fill="${color}" />`;
-    } else if (shape.type === 'donut') content += `<circle r="${size / 2}" fill="none" stroke="${color}" stroke-width="${size / 4}" />`;
-    else if (shape.type === 'cross') {
+        content += `<polygon points="${points.trim()}" ${getFillOrStroke()} />`;
+    } else if (shape.type === 'donut') {
+        content += `<circle r="${size / 2}" fill="none" stroke="${color}" stroke-width="${size / 4}" />`;
+    } else if (shape.type === 'cross') {
         const thick = size / 3;
-        content += `<rect x="${-thick / 2}" y="${-size / 2}" width="${thick}" height="${size}" fill="${color}" />`;
-        content += `<rect x="${-size / 2}" y="${-thick / 2}" width="${size}" height="${thick}" fill="${color}" />`;
+        content += `<rect x="${-thick / 2}" y="${-size / 2}" width="${thick}" height="${size}" ${getFillOrStroke()} />`;
+        content += `<rect x="${-size / 2}" y="${-thick / 2}" width="${size}" height="${thick}" ${getFillOrStroke()} />`;
     } else if (shape.type === 'pill') {
         const w = size;
         const h = size / 2;
-        content += `<rect x="${-w / 2}" y="${-h / 2}" width="${w}" height="${h}" rx="${h / 2}" fill="${color}" />`;
+        content += `<rect x="${-w / 2}" y="${-h / 2}" width="${w}" height="${h}" rx="${h / 2}" ${getFillOrStroke()} />`;
     } else if (shape.type === 'cube') {
         const r = size / 2;
         const angle30 = Math.PI / 6;
