@@ -237,6 +237,12 @@ export const generateSVG = async (
 ): Promise<string> => {
     let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">`;
 
+    // Add global background from first visible layer (prevents black bars in viewers)
+    const firstVisibleLayer = state.layers.find(l => l.visible);
+    if (firstVisibleLayer && !firstVisibleLayer.config.transparentBackground) {
+        svg += `<rect width="100%" height="100%" fill="${firstVisibleLayer.config.palette.bg}"/>`;
+    }
+
     // Iterate Layers
     state.layers.forEach(layer => {
         if (!layer.visible) return;
