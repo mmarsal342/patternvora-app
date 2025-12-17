@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { api, UserProfile } from '../services/api';
 import { STORAGE_KEY } from '../utils/gamification';
+import { logger } from '../utils/logger';
 
 // TYPES
 interface UserContextType {
@@ -79,16 +80,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const syncExportCount = async () => {
         if (!user) return;
 
-        console.log('[syncExportCount] Starting, current user.exportCount:', user?.exportCount);
+        logger.debug('[syncExportCount] Starting, current user.exportCount:', user?.exportCount);
 
         // Call backend to record export
         const result = await api.recordExport();
 
-        console.log('[syncExportCount] API result:', result);
+        logger.debug('[syncExportCount] API result:', result);
 
         if (result) {
             // Update local state
-            console.log('[syncExportCount] Updating state with count:', result.count);
+            logger.debug('[syncExportCount] Updating state with count:', result.count);
             setUser(prev => prev ? { ...prev, exportCount: result.count } : null);
             localStorage.setItem(STORAGE_KEY, String(result.count));
 
@@ -102,7 +103,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const currentCount = user?.exportCount || 0;
             const newCount = currentCount + 1;
 
-            console.log('[syncExportCount] Backend failed, incrementing locally:', currentCount, '->', newCount);
+            logger.debug('[syncExportCount] Backend failed, incrementing locally:', currentCount, '->', newCount);
 
             // Update user state so canExport() check works
             setUser(prev => prev ? { ...prev, exportCount: newCount } : null);

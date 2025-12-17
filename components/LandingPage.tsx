@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Layers, Zap, Download, Repeat, ArrowRight, Layout, Palette, Film, HelpCircle, Bell, X, Sparkles, CheckCircle2, Clock, Trophy, LogOut, Loader2, ChevronDown, Shield, Chrome, Info } from 'lucide-react';
 import { getCurrentRank, getNextRank, getProgress, STORAGE_KEY, RANKS } from '../utils/gamification';
 import { useUser } from './UserContext';
+import { logger } from '../utils/logger';
 
 // Browser detection helper
 const isChrome = (): boolean => {
@@ -231,7 +232,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin, 
   const isAdmin = user && ADMIN_EMAILS.some(email => email.toLowerCase().trim() === userEmailNormalized);
 
   // Debug log
-  console.log('[LandingPage Admin Debug] userEmail:', userEmailNormalized, 'isAdmin:', isAdmin, 'onAdmin:', !!onAdmin);
+  logger.debug('[LandingPage Admin Debug] userEmail:', userEmailNormalized, 'isAdmin:', isAdmin, 'onAdmin:', !!onAdmin);
 
   // Gamification State - use user context exportCount (clears on logout)
   const exportCount = user?.exportCount || 0;
