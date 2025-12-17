@@ -15,8 +15,8 @@ const CHECKOUT_URLS = {
     lifetime: 'https://lynk.id/mma267/vqdp1njd69qn/checkout',
   },
   USD: {
-    pro_monthly: 'https://patternvora.lemonsqueezy.com/buy/de19f34a-1e18-4096-a8f0-3f5ff51e0d1e',
-    lifetime: 'https://patternvora.lemonsqueezy.com/buy/b53c3319-7352-423a-99be-a245f8ccf5c9',
+    pro_monthly: 'https://patternvora.lemonsqueezy.com/buy/ad83a5ce-b47d-4e79-bf9e-10814ccf5481',
+    lifetime: 'https://patternvora.lemonsqueezy.com/buy/5b87d642-c6e4-412c-b8f4-38b7a0e2a525',
   },
 };
 
