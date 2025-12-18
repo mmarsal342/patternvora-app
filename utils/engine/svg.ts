@@ -233,14 +233,25 @@ export const generateSVG = async (
     width: number,
     height: number,
     state: AppState,
-    fonts: FontDef[]
+    fonts: FontDef[],
+    clipToCanvas: boolean = false
 ): Promise<string> => {
-    let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">`;
+    // Build defs section for clipPath if needed
+    const defsContent = clipToCanvas
+        ? `<defs><clipPath id="canvas-clip"><rect x="0" y="0" width="${width}" height="${height}"/></clipPath></defs>`
+        : '';
+
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">${defsContent}`;
 
     // Add global background from first visible layer (prevents black bars in viewers)
     const firstVisibleLayer = state.layers.find(l => l.visible);
     if (firstVisibleLayer && !firstVisibleLayer.config.transparentBackground) {
         svg += `<rect width="100%" height="100%" fill="${firstVisibleLayer.config.palette.bg}"/>`;
+    }
+
+    // Wrap content in clip group if clipToCanvas is enabled
+    if (clipToCanvas) {
+        svg += `<g clip-path="url(#canvas-clip)">`;
     }
 
     // Iterate Layers
@@ -254,6 +265,11 @@ export const generateSVG = async (
         svg += generateLayerSVG(width, height, layer.config, layer.id);
         svg += `</g>`;
     });
+
+    // Close clip group if enabled
+    if (clipToCanvas) {
+        svg += `</g>`;
+    }
 
     svg += `</svg>`;
     return svg;

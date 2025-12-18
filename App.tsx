@@ -8,6 +8,7 @@ import BatchModal from './components/BatchModal';
 import PricingPage from './components/PricingPage';
 import AdminPage from './components/AdminPage';
 import LegalPage from './components/LegalPage';
+import VideoExportProgress from './components/VideoExportProgress';
 import { useHistory } from './hooks/useHistory';
 import { useExport, FREE_EXPORT_LIMIT } from './hooks/useExport';
 import { usePresets } from './hooks/usePresets';
@@ -93,6 +94,15 @@ const App: React.FC = () => {
 
     // Export states provided by useExport hook below
     const [isRecording, setIsRecording] = useState(false);
+
+    // Video export progress state
+    const [exportProgress, setExportProgress] = useState({
+        isExporting: false,
+        mode: 'fast' as 'fast' | 'quality',
+        phase: 'rendering' as 'rendering' | 'encoding',
+        percent: 0,
+        message: ''
+    });
 
     // Edit Mode Toggle (Mouse/Pointer)
     const [isEditMode, setIsEditMode] = useState(false);
@@ -533,6 +543,26 @@ const App: React.FC = () => {
                         updateText={updateText}
                         updateShapeOverride={updateShapeOverride}
                         isEditMode={isEditMode}
+                        onExportProgress={(percent, message, phase) => {
+                            setExportProgress(prev => ({
+                                ...prev,
+                                percent,
+                                message,
+                                phase: phase || prev.phase
+                            }));
+                        }}
+                        onExportStart={(mode) => {
+                            setExportProgress({
+                                isExporting: true,
+                                mode,
+                                phase: 'rendering',
+                                percent: 0,
+                                message: 'Initializing...'
+                            });
+                        }}
+                        onExportComplete={() => {
+                            setExportProgress(prev => ({ ...prev, isExporting: false }));
+                        }}
                     />
 
                     <FilmStrip
@@ -597,6 +627,18 @@ const App: React.FC = () => {
                 onClose={() => setIsBatchModalOpen(false)}
                 baseState={state}
                 loadedImages={loadedImages}
+            />
+
+            <VideoExportProgress
+                isOpen={exportProgress.isExporting}
+                mode={exportProgress.mode}
+                phase={exportProgress.phase}
+                percent={exportProgress.percent}
+                message={exportProgress.message}
+                onCancel={() => {
+                    setExportProgress(prev => ({ ...prev, isExporting: false }));
+                    setIsRecording(false);
+                }}
             />
         </div>
     );

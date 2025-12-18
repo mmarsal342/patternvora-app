@@ -23,7 +23,7 @@ export interface UseExportReturn {
     // Export functions
     handleDownloadPNG: (size: number) => void;
     handleDownloadJPG: (size: number) => void;
-    handleDownloadSVG: () => Promise<void>;
+    handleDownloadSVG: (clipToCanvas?: boolean) => Promise<void>;
 
     // Utility functions
     canExport: () => { allowed: boolean; reason?: string };
@@ -216,19 +216,19 @@ export function useExport(options: UseExportOptions): UseExportReturn {
     }, [state, loadedImages, isPro, isGuest, canExport, checkTierAccess, getExportSize, onLogin, onShowPricing, onExportComplete]);
 
     // Download SVG
-    const handleDownloadSVG = useCallback(async () => {
+    const handleDownloadSVG = useCallback(async (clipToCanvas: boolean = false) => {
         if (!checkTierAccess('svg')) return;
 
         setIsGeneratingSVG(true);
         try {
             const dims = getDimensions(state.aspectRatio, 1000);
             const allFonts = [...DEFAULT_FONTS, ...customFonts];
-            const svgString = await generateSVG(dims.width, dims.height, state, allFonts);
+            const svgString = await generateSVG(dims.width, dims.height, state, allFonts, clipToCanvas);
             const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `patternvora-${Date.now()}.svg`;
+            link.download = `patternvora-${clipToCanvas ? 'clipped-' : ''}${Date.now()}.svg`;
             link.click();
             onExportComplete();
         } catch (error) {

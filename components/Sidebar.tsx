@@ -31,7 +31,7 @@ interface SidebarProps {
     onGenerate: () => void;
     onDownloadPNG: (size: number) => void;
     onDownloadJPG: (size: number) => void;
-    onDownloadSVG: () => void;
+    onDownloadSVG: (clipToCanvas?: boolean) => void;
     isGeneratingSVG?: boolean;
     isExportingPNG?: boolean;
     isExportingJPG?: boolean;
@@ -61,6 +61,7 @@ const SidebarLayout: React.FC<Omit<SidebarProps, keyof SidebarContextType>> = (p
     const { state, activeLayerConfig, updateState, onGenerate } = useSidebar();
     const { isPro, isGuest } = useUser();
     const [exportSize, setExportSize] = useState<ExportSize>(4096);
+    const [svgClipToCanvas, setSvgClipToCanvas] = useState(false);
     const [isFooterOpen, setIsFooterOpen] = useState(true);
 
     // Quick Save Preset state
@@ -250,14 +251,28 @@ const SidebarLayout: React.FC<Omit<SidebarProps, keyof SidebarContextType>> = (p
                                 {isExportingJPG ? <div className="w-3 h-3 border-2 border-slate-400/30 border-t-slate-600 rounded-full animate-spin" /> : <Download size={14} />}
                                 <span>JPG</span>
                             </button>
-                            <button
-                                onClick={onDownloadSVG}
-                                disabled={isGeneratingSVG}
-                                className="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-70"
-                            >
-                                {isGeneratingSVG ? <div className="w-3 h-3 border-2 border-slate-400/30 border-t-slate-600 rounded-full animate-spin" /> : <Download size={14} />}
-                                <span>SVG</span>
-                            </button>
+                            <div className="relative flex flex-col gap-1">
+                                <button
+                                    onClick={() => onDownloadSVG(svgClipToCanvas)}
+                                    disabled={isGeneratingSVG}
+                                    className="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-70"
+                                >
+                                    {isGeneratingSVG ? <div className="w-3 h-3 border-2 border-slate-400/30 border-t-slate-600 rounded-full animate-spin" /> : <Download size={14} />}
+                                    <span>SVG</span>
+                                </button>
+                                <label
+                                    className="flex items-center gap-1.5 text-[10px] text-slate-500 cursor-pointer hover:text-slate-700 justify-center"
+                                    title="Clip shapes to canvas boundary. Recommended for Adobe Stock submission. Shapes won't extend beyond artboard."
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={svgClipToCanvas}
+                                        onChange={(e) => setSvgClipToCanvas(e.target.checked)}
+                                        className="w-3 h-3 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                    />
+                                    <span>Stock-Ready</span>
+                                </label>
+                            </div>
                             <button
                                 onClick={() => {
                                     if (!isRecording) {

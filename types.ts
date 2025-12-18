@@ -52,6 +52,8 @@ export type StrokeMode = 'random' | 'fill' | 'stroke';
 
 export type AnimationDirection = 'normal' | 'reverse';
 
+export type VideoExportMode = 'fast' | 'quality';
+
 export type AnimationConfig = {
   enabled: boolean;
   primary: PrimaryAnimationType;
@@ -61,6 +63,7 @@ export type AnimationConfig = {
   resolution: VideoResolution;
   intensity: number; // 0.1 to 3.0
   direction: AnimationDirection;
+  exportMode?: VideoExportMode; // Video export quality mode
 };
 
 export interface ShapeOverride {

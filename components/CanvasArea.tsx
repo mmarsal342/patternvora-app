@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { AppState, TextConfig, ShapeOverride } from '../types';
 import { renderToCanvas, getDimensions, createNoisePattern, getShapeAtPosition, ShapeData } from '../utils/drawingEngine';
 import { Move, Scaling, RotateCw, Trash2, Maximize, X, Grid3x3, Square, Download } from 'lucide-react';
+import { getVideoExportService } from '../utils/videoExport';
 
 interface CanvasAreaProps {
     state: AppState;
@@ -12,12 +13,26 @@ interface CanvasAreaProps {
     updateText?: (updates: Partial<TextConfig>) => void;
     updateShapeOverride?: (index: number, override: Partial<ShapeOverride>, layerId?: string) => void;
     isEditMode?: boolean;
+    onExportProgress?: (percent: number, message: string, phase?: 'rendering' | 'encoding') => void;
+    onExportStart?: (mode: 'fast' | 'quality') => void;
+    onExportComplete?: () => void;
 }
 
 type SelectedShape = ShapeData & { layerId: string };
 type ViewMode = 'single' | 'tile';
 
-const CanvasArea: React.FC<CanvasAreaProps> = ({ state, loadedImages, setRecordingState, isRecording, updateText, updateShapeOverride, isEditMode }) => {
+const CanvasArea: React.FC<CanvasAreaProps> = ({
+    state,
+    loadedImages,
+    setRecordingState,
+    isRecording,
+    updateText,
+    updateShapeOverride,
+    isEditMode,
+    onExportProgress,
+    onExportStart,
+    onExportComplete
+}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasWrapperRef = useRef<HTMLDivElement>(null);
@@ -381,14 +396,67 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({ state, loadedImages, setRecordi
         }
     }, [isRecording]);
 
-    // Recording Initialization
+    //Recording Initialization - Hybrid Mode (MediaRecorder or FFmpeg)
     useEffect(() => {
         if (isRecording && !isInitializingRef.current && canvasRef.current) {
             isInitializingRef.current = true;
+            const activeLayer = state.layers.find(l => l.id === state.activeLayerId) || state.layers[0];
+            const exportMode = activeLayer.config.animation.exportMode || 'fast';
+            const resolution = activeLayer.config.animation.resolution || 'HD';
+            const duration = activeLayer.config.animation.duration;
+            const fps = 30;
+
+            // Quality Mode: Use FFmpeg via WebWorker
+            if (exportMode === 'quality') {
+                onExportStart?.('quality');
+
+                // Use VideoExportService
+                const service = getVideoExportService();
+
+                service.export({
+                    state,
+                    loadedImages,
+                    mode: 'quality',
+                    resolution,
+                    duration,
+                    fps,
+                    onProgress: (percent, message) => {
+                        // Determine phase based on percent
+                        const phase = percent < 50 ? 'rendering' : 'encoding';
+                        onExportProgress?.(percent, message, phase);
+                    }
+                }).then((result) => {
+                    // Download the exported video
+                    const url = URL.createObjectURL(result.blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `patternvora-quality-${resolution}-${Date.now()}.mp4`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+
+                    onExportComplete?.();
+                    setRecordingState(false);
+                    isInitializingRef.current = false;
+                }).catch((error) => {
+                    console.error('Quality export failed:', error);
+                    alert(`Export failed: ${error.message}\n\nTrying fast mode instead...`);
+
+                    // Fallback to fast mode
+                    onExportComplete?.();
+                    isInitializingRef.current = false;
+                    // Could trigger fast mode here as fallback
+                    setRecordingState(false);
+                });
+
+                return; // Exit early for quality mode
+            }
+
+            // Fast Mode: Use existing MediaRecorder logic
+            onExportStart?.('fast');
+
             const canvas = canvasRef.current;
             const ctx = canvas.getContext('2d');
 
-            const resolution = activeLayer.config.animation.resolution || 'HD';
             const baseSize = resolution === 'SD' ? 1280 : resolution === '4K' ? 3840 : 1920;
 
             const renderDims = getDimensions(state.aspectRatio, baseSize);
@@ -421,7 +489,7 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({ state, loadedImages, setRecordi
                         const blob = new Blob(chunksRef.current, { type: mimeType });
                         if (blob.size > 0) {
                             // Calculate actual bitrate from file size
-                            const durationSec = activeLayer.config.animation.duration;
+                            const durationSec = duration;
                             const fileSizeMB = blob.size / (1024 * 1024);
                             const actualBitrateMbps = (fileSizeMB * 8) / durationSec;
                             const bitrateStr = actualBitrateMbps.toFixed(1);
@@ -432,9 +500,10 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({ state, loadedImages, setRecordi
                             const url = URL.createObjectURL(blob);
                             const a = document.createElement('a');
                             a.href = url;
-                            a.download = `patternvora-${resLabel}-${bitrateStr}mbps-${Date.now()}.${ext}`;
+                            a.download = `patternvora-fast-${resLabel}-${bitrateStr}mbps-${Date.now()}.${ext}`;
                             a.click();
                         }
+                        onExportComplete?.();
                         setRecordingState(false);
                         recorderReadyRef.current = false;
                         isInitializingRef.current = false;
@@ -448,12 +517,13 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({ state, loadedImages, setRecordi
 
                 } catch (e) {
                     console.error("Recording init failed", e);
+                    onExportComplete?.();
                     setRecordingState(false);
                     isInitializingRef.current = false;
                 }
             }, 100);
         }
-    }, [isRecording, setRecordingState, state.aspectRatio, activeLayer.config.animation.resolution]);
+    }, [isRecording, setRecordingState, state.aspectRatio, state, loadedImages, onExportStart, onExportProgress, onExportComplete]);
 
     // Unified Animation Loop
     useEffect(() => {

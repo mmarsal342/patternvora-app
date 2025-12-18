@@ -99,6 +99,56 @@ const MotionPanel: React.FC = () => {
                             </div>
                         </div>
 
+                        {/* Export Mode Toggle - Fast vs Quality */}
+                        <div>
+                            <label className="text-xs font-medium text-slate-600 block mb-2">Export Mode</label>
+                            <div className="space-y-2">
+                                <label className="flex items-start gap-2 p-2 rounded-lg border border-slate-200 hover:border-indigo-300 cursor-pointer transition-colors">
+                                    <input
+                                        type="radio"
+                                        name="exportMode"
+                                        value="fast"
+                                        checked={!anim.exportMode || anim.exportMode === 'fast'}
+                                        onChange={() => updateAnimation({ exportMode: 'fast' })}
+                                        className="mt-0.5 text-indigo-600 focus:ring-indigo-500"
+                                    />
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs font-semibold text-slate-700">Fast Export</span>
+                                            <span className="text-[9px] px-1.5 py-0.5 bg-green-100 text-green-700 rounded-full font-bold">2-3s</span>
+                                        </div>
+                                        <p className="text-[10px] text-slate-500 mt-0.5">Hardware-accelerated. UI freezes during export.</p>
+                                    </div>
+                                </label>
+
+                                <label className="flex items-start gap-2 p-2 rounded-lg border border-slate-200 hover:border-purple-300 cursor-pointer transition-colors">
+                                    <input
+                                        type="radio"
+                                        name="exportMode"
+                                        value="quality"
+                                        checked={anim.exportMode === 'quality'}
+                                        onChange={() => updateAnimation({ exportMode: 'quality' })}
+                                        className="mt-0.5 text-purple-600 focus:ring-purple-500"
+                                    />
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs font-semibold text-slate-700">High Quality</span>
+                                            <span className="text-[9px] px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded-full font-bold">20-30s</span>
+                                        </div>
+                                        <p className="text-[10px] text-slate-500 mt-0.5">Consistent quality. UI stays responsive.</p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            {anim.exportMode === 'quality' && (
+                                <div className="mt-2 p-2 bg-purple-50 border border-purple-200 rounded-lg">
+                                    <p className="text-[9px] text-purple-700 leading-relaxed">
+                                        <strong>Quality Mode:</strong> Uses FFmpeg software encoding for consistent results. Takes longer but guarantees high-quality H.264 output on all devices.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
                         {/* Intensity Control - Show if any animation is active */}
                         {(anim.primary !== 'none' || anim.secondary !== 'none') && (
                             <RangeControl
