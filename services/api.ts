@@ -36,14 +36,27 @@ export const api = {
         window.location.href = `${API_BASE_URL}/auth/google?redirect_url=${encodeURIComponent(redirectUrl)}`;
     },
 
-    // Handle callback - extract token from URL and store it
+    // Handle callback - extract token from URL fragment (secure) or query param (legacy)
     handleAuthCallback: (): string | null => {
-        const params = new URLSearchParams(window.location.search);
-        const token = params.get('token');
+        // Try URL fragment first (new secure method: /#token=xxx)
+        const hash = window.location.hash;
+        let token: string | null = null;
+
+        if (hash && hash.includes('token=')) {
+            // Parse fragment as URLSearchParams (remove leading #)
+            const fragmentParams = new URLSearchParams(hash.substring(1));
+            token = fragmentParams.get('token');
+        }
+
+        // Fallback to query param for backward compatibility (?token=xxx)
+        if (!token) {
+            const queryParams = new URLSearchParams(window.location.search);
+            token = queryParams.get('token');
+        }
 
         if (token) {
             localStorage.setItem(AUTH_TOKEN_KEY, token);
-            // Clean up URL
+            // Clean up URL (remove both fragment and query params)
             window.history.replaceState({}, document.title, window.location.pathname);
             return token;
         }

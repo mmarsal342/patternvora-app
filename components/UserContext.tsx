@@ -42,7 +42,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Initial Load - Check for auth callback token or existing session
     useEffect(() => {
         const init = async () => {
-            // 1. Check if this is an OAuth callback (has ?token= in URL)
+            // 1. Check if this is an OAuth callback (has #token= in URL fragment)
             const callbackToken = api.handleAuthCallback();
 
             if (callbackToken) {
