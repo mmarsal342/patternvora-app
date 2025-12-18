@@ -150,6 +150,36 @@ const getSingleShapeSVG = (
             d += ` L ${x + step / 2} ${(i % 2 === 0) ? -h : h} L ${x + step} 0`;
         }
         content += `<path d="${d}" fill="none" stroke="${color}" stroke-width="${Math.max(2, size / 10)}" stroke-linecap="round" stroke-linejoin="round" />`;
+    } else if (shape.type === 'char') {
+        // Typo style - render character as text element
+        const char = shape.char || 'A';
+        content += `<text font-family="sans-serif" font-size="${size}" font-weight="bold" fill="${color}" text-anchor="middle" dominant-baseline="central">${char}</text>`;
+    } else if (shape.type === 'arc') {
+        // Half-circle arc
+        const r = size / 2;
+        content += isStroke
+            ? `<path d="M ${-r} 0 A ${r} ${r} 0 0 1 ${r} 0" fill="none" stroke="${color}" stroke-width="${Math.max(2, strokeWidth * 2)}" />`
+            : `<path d="M ${-r} 0 A ${r} ${r} 0 0 1 ${r} 0 Z" fill="${color}" />`;
+    } else if (shape.type === 'line') {
+        // Simple horizontal line
+        content += `<line x1="${-size / 2}" y1="0" x2="${size / 2}" y2="0" stroke="${color}" stroke-width="${Math.max(2, strokeWidth * 2)}" stroke-linecap="round" />`;
+    } else if (shape.type === 'star') {
+        // 5-pointed star
+        const spikes = 5;
+        const outerRadius = size / 2;
+        const innerRadius = size / 4;
+        let points = "";
+        for (let i = 0; i < spikes * 2; i++) {
+            const r = (i % 2 === 0) ? outerRadius : innerRadius;
+            const angle = (i / (spikes * 2)) * Math.PI * 2 - Math.PI / 2;
+            points += `${Math.cos(angle) * r},${Math.sin(angle) * r} `;
+        }
+        content += `<polygon points="${points.trim()}" ${getFillOrStroke()} />`;
+    } else if (shape.type === 'blob') {
+        // Organic blob shape using bezier curves
+        const r = size / 2;
+        const d = `M ${r} 0 C ${r} ${r * 0.5} ${r * 0.5} ${r} 0 ${r} C ${-r * 0.5} ${r} ${-r} ${r * 0.5} ${-r} 0 C ${-r} ${-r * 0.5} ${-r * 0.5} ${-r} 0 ${-r} C ${r * 0.5} ${-r} ${r} ${-r * 0.5} ${r} 0 Z`;
+        content += `<path d="${d}" fill="${color}" />`;
     } else if (shape.type === 'image' && shape.assetId) {
         const asset = config.customImage.assets.find(a => a.id === shape.assetId);
         if (asset) {
