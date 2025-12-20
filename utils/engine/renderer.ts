@@ -67,7 +67,10 @@ export const drawShape = (
         }
 
         const direction = anim.direction === 'normal' ? 1 : -1;
-        const t = (anim.enabled ? progress * Math.PI * 2 : 0) * shape.speedFactor * speedMultiplier * direction;
+        // CRITICAL FIX: Use integer speedFactor for perfect wave looping
+        // Floating speedFactor causes t mismatch at progress boundaries
+        const integerSpeedFactor = Math.max(1, Math.round(shape.speedFactor));
+        const t = (anim.enabled ? progress * Math.PI * 2 : 0) * integerSpeedFactor * speedMultiplier * direction;
 
         let amplitude = shape.size * 0.3;
         if (anim.enabled && anim.secondary === 'pulse') {

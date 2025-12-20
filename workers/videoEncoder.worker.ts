@@ -16,7 +16,8 @@ async function initializeFFmpeg() {
 
     ffmpeg = new FFmpeg();
 
-    const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+    // Use jsdelivr CDN for better reliability (fallback if unpkg fails)
+    const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
 
     await ffmpeg.load({
         coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
