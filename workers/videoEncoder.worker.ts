@@ -10,23 +10,60 @@ import { renderToCanvas, getDimensions, createNoisePattern } from '../utils/draw
 let ffmpeg: FFmpeg | null = null;
 let isFFmpegLoaded = false;
 
-// Initialize FFmpeg (lazy load from CDN)
+// Initialize FFmpeg (lazy load from self-hosted files)
 async function initializeFFmpeg() {
-    if (isFFmpegLoaded && ffmpeg) return ffmpeg;
+    if (isFFmpegLoaded && ffmpeg) {
+        console.log('[FFmpeg] Already loaded, reusing instance');
+        return ffmpeg;
+    }
 
+    console.log('[FFmpeg] 🚀 Starting initialization...');
     ffmpeg = new FFmpeg();
 
     // Use self-hosted FFmpeg files (fixes CORS blocking from CDN)
     // Files served from /public/ffmpeg/ directory
     const baseURL = '/ffmpeg';
+    console.log('[FFmpeg] 📁 Base URL:', baseURL);
 
-    await ffmpeg.load({
-        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-    });
+    try {
+        const coreURL = `${baseURL}/ffmpeg-core.js`;
+        const wasmURL = `${baseURL}/ffmpeg-core.wasm`;
 
-    isFFmpegLoaded = true;
-    return ffmpeg;
+        console.log('[FFmpeg] 📥 Fetching files:');
+        console.log('  - Core JS:', coreURL);
+        console.log('  - WASM:', wasmURL);
+
+        // Convert to Blob URLs (required by FFmpeg.wasm)
+        console.log('[FFmpeg] 🔄 Converting to Blob URLs...');
+        const coreBlobURL = await toBlobURL(coreURL, 'text/javascript');
+        console.log('[FFmpeg] ✅ Core Blob URL created:', coreBlobURL.substring(0, 50) + '...');
+
+        const wasmBlobURL = await toBlobURL(wasmURL, 'application/wasm');
+        console.log('[FFmpeg] ✅ WASM Blob URL created:', wasmBlobURL.substring(0, 50) + '...');
+
+        console.log('[FFmpeg] ⚙️ Loading FFmpeg library...');
+        await ffmpeg.load({
+            coreURL: coreBlobURL,
+            wasmURL: wasmBlobURL,
+        });
+
+        isFFmpegLoaded = true;
+        console.log('[FFmpeg] ✅ Successfully loaded!');
+        return ffmpeg;
+    } catch (error) {
+        console.error('[FFmpeg] ❌ Initialization failed!');
+        console.error('[FFmpeg] Error details:', error);
+        console.error('[FFmpeg] Error message:', error instanceof Error ? error.message : String(error));
+        console.error('[FFmpeg] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+
+        // Additional diagnostic info
+        console.error('[FFmpeg] Diagnostic info:');
+        console.error('  - Base URL:', baseURL);
+        console.error('  - Current origin:', self.location?.origin || 'unknown');
+        console.error('  - Worker location:', self.location?.href || 'unknown');
+
+        throw new Error(`FFmpeg initialization failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
 }
 
 // Convert ImageData to PNG Blob
@@ -59,6 +96,12 @@ async function loadImages(imageMap: Record<string, string>): Promise<Record<stri
 // Main encoding function
 self.onmessage = async (e: MessageEvent<EncodeMessage>) => {
     const { state, loadedImages, duration, fps, resolution, width, height } = e.data;
+
+    console.log('[Worker] 📨 Received encode request:');
+    console.log('  - Duration:', duration, 's');
+    console.log('  - FPS:', fps);
+    console.log('  - Resolution:', resolution, `(${width}x${height})`);
+    console.log('  - Total frames:', Math.floor(duration * fps));
 
     try {
         // Send initial progress
