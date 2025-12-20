@@ -37,9 +37,10 @@ export const applyAnimation = (
     }
 
     if (config.secondary === 'spin') {
-        // Ensure integer cycles for perfect loop
+        // CRITICAL FIX: Integer cycles for perfect spin loop
         const cycles = intensityInt;
-        const totalRotation = 360 * shape.speedFactor * cycles;
+        const integerSpeed = Math.max(1, Math.round(shape.speedFactor));
+        const totalRotation = 360 * integerSpeed * cycles;
         const currentRotOffset = totalRotation * progress * dir;
         shape.rotation += currentRotOffset;
     }
@@ -59,8 +60,9 @@ export const applyAnimation = (
         const dist = Math.sqrt(dx * dx + dy * dy);
         const initialAngle = Math.atan2(dy, dx);
 
-        // Integer cycles for orbit
-        const totalAngle = Math.PI * 2 * shape.speedFactor * intensityInt;
+        // CRITICAL FIX: Integer cycles for perfect orbit loop
+        const integerSpeed = Math.max(1, Math.round(shape.speedFactor));
+        const totalAngle = Math.PI * 2 * integerSpeed * intensityInt;
         const angleOffset = totalAngle * progress * dir;
         const currentAngle = initialAngle + angleOffset;
 
@@ -74,9 +76,11 @@ export const applyAnimation = (
 
     if (config.primary === 'float') {
         const amplitude = 50 * config.intensity;
-        // Integer frequency multiplier for perfect loop
-        const freqY = shape.speedFactor;
-        const freqX = Math.ceil(shape.speedFactor * 0.5);
+        // CRITICAL FIX: Use integer speedFactor for perfect loop
+        // Floating speedFactor (e.g., 1.237) causes position mismatch at progress boundaries
+        const integerSpeed = Math.max(1, Math.round(shape.speedFactor));
+        const freqY = integerSpeed;
+        const freqX = Math.max(1, Math.ceil(integerSpeed * 0.5));
 
         shape.y += Math.sin(t * freqY + phase) * amplitude;
         shape.x += Math.cos(t * freqX + phase) * (10 * config.intensity);
