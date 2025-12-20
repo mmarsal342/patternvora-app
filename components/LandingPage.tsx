@@ -591,62 +591,112 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin, 
         </section>
       </main>
 
-      {/* FAQ Section - Collapsible Accordion */}
+      {/* FAQ Section - Thematic Organization */}
       <section className="bg-slate-50 py-20">
         <div className="max-w-3xl mx-auto px-6">
           <h2 className="text-3xl font-extrabold text-center text-slate-900 mb-4">Frequently Asked Questions</h2>
-          <p className="text-center text-slate-500 mb-12">Got questions? We've got answers.</p>
+          <p className="text-center text-slate-500 mb-12">Everything you need to know about PatternVora</p>
 
-          <div className="space-y-3">
-            {/* Stock/Commercial Questions */}
-            <FAQItem
-              question="Can I sell these on stock marketplaces (Adobe Stock, etc)?"
-              answer="Yes! You own the full IP. Important for Adobe Stock: You must check the 'Created using generative AI tools' box during submission. Adobe broadly classifies procedural/algorithmic tools under this label for transparency, even though PatternVora isn't neural AI."
-            />
-            <FAQItem
-              question="How should I label this on Shutterstock?"
-              answer="Shutterstock accepts procedural content but bans AI models trained on stolen art. Since PatternVora is procedural and IP-safe, it is allowed. We recommend adding 'Procedurally-generated pattern' in your item description."
-            />
-            <FAQItem
-              question="Is this using AI (Generative AI)?"
-              answer="No. PatternVora uses 'Algorithmic/Procedural Generation' (pure math & logic). No external APIs, no data training, and no hallucinations. It runs 100% offline."
-            />
+          {/* SECTION 1: Licensing & Commercial Use */}
+          <div className="mb-10">
+            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <span className="text-2xl">💼</span>
+              Licensing & Commercial Use
+            </h3>
+            <div className="space-y-3">
+              <FAQItem
+                question="Can I sell these on stock marketplaces (Adobe Stock, etc)?"
+                answer="Yes! You own the full IP. Important for Adobe Stock: You must check the 'Created using generative AI tools' box during submission. Adobe broadly classifies procedural/algorithmic tools under this label for transparency, even though PatternVora isn't neural AI."
+              />
+              <FAQItem
+                question="How should I label this on Shutterstock?"
+                answer="Shutterstock accepts procedural content but bans AI models trained on stolen art. Since PatternVora is procedural and IP-safe, it is allowed. We recommend adding 'Procedurally-generated pattern' in your item description."
+              />
+              <FAQItem
+                question="Is this using AI (Generative AI)?"
+                answer="No. PatternVora uses 'Algorithmic/Procedural Generation' (pure math & logic). No external APIs, no data training, and no hallucinations. It runs 100% offline."
+              />
+              <FAQItem
+                question="Can I use patterns commercially?"
+                answer="Yes! All patterns you create are 100% yours. Free users can use exports for personal and commercial projects. Pro users get additional benefits like no watermark and 4K resolution for professional stock assets."
+              />
+            </div>
+          </div>
 
-            {/* Pricing & Usage */}
-            <FAQItem
-              question="Is PatternVora free to use?"
-              answer="Yes, the basic editor is completely free to use directly in your browser. No account required. Free users get 10 exports per month with watermark. Pro users get unlimited exports, 4K resolution, and no watermark."
-            />
-            <FAQItem
-              question="How do export limits work?"
-              answer="Free users get 10 image exports per 30-day period, resetting from your sign-up date. Pro and Lifetime users have unlimited exports. Video recording and SVG export are Pro-only features."
-            />
-            <FAQItem
-              question="Can I use patterns commercially?"
-              answer="Yes! All patterns you create are 100% yours. Free users can use exports for personal and commercial projects. Pro users get additional benefits like no watermark and 4K resolution for professional stock assets."
-            />
+          {/* SECTION 2: Pricing & Export Limits */}
+          <div className="mb-10">
+            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <span className="text-2xl">💰</span>
+              Pricing & Export Limits
+            </h3>
+            <div className="space-y-3">
+              <FAQItem
+                question="Is PatternVora free to use?"
+                answer="Yes, the basic editor is completely free to use directly in your browser. No account required. Free users get 10 exports per month with watermark. Pro users get unlimited exports, 4K resolution, and no watermark."
+              />
+              <FAQItem
+                question="How do export limits work?"
+                answer="Free users get 10 image exports per 30-day period, resetting from your sign-up date. Pro and Lifetime users have unlimited exports. Video recording and SVG export are Pro-only features."
+              />
+            </div>
+          </div>
 
-            {/* Technical */}
-            <FAQItem
-              question="Does it work offline?"
-              answer="Yes! Once loaded, all generation happens locally on your device using your CPU/GPU. No internet required after the initial page load."
-            />
-            <FAQItem
-              question="Why are my exported files smaller than expected?"
-              answer="PatternVora generates geometric patterns with flat colors and gradients, which compress extremely efficiently. A 4K pattern file at 95% JPG quality might only be 0.5-1MB because there's less 'noise' compared to photos. This doesn't affect visual quality—your exports are still high-fidelity and print-ready!"
-            />
-            <FAQItem
-              question="What's the difference between PNG and JPG export?"
-              answer="PNG is lossless (no quality loss) but larger files. JPG uses compression for smaller files with minimal visible quality loss. For patterns, JPG at 95% quality is virtually indistinguishable from PNG. Use PNG if you need transparency or plan to edit further."
-            />
-            <FAQItem
-              question="Is my data saved if I close the browser?"
-              answer="Your presets are saved locally in your browser using IndexedDB. However, we recommend exporting important presets to JSON files for backup. Your export count is synced to your account if you're logged in."
-            />
-            <FAQItem
-              question="Why does my video export look lower quality than the preview?"
-              answer="Video (MP4) export quality depends on your device's hardware and browser. Unlike PNG/JPG/SVG exports which render a single frame perfectly, video requires real-time encoding of hundreds of frames. For best results: use Google Chrome, close other browser tabs, don't minimize the window during recording, and choose HD (1080p) for most devices. The filename shows your actual output bitrate (e.g., 12.5mbps) so you can verify quality. PNG, JPG, and SVG exports work perfectly at all resolutions including 4K."
-            />
+          {/* SECTION 3: Video Export */}
+          <div className="mb-10">
+            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <span className="text-2xl">🎬</span>
+              Video Export
+            </h3>
+            <div className="space-y-3">
+              <FAQItem
+                question="Why does my fast mode video have a small jump when looping?"
+                answer="Fast mode video export uses MediaRecorder, which has variable framerate (not exact 30fps). This causes the last captured frame to be slightly different from the first frame, resulting in a small (~1%) visual discontinuity when the video loops. Most users won't notice this, but if you need pixel-perfect seamless loops for professional use (Instagram Stories, TikTok, Stream overlays), we recommend using Quality Mode (Pro feature), which renders exact frame counts for perfect loops."
+              />
+              <FAQItem
+                question="What's the difference between Fast Export and Quality Mode?"
+                answer="Fast Export uses your browser's MediaRecorder for quick 2-3 second exports with hardware acceleration. However, it may have a small loop discontinuity (~1% jump) and quality depends on your device. Quality Mode (Pro only) uses FFmpeg software encoding for consistent, high-quality H.264 output with perfect seamless loops. It takes 20-30 seconds but guarantees professional results on all devices. For most casual use, Fast mode is fine. For stock submissions or client work, use Quality mode."
+              />
+              <FAQItem
+                question="Why does my video export look lower quality than the preview?"
+                answer="Video (MP4) export quality depends on your device's hardware and browser. Unlike PNG/JPG/SVG exports which render a single frame perfectly, video requires real-time encoding of hundreds of frames. For best results: use Google Chrome, close other browser tabs, don't minimize the window during recording, and choose HD (1080p) for most devices. The filename shows your actual output bitrate (e.g., 12.5mbps) so you can verify quality. PNG, JPG, and SVG exports work perfectly at all resolutions including 4K."
+              />
+            </div>
+          </div>
+
+          {/* SECTION 4: Export Formats */}
+          <div className="mb-10">
+            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <span className="text-2xl">📦</span>
+              Export Formats
+            </h3>
+            <div className="space-y-3">
+              <FAQItem
+                question="Why are my exported files smaller than expected?"
+                answer="PatternVora generates geometric patterns with flat colors and gradients, which compress extremely efficiently. A 4K pattern file at 95% JPG quality might only be 0.5-1MB because there's less 'noise' compared to photos. This doesn't affect visual quality—your exports are still high-fidelity and print-ready!"
+              />
+              <FAQItem
+                question="What's the difference between PNG and JPG export?"
+                answer="PNG is lossless (no quality loss) but larger files. JPG uses compression for smaller files with minimal visible quality loss. For patterns, JPG at 95% quality is virtually indistinguishable from PNG. Use PNG if you need transparency or plan to edit further."
+              />
+            </div>
+          </div>
+
+          {/* SECTION 5: Technical & Browser */}
+          <div className="mb-10">
+            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <span className="text-2xl">⚙️</span>
+              Technical & Browser
+            </h3>
+            <div className="space-y-3">
+              <FAQItem
+                question="Does it work offline?"
+                answer="Yes! Once loaded, all generation happens locally on your device using your CPU/GPU. No internet required after the initial page load."
+              />
+              <FAQItem
+                question="Is my data saved if I close the browser?"
+                answer="Your presets are saved locally in your browser using IndexedDB. However, we recommend exporting important presets to JSON files for backup. Your export count is synced to your account if you're logged in."
+              />
+            </div>
           </div>
         </div>
       </section>
