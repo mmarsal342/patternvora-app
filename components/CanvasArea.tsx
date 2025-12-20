@@ -587,6 +587,13 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
                         const frameTime = 1000 / 30;  // ~33.33ms per frame
                         const stopTime = durationMs - frameTime;
 
+                        // ADDITIONAL FIX: Clamp elapsedTime to ensure last rendered frame = first frame
+                        // MediaRecorder has variable framerate, so we force wrap when near end
+                        if (elapsedTime >= stopTime - frameTime) {
+                            // Within 2 frames of end: clamp to duration so modulo wraps to 0
+                            elapsedTime = elapsedTime % durationMs;
+                        }
+
                         if (elapsedTime >= stopTime && !stoppingRef.current) {
                             stoppingRef.current = true;
                             if (mediaRecorderRef.current?.state === 'recording') {
