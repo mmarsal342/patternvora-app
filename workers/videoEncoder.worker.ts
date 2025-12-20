@@ -87,7 +87,12 @@ self.onmessage = async (e: MessageEvent<EncodeMessage>) => {
         sendProgress('rendering', 15, `Rendering ${totalFrames} frames...`);
 
         for (let frame = 0; frame < totalFrames; frame++) {
-            const timeMs = (frame / fps) * 1000;
+            // CRITICAL FIX: Map frame [0, N-1] to progress [0, 1) for seamless looping
+            // This ensures frame N-1 approaches progress=1 but never reaches it,
+            // making it visually identical to frame 0 when the loop restarts
+            // Formula: timeMs = (frame / totalFrames) * duration * 1000
+            const progress = frame / totalFrames;
+            const timeMs = progress * duration * 1000;
 
             // Render frame to canvas
             renderToCanvas(ctx, width, height, state, images, timeMs, noisePattern, false, null);
@@ -127,7 +132,8 @@ self.onmessage = async (e: MessageEvent<EncodeMessage>) => {
 
         // Read encoded file
         const data = await ffmpegInstance.readFile('output.mp4');
-        const blob = new Blob([data], { type: 'video/mp4' });
+        // Convert FileData to Uint8Array for Blob compatibility (double assertion for strict types)
+        const blob = new Blob([data as unknown as Uint8Array], { type: 'video/mp4' });
 
         // Clean up virtual filesystem
         for (let frame = 0; frame < totalFrames; frame++) {
