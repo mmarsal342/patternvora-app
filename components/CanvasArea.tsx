@@ -580,7 +580,14 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
                 if (isRecording) {
                     if (recorderReadyRef.current) {
                         elapsedTime = timestamp - startTimeRef.current;
-                        if (elapsedTime >= durationMs && !stoppingRef.current) {
+                        // CRITICAL FIX: Stop recording ONE FRAME BEFORE duration ends
+                        // This ensures last frame approaches progress=1 but never reaches it,
+                        // making it visually identical to first frame (progress=0) for seamless loops
+                        // At 30fps, one frame = 33.33ms
+                        const frameTime = 1000 / 30;  // ~33.33ms per frame
+                        const stopTime = durationMs - frameTime;
+
+                        if (elapsedTime >= stopTime && !stoppingRef.current) {
                             stoppingRef.current = true;
                             if (mediaRecorderRef.current?.state === 'recording') {
                                 mediaRecorderRef.current.stop();
