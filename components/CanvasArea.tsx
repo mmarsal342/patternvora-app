@@ -79,6 +79,10 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const chunksRef = useRef<Blob[]>([]);
 
+    // Fixed-Step Rendering: Virtual clock for frame-perfect timing
+    const virtualTimeRef = useRef<number>(0);
+    const recordingFrameCountRef = useRef<number>(0);
+
     // State Guards
     const stoppingRef = useRef(false);
     const recorderReadyRef = useRef(false);
@@ -512,6 +516,9 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
                     mediaRecorderRef.current = recorder;
                     recorder.start();
 
+                    // Initialize Fixed-Step Rendering clock
+                    virtualTimeRef.current = 0;
+                    recordingFrameCountRef.current = 0;
                     recorderReadyRef.current = true;
                     startTimeRef.current = performance.now();
 
@@ -579,20 +586,21 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
 
                 if (isRecording) {
                     if (recorderReadyRef.current) {
-                        elapsedTime = timestamp - startTimeRef.current;
+                        // FIXED-STEP RENDERING: Use virtual clock for frame-perfect timing
+                        // Instead of unpredictable performance.now(), increment by exact intervals
+                        const TARGET_FPS = 30;
+                        const FRAME_INTERVAL = 1000 / TARGET_FPS;  // Exactly 33.333...ms
 
-                        const frameTime = 1000 / 30;  // ~33.33ms per frame
-                        const stopTime = durationMs - frameTime;
+                        // Use virtual time (always exact) instead of real time (variable)
+                        elapsedTime = virtualTimeRef.current;
 
-                        // CRITICAL FIX: Force last rendered frame to BE the first frame
-                        // When past stop time, render with elapsedTime=0 so it matches loop start
-                        if (elapsedTime >= stopTime) {
-                            elapsedTime = 0;  // Last frame(s) = First frame!
-                        }
+                        // Increment virtual clock by exact frame interval
+                        virtualTimeRef.current += FRAME_INTERVAL;
+                        recordingFrameCountRef.current++;
 
-                        // Check if we should stop recording
-                        const actualElapsed = timestamp - startTimeRef.current;
-                        if (actualElapsed >= stopTime && !stoppingRef.current) {
+                        // Stop when we've captured target number of frames
+                        const targetFrames = Math.floor(loopDuration * TARGET_FPS);
+                        if (recordingFrameCountRef.current >= targetFrames && !stoppingRef.current) {
                             stoppingRef.current = true;
                             if (mediaRecorderRef.current?.state === 'recording') {
                                 mediaRecorderRef.current.stop();
