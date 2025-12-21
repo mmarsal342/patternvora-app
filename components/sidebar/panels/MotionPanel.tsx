@@ -150,9 +150,10 @@ const MotionPanel: React.FC = () => {
                                     </div>
                                 </div>
                             )}
-                        </>
+                        </div>
+                    </>
                 )}
-                    </div>
+            </div>
         </CollapsibleSection>
     );
 };
