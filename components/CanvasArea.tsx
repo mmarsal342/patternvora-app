@@ -475,7 +475,8 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
                     let mimeType = mimeOptions.find(type => MediaRecorder.isTypeSupported(type)) || 'video/webm';
                     let ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
 
-                    const bitrate = resolution === 'SD' ? 6000000 : resolution === '4K' ? 35000000 : 15000000;
+                    // Increased bitrates for better quality (67% improvement for HD/SD, 43% for 4K)
+                    const bitrate = resolution === 'SD' ? 10000000 : resolution === '4K' ? 50000000 : 25000000;
 
                     const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: bitrate });
                     chunksRef.current = [];
