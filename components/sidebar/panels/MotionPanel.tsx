@@ -108,78 +108,51 @@ const MotionPanel: React.FC = () => {
                                         type="radio"
                                         name="exportMode"
                                         value="fast"
-                                        checked={!anim.exportMode || anim.exportMode === 'fast'}
-                                        onChange={() => updateAnimation({ exportMode: 'fast' })}
+                                        checked={true}
+                                        disabled
                                         className="mt-0.5 text-indigo-600 focus:ring-indigo-500"
                                     />
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-xs font-semibold text-slate-700">Fast Export</span>
+                                            <span className="text-xs font-semibold text-slate-700">Fast Export (Only Mode)</span>
                                             <span className="text-[9px] px-1.5 py-0.5 bg-green-100 text-green-700 rounded-full font-bold">2-3s</span>
                                         </div>
-                                        <p className="text-[10px] text-slate-500 mt-0.5">Hardware-accelerated. UI freezes during export.</p>
-                                    </div>
-                                </label>
-
-                                <label className="flex items-start gap-2 p-2 rounded-lg border border-slate-200 hover:border-purple-300 cursor-pointer transition-colors">
-                                    <input
-                                        type="radio"
-                                        name="exportMode"
-                                        value="quality"
-                                        checked={anim.exportMode === 'quality'}
-                                        onChange={() => updateAnimation({ exportMode: 'quality' })}
-                                        className="mt-0.5 text-purple-600 focus:ring-purple-500"
-                                    />
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xs font-semibold text-slate-700">High Quality</span>
-                                            <span className="text-[9px] px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded-full font-bold">20-30s</span>
-                                        </div>
-                                        <p className="text-[10px] text-slate-500 mt-0.5">Consistent quality. UI stays responsive.</p>
+                                        <p className="text-[10px] text-slate-500 mt-0.5">Hardware-accelerated. Quick exports with minor loop discontinuity (~1%).</p>
                                     </div>
                                 </label>
                             </div>
 
-                            {anim.exportMode === 'quality' && (
-                                <div className="mt-2 p-2 bg-purple-50 border border-purple-200 rounded-lg">
-                                    <p className="text-[9px] text-purple-700 leading-relaxed">
-                                        <strong>Quality Mode:</strong> Uses FFmpeg software encoding for consistent results. Takes longer but guarantees high-quality H.264 output on all devices.
-                                    </p>
+                            {/* Intensity Control - Show if any animation is active */}
+                            {(anim.primary !== 'none' || anim.secondary !== 'none') && (
+                                <RangeControl
+                                    label="Intensity / Amplitude" value={anim.intensity} onChange={(v) => updateAnimation({ intensity: v })}
+                                    min={0.1} max={3.0} step={0.1} displayValue={anim.intensity.toFixed(1) + 'x'}
+                                />
+                            )}
+
+                            {/* Direction Control - Only relevant for directional animations */}
+                            {(['orbit', 'scan'].includes(anim.primary) || anim.secondary === 'spin') && (
+                                <div>
+                                    <label className="text-xs text-slate-500 mb-1 block">Direction</label>
+                                    <div className="flex bg-slate-100 rounded-lg p-1">
+                                        <button
+                                            className={`flex-1 py-1 text-[10px] font-medium rounded-md transition-all ${anim.direction === 'normal' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                            onClick={() => updateAnimation({ direction: 'normal' })}
+                                        >
+                                            Normal (CW)
+                                        </button>
+                                        <button
+                                            className={`flex-1 py-1 text-[10px] font-medium rounded-md transition-all ${anim.direction === 'reverse' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                            onClick={() => updateAnimation({ direction: 'reverse' })}
+                                        >
+                                            Reverse (CCW)
+                                        </button>
+                                    </div>
                                 </div>
                             )}
-                        </div>
-
-                        {/* Intensity Control - Show if any animation is active */}
-                        {(anim.primary !== 'none' || anim.secondary !== 'none') && (
-                            <RangeControl
-                                label="Intensity / Amplitude" value={anim.intensity} onChange={(v) => updateAnimation({ intensity: v })}
-                                min={0.1} max={3.0} step={0.1} displayValue={anim.intensity.toFixed(1) + 'x'}
-                            />
-                        )}
-
-                        {/* Direction Control - Only relevant for directional animations */}
-                        {(['orbit', 'scan'].includes(anim.primary) || anim.secondary === 'spin') && (
-                            <div>
-                                <label className="text-xs text-slate-500 mb-1 block">Direction</label>
-                                <div className="flex bg-slate-100 rounded-lg p-1">
-                                    <button
-                                        className={`flex-1 py-1 text-[10px] font-medium rounded-md transition-all ${anim.direction === 'normal' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                        onClick={() => updateAnimation({ direction: 'normal' })}
-                                    >
-                                        Normal (CW)
-                                    </button>
-                                    <button
-                                        className={`flex-1 py-1 text-[10px] font-medium rounded-md transition-all ${anim.direction === 'reverse' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                        onClick={() => updateAnimation({ direction: 'reverse' })}
-                                    >
-                                        Reverse (CCW)
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </>
+                        </>
                 )}
-            </div>
+                    </div>
         </CollapsibleSection>
     );
 };

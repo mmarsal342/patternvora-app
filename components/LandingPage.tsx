@@ -649,12 +649,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onPricing, onAdmin, 
             </h3>
             <div className="space-y-3">
               <FAQItem
-                question="Why does my fast mode video have a small jump when looping?"
-                answer="Fast mode video export uses MediaRecorder, which has variable framerate (not exact 30fps). This causes the last captured frame to be slightly different from the first frame, resulting in a small (~1%) visual discontinuity when the video loops. Most users won't notice this, but if you need pixel-perfect seamless loops for professional use (Instagram Stories, TikTok, Stream overlays), we recommend using Quality Mode (Pro feature), which renders exact frame counts for perfect loops."
+                question="Why does my video have a small jump when looping?"
+                answer="Video export uses MediaRecorder, which has variable framerate (not exact 30fps). This causes the last captured frame to be slightly different from the first frame, resulting in a small (~1%) visual discontinuity when the video loops. Most users won't notice this. For pixel-perfect loops, consider duplicating your video 2x in a video editor, or export as PNG sequence and compile in editing software."
               />
               <FAQItem
-                question="What's the difference between Fast Export and Quality Mode?"
-                answer="Fast Export uses your browser's MediaRecorder for quick 2-3 second exports with hardware acceleration. However, it may have a small loop discontinuity (~1% jump) and quality depends on your device. Quality Mode (Pro only) uses FFmpeg software encoding for consistent, high-quality H.264 output with perfect seamless loops. It takes 20-30 seconds but guarantees professional results on all devices. For most casual use, Fast mode is fine. For stock submissions or client work, use Quality mode."
+                question="Can I get higher quality video exports?"
+                answer="Video export uses your browser's MediaRecorder with hardware acceleration for quick 2-3 second exports. Quality depends on your device and selected resolution. For best results: use Chrome, choose HD (1080p), close other tabs, and don't minimize during export. For professional work requiring perfect loops, consider exporting as PNG sequence (coming soon) and compiling in video editing software like Premiere or After Effects."
               />
               <FAQItem
                 question="Why does my video export look lower quality than the preview?"
