@@ -75,27 +75,14 @@ const MotionPanel: React.FC = () => {
                                 <div className="relative">
                                     <select
                                         value={anim.resolution || 'HD'}
-                                        onChange={(e) => {
-                                            const val = e.target.value as VideoResolution;
-                                            if (val === '4K') {
-                                                if (window.confirm('⚠️ 4K Video Recording\n\nRequirements:\n• Modern desktop/laptop with dedicated GPU\n• At least 8GB RAM\n• Not recommended for mobile or tablet\n\n4K recording may cause lag or browser crash on older devices.\n\nContinue?')) {
-                                                    updateAnimation({ resolution: val });
-                                                }
-                                            } else {
-                                                updateAnimation({ resolution: val });
-                                            }
-                                        }}
+                                        onChange={(e) => updateAnimation({ resolution: e.target.value as VideoResolution })}
                                         className="w-full bg-slate-50 border border-slate-200 rounded-lg p-1.5 h-[26px] text-[10px] font-bold text-slate-700 appearance-none"
                                     >
                                         <option value="SD">720p</option>
-                                        <option value="HD">1080p</option>
-                                        <option value="4K">4K ⭐</option>
+                                        <option value="HD">1080p ⭐</option>
                                     </select>
                                     <ChevronDown size={10} className="absolute right-1.5 top-2 text-slate-500 pointer-events-none" />
                                 </div>
-                                {anim.resolution === '4K' && (
-                                    <p className="text-[9px] text-amber-600 mt-1">⚠️ High-end desktop only</p>
-                                )}
                             </div>
                         </div>
 

@@ -463,6 +463,15 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
             if (renderDims.width % 2 !== 0) renderDims.width -= 1;
             if (renderDims.height % 2 !== 0) renderDims.height -= 1;
 
+            // Check 4K canvas size limits (max ~16384px on most browsers)
+            if (resolution === '4K' && (renderDims.width > 8000 || renderDims.height > 8000)) {
+                console.error('[4K Export] Canvas too large:', renderDims);
+                alert('❌ 4K Export Failed\n\nCanvas size exceeds browser limits.\nTry HD 1080p instead.');
+                onExportComplete?.();
+                setRecordingState(false);
+                return;
+            }
+
             canvas.width = renderDims.width;
             canvas.height = renderDims.height;
 
@@ -478,7 +487,17 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
                     // Increased bitrates for better quality (67% improvement for HD/SD, 43% for 4K)
                     const bitrate = resolution === 'SD' ? 10000000 : resolution === '4K' ? 50000000 : 25000000;
 
-                    const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: bitrate });
+                    // Test if browser can handle the requested config (especially for 4K)
+                    let recorder;
+                    try {
+                        recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: bitrate });
+                    } catch (recorderError) {
+                        console.error('[4K Export] MediaRecorder init failed:', recorderError);
+                        if (resolution === '4K') {
+                            alert('❌ 4K Recording Not Supported\n\nYour browser/device cannot record 4K video at 50 Mbps.\n\nTry:\n• HD 1080p instead\n• Close other tabs\n• Use Chrome on Desktop');
+                        }
+                        throw recorderError;
+                    }
                     chunksRef.current = [];
 
                     recorder.ondataavailable = (e) => {
