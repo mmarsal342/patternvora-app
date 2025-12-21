@@ -29,22 +29,17 @@ async function initializeFFmpeg() {
         const coreURL = `${baseURL}/ffmpeg-core.js`;
         const wasmURL = `${baseURL}/ffmpeg-core.wasm`;
 
-        console.log('[FFmpeg] 📥 Fetching files:');
+        console.log('[FFmpeg] 📥 Loading files directly (no blob conversion):');
         console.log('  - Core JS:', coreURL);
         console.log('  - WASM:', wasmURL);
 
-        // Convert to Blob URLs (required by FFmpeg.wasm)
-        console.log('[FFmpeg] 🔄 Converting to Blob URLs...');
-        const coreBlobURL = await toBlobURL(coreURL, 'text/javascript');
-        console.log('[FFmpeg] ✅ Core Blob URL created:', coreBlobURL.substring(0, 50) + '...');
-
-        const wasmBlobURL = await toBlobURL(wasmURL, 'application/wasm');
-        console.log('[FFmpeg] ✅ WASM Blob URL created:', wasmBlobURL.substring(0, 50) + '...');
-
+        // CRITICAL FIX: Load directly from URLs without blob conversion
+        // Blob URLs cause "Failed to fetch dynamically imported module" in worker
+        // Since files are same-origin, direct loading works without CORS issues
         console.log('[FFmpeg] ⚙️ Loading FFmpeg library...');
         await ffmpeg.load({
-            coreURL: coreBlobURL,
-            wasmURL: wasmBlobURL,
+            coreURL: coreURL,
+            wasmURL: wasmURL,
         });
 
         isFFmpegLoaded = true;
