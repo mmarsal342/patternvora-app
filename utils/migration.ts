@@ -53,7 +53,28 @@ export const DEFAULT_LAYER_CONFIG: LayerConfig = {
     transparentBackground: false,
     overrides: {},
     styleOptions: DEFAULT_STYLE_OPTIONS,
-    compositionOptions: DEFAULT_COMPOSITION_OPTIONS
+    compositionOptions: DEFAULT_COMPOSITION_OPTIONS,
+    truchetOptions: {
+        mazeDensity: 10,
+        arcWeight: 5,
+        concentricCount: 1,
+        doubleStroke: false
+    },
+    guillocheOptions: {
+        curveType: 'hypotrochoid',
+        majorRadius: 100,
+        minorRadius: 40,
+        penDistance: 60,
+        layerCount: 3,
+        strokeWeight: 2
+    },
+    herringboneOptions: {
+        pattern: 'herringbone',
+        tileRatio: 2.5,
+        groutSize: 2,
+        colorMode: 'alternating'
+    },
+    symmetryGroup: 'none'
 };
 
 export const INITIAL_V2_STATE: AppState = {
@@ -118,7 +139,11 @@ export const migrateToV2 = (oldState: any): AppState => {
         transparentBackground: false,
         overrides: oldState.overrides ?? {},
         styleOptions: oldState.styleOptions ?? DEFAULT_STYLE_OPTIONS,
-        compositionOptions: oldState.compositionOptions ?? DEFAULT_COMPOSITION_OPTIONS
+        compositionOptions: oldState.compositionOptions ?? DEFAULT_COMPOSITION_OPTIONS,
+        truchetOptions: { mazeDensity: 10, arcWeight: 5, concentricCount: 1, doubleStroke: false },
+        guillocheOptions: { curveType: 'hypotrochoid', majorRadius: 100, minorRadius: 40, penDistance: 60, layerCount: 3, strokeWeight: 2 },
+        herringboneOptions: { pattern: 'herringbone', tileRatio: 2.5, groutSize: 2, colorMode: 'alternating' },
+        symmetryGroup: 'none'
     };
 
     return {

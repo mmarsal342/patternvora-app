@@ -185,6 +185,57 @@ const getSingleShapeSVG = (
         if (asset) {
             content += `<image href="${asset.src}" x="${-size / 2}" y="${-size / 2}" width="${size}" height="${size}" />`;
         }
+    } else if (shape.type === 'truchet-tile') {
+        // CONNECTOR-BASED TRUCHET TILES SVG
+        // Tile types: 1=arc-a, 2=arc-b, 3=diag-a, 4=diag-b, 5=straight-a (N↔S), 6=straight-b (E↔W)
+        const tileType = shape.points || 1;
+        const r = size / 2;
+        const strokeWidth = Math.max(4, config.strokeWidth * 2.5);
+        const strokeProps = `fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round"`;
+
+        if (tileType === 1) {
+            // Arc-A: N↔E and S↔W
+            content += `<path d="M 0 ${-r} A ${r} ${r} 0 0 1 ${r} 0" ${strokeProps} />`;
+            content += `<path d="M 0 ${r} A ${r} ${r} 0 0 1 ${-r} 0" ${strokeProps} />`;
+        } else if (tileType === 2) {
+            // Arc-B: N↔W and E↔S
+            content += `<path d="M 0 ${-r} A ${r} ${r} 0 0 0 ${-r} 0" ${strokeProps} />`;
+            content += `<path d="M ${r} 0 A ${r} ${r} 0 0 1 0 ${r}" ${strokeProps} />`;
+        } else if (tileType === 3) {
+            // Diagonal-A: N↔E and S↔W
+            content += `<line x1="0" y1="${-r}" x2="${r}" y2="0" ${strokeProps} />`;
+            content += `<line x1="0" y1="${r}" x2="${-r}" y2="0" ${strokeProps} />`;
+        } else if (tileType === 4) {
+            // Diagonal-B: N↔W and E↔S
+            content += `<line x1="0" y1="${-r}" x2="${-r}" y2="0" ${strokeProps} />`;
+            content += `<line x1="${r}" y1="0" x2="0" y2="${r}" ${strokeProps} />`;
+        } else if (tileType === 5) {
+            // Straight-A: N↔S (vertical)
+            content += `<line x1="0" y1="${-r}" x2="0" y2="${r}" ${strokeProps} />`;
+        } else if (tileType === 6) {
+            // Straight-B: E↔W (horizontal)
+            content += `<line x1="${-r}" y1="0" x2="${r}" y2="0" ${strokeProps} />`;
+        } else if (tileType === 7) {
+            // Zigzag-A: N↔E and S↔W with stepped pattern
+            content += `<polyline points="0,${-r} ${r * 0.5},${-r * 0.5} ${r},0" ${strokeProps} />`;
+            content += `<polyline points="0,${r} ${-r * 0.5},${r * 0.5} ${-r},0" ${strokeProps} />`;
+        } else if (tileType === 8) {
+            // Zigzag-B: N↔W and E↔S with stepped pattern
+            content += `<polyline points="0,${-r} ${-r * 0.5},${-r * 0.5} ${-r},0" ${strokeProps} />`;
+            content += `<polyline points="${r},0 ${r * 0.5},${r * 0.5} 0,${r}" ${strokeProps} />`;
+        }
+    } else if (shape.type === 'guilloche-curve') {
+        // Render guilloche curve as SVG polyline
+        const pointsData = (shape as any).pointsData as number[] | undefined;
+        if (pointsData && pointsData.length >= 4) {
+            const strokeWeight = shape.seed || 2;
+            const pointsStr = [];
+            for (let i = 0; i < pointsData.length; i += 2) {
+                pointsStr.push(`${pointsData[i].toFixed(2)},${pointsData[i + 1].toFixed(2)}`);
+            }
+            // Use polyline (not polygon) to avoid auto-closing straight line
+            return `<polyline points="${pointsStr.join(' ')}" fill="none" stroke="${color}" stroke-width="${strokeWeight}" stroke-linecap="round" stroke-linejoin="round"/>`;
+        }
     } else if (isSeasonalShape(shape.type)) {
         // Handle seasonal shapes (Christmas, CNY, Valentine, etc.)
         content += getSeasonalShapeSVG(shape.type as any, size, color);

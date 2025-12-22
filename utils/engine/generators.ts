@@ -2,6 +2,7 @@
 
 import { AppState, CompositionType, ShapeData, LayerConfig, CompositionOptions, StrokeMode } from '../../types';
 import { RNG } from '../rng';
+import { applySymmetry } from './symmetry';
 
 // Shapes that cannot be stroke-only (always force fill)
 const FILL_ONLY_SHAPES = ['image', 'char', 'wave', 'zigzag', 'blob'];
@@ -466,20 +467,426 @@ export const generateStandardScatter = (width: number, height: number, baseSize:
     return shapes;
 }
 
+// --- TRUCHET TILES GENERATOR (CONNECTOR-BASED MAZE) ---
+// Generates TRUE maze patterns where tiles connect at edges
+// Each tile type defines edge connections (N/E/S/W)
+
+export type TruchetTileType = 'arc-a' | 'arc-b' | 'diagonal-a' | 'diagonal-b' | 'straight-a' | 'straight-b' | 'zigzag-a' | 'zigzag-b';
+
+// Tile connectivity definitions
+// Edges: N=0, E=1, S=2, W=3
+// Each tile connects pairs of edges
+const TILE_CONNECTIONS: Record<TruchetTileType, [number, number][]> = {
+    'arc-a': [[0, 1], [2, 3]],      // N↔E, S↔W (quarter arcs)
+    'arc-b': [[0, 3], [1, 2]],      // N↔W, E↔S (mirrored arcs)
+    'diagonal-a': [[0, 1], [2, 3]], // N↔E, S↔W (diagonal lines)
+    'diagonal-b': [[0, 3], [1, 2]], // N↔W, E↔S (diagonal lines mirrored)
+    'straight-a': [[0, 2]],         // N↔S (vertical through-line)
+    'straight-b': [[1, 3]],         // E↔W (horizontal through-line)
+    'zigzag-a': [[0, 1], [2, 3]],   // N↔E, S↔W but with stepped zigzag
+    'zigzag-b': [[0, 3], [1, 2]],   // N↔W, E↔S but with stepped zigzag
+};
+
+// Get opposite edge (for neighbor matching)
+const getOppositeEdge = (edge: number): number => (edge + 2) % 4;
+
+// Check if tile has connection at specified edge
+const hasEdgeConnection = (tileType: TruchetTileType, edge: number): boolean => {
+    const connections = TILE_CONNECTIONS[tileType];
+    return connections.some(([a, b]) => a === edge || b === edge);
+};
+
+export const generateTruchet = (width: number, height: number, config: LayerConfig, rng: RNG): ShapeData[] => {
+    const shapes: ShapeData[] = [];
+
+    // Get truchet options with defaults
+    const truchetOpts = config.truchetOptions || { mazeDensity: 10, arcWeight: 5, concentricCount: 1, doubleStroke: false };
+
+    // Grid size based on mazeDensity (4-20) - use square cells always!
+    const mazeDensity = Math.max(4, Math.min(20, truchetOpts.mazeDensity || 10));
+
+    // Calculate square cell size based on shorter dimension
+    const minDim = Math.min(width, height);
+    const cellSize = minDim / mazeDensity;
+
+    // Calculate how many cells fit in each dimension
+    const colCount = Math.ceil(width / cellSize);
+    const rowCount = Math.ceil(height / cellSize);
+
+    // Extract options
+    const arcWeight = truchetOpts.arcWeight || 5;
+    const concentricCount = truchetOpts.concentricCount || 1;
+    const doubleStroke = truchetOpts.doubleStroke || false;
+
+    // Pre-allocate tile grid for neighbor-aware connected mode
+    // arc-a: N↔E, S↔W (exits at all 4 edges, but pairs are: top-right, bottom-left)
+    // arc-b: N↔W, E↔S (exits at all 4 edges, but pairs are: top-left, bottom-right)
+    const tileGrid: ('arc-a' | 'arc-b')[][] = [];
+    for (let r = 0; r < rowCount; r++) {
+        tileGrid[r] = [];
+    }
+
+    let globalIndex = 0;
+
+    // Place tiles with neighbor-matching for connected paths
+    for (let row = 0; row < rowCount; row++) {
+        for (let col = 0; col < colCount; col++) {
+            let selectedTile: 'arc-a' | 'arc-b';
+
+            // For connected mode: match with left and top neighbors
+            const leftTile = col > 0 ? tileGrid[row][col - 1] : null;
+            const topTile = row > 0 ? tileGrid[row - 1][col] : null;
+
+            // Scoring: prefer tiles that match neighbor directions
+            let arcAScore = 1;
+            let arcBScore = 1;
+
+            if (leftTile) {
+                // Left tile's right exit should match our left entry
+                if (leftTile === 'arc-a') {
+                    // arc-a exits to E at top → need arc-b (N↔W)
+                    arcBScore += 10;
+                } else {
+                    // arc-b exits to E at bottom → need arc-a (S↔W)
+                    arcAScore += 10;
+                }
+            }
+
+            if (topTile) {
+                // Top tile's bottom exit should match our top entry
+                if (topTile === 'arc-a') {
+                    // arc-a exits to S at left → need arc-b (N↔W)
+                    arcBScore += 10;
+                } else {
+                    // arc-b exits to S at right → need arc-a (N↔E)
+                    arcAScore += 10;
+                }
+            }
+
+            // Weighted selection based on scores
+            const totalScore = arcAScore + arcBScore;
+            const roll = rng.nextFloat() * totalScore;
+            selectedTile = roll < arcAScore ? 'arc-a' : 'arc-b';
+
+            tileGrid[row][col] = selectedTile;
+
+            // Cell center (using square cellSize)
+            const cx = col * cellSize + cellSize / 2;
+            const cy = row * cellSize + cellSize / 2;
+
+            const color = rng.nextItem(config.palette.colors);
+
+            // Encode: points = tileCode (1=arc-a, 2=arc-b)
+            // Encode: seed = packed data: doubleStroke(1 bit) + arcWeight(4 bits) + concentricCount(2 bits)
+            const tileCode = selectedTile === 'arc-a' ? 1 : 2;
+            const packedSeed = (doubleStroke ? 64 : 0) + (arcWeight * 4) + concentricCount;
+
+            shapes.push({
+                index: globalIndex++,
+                type: 'truchet-tile' as ShapeData['type'],
+                x: cx,
+                y: cy,
+                size: cellSize * (config.scale / 1.2),
+                rotation: 0,
+                color,
+                stroke: true,
+                speedFactor: 1,
+                phaseOffset: rng.nextFloat() * Math.PI * 2,
+                points: tileCode,
+                seed: packedSeed,
+            });
+        }
+    }
+
+    return shapes;
+};
+
+// --- GUILLOCHÉ / SPIROGRAPH GENERATOR ---
+// Creates luxury banknote-style patterns using parametric curves
+
+// Hypotrochoid: small circle rolling INSIDE large circle
+const hypotrochoid = (t: number, R: number, r: number, d: number) => ({
+    x: (R - r) * Math.cos(t) + d * Math.cos(((R - r) / r) * t),
+    y: (R - r) * Math.sin(t) - d * Math.sin(((R - r) / r) * t)
+});
+
+// Epitrochoid: small circle rolling OUTSIDE large circle
+const epitrochoid = (t: number, R: number, r: number, d: number) => ({
+    x: (R + r) * Math.cos(t) - d * Math.cos(((R + r) / r) * t),
+    y: (R + r) * Math.sin(t) - d * Math.sin(((R + r) / r) * t)
+});
+
+export const generateGuilloche = (width: number, height: number, config: LayerConfig, rng: RNG): ShapeData[] => {
+    const shapes: ShapeData[] = [];
+
+    // Get guilloche options with defaults
+    const opts = config.guillocheOptions || {
+        curveType: 'hypotrochoid',
+        majorRadius: 100,
+        minorRadius: 40,
+        penDistance: 60,
+        layerCount: 3,
+        strokeWeight: 2
+    };
+
+    // Center of canvas
+    const cx = width / 2;
+    const cy = height / 2;
+
+    // Scale factor to fit in canvas
+    const maxRadius = Math.min(width, height) * 0.45;
+    const scale = maxRadius / (opts.majorRadius + opts.penDistance);
+
+    // Generate multiple layers with slight variations
+    for (let layer = 0; layer < opts.layerCount; layer++) {
+        // Vary parameters for each layer
+        const layerRatio = layer / Math.max(1, opts.layerCount - 1);
+        const R = opts.majorRadius * (1 - layerRatio * 0.3) * scale;
+        const r = opts.minorRadius * (1 - layerRatio * 0.2) * scale;
+        const d = opts.penDistance * (1 - layerRatio * 0.2) * scale;
+
+        // Calculate number of revolutions needed for closed curve
+        // Use ORIGINAL unscaled values for GCD (before layer variation)
+        const gcd = (a: number, b: number): number => b === 0 ? a : gcd(b, a % b);
+        const originalR = Math.round(opts.majorRadius * (1 - layerRatio * 0.3));
+        const originalr = Math.round(opts.minorRadius * (1 - layerRatio * 0.2));
+        const revolutions = originalr / gcd(originalR, originalr);
+        const maxT = 2 * Math.PI * revolutions;
+
+        // Higher sampling for smooth curves that close properly
+        const basePoints = Math.min(1000, Math.max(200, Math.round(revolutions * 100)));
+
+        // Generate curve points
+        const points: number[] = [];
+        for (let i = 0; i <= basePoints; i++) {
+            const t = (i / basePoints) * maxT;
+
+            let pt: { x: number; y: number };
+
+            // Select curve type
+            if (opts.curveType === 'epitrochoid') {
+                pt = epitrochoid(t, R, r, d);
+            } else if (opts.curveType === 'mixed' && layer % 2 === 1) {
+                pt = epitrochoid(t, R, r, d);
+            } else {
+                pt = hypotrochoid(t, R, r, d);
+            }
+
+            points.push(cx + pt.x, cy + pt.y);
+        }
+
+        // Add phase offset for variety
+        const phaseOffset = layer * (Math.PI / opts.layerCount);
+
+        // Get color from palette
+        const color = config.palette.colors[layer % config.palette.colors.length];
+
+        shapes.push({
+            index: layer,
+            type: 'guilloche-curve' as ShapeData['type'],
+            x: cx,
+            y: cy,
+            size: maxRadius * 2,
+            rotation: phaseOffset,
+            color,
+            stroke: true,
+            speedFactor: 1 + layer * 0.1,
+            phaseOffset: phaseOffset,
+            points: points.length, // Store point count
+            seed: opts.strokeWeight + (layer * 0.3), // Use seed for stroke weight per layer
+            // Store the actual points in a custom way - we'll encode first few for rendering
+            pointsData: points, // We'll handle this in renderer
+        } as ShapeData & { pointsData: number[] });
+    }
+
+    return shapes;
+};
+
+// --- HERRINGBONE / CHEVRON GENERATOR ---
+// Creates classic tile patterns: herringbone, chevron, basket-weave
+
+export const generateHerringbone = (width: number, height: number, config: LayerConfig, rng: RNG): ShapeData[] => {
+    const shapes: ShapeData[] = [];
+
+    const opts = config.herringboneOptions || {
+        pattern: 'herringbone',
+        tileRatio: 2.5,
+        groutSize: 2,
+        colorMode: 'alternating'
+    };
+
+    // Base tile size from complexity/scale
+    const baseSize = Math.min(width, height) / (config.complexity / 10);
+    const tileWidth = baseSize;
+    const tileHeight = baseSize * opts.tileRatio;
+    const grout = opts.groutSize;
+
+    const colors = config.palette.colors;
+    let index = 0;
+
+    if (opts.pattern === 'herringbone') {
+        // Classic herringbone: alternating V pattern
+        const stepX = tileHeight + grout;
+        const stepY = tileWidth + grout;
+
+        for (let row = -1; row < Math.ceil(height / stepY) + 1; row++) {
+            for (let col = -1; col < Math.ceil(width / stepX) + 1; col++) {
+                const isEven = (row + col) % 2 === 0;
+                const x = col * stepX + (isEven ? 0 : tileWidth / 2);
+                const y = row * stepY + (isEven ? 0 : tileWidth / 2);
+
+                // Get color based on mode
+                let color: string;
+                if (opts.colorMode === 'mono') {
+                    color = colors[0];
+                } else if (opts.colorMode === 'alternating') {
+                    color = colors[isEven ? 0 : 1 % colors.length];
+                } else {
+                    color = colors[Math.floor(rng.nextFloat() * colors.length)];
+                }
+
+                shapes.push({
+                    index: index++,
+                    type: 'rect' as ShapeData['type'],
+                    x: x + tileHeight / 2,
+                    y: y + tileWidth / 2,
+                    size: tileWidth,
+                    rotation: isEven ? Math.PI / 4 : -Math.PI / 4,
+                    color,
+                    stroke: false,
+                    speedFactor: 1,
+                    phaseOffset: 0,
+                    points: Math.round(opts.tileRatio * 10), // Encode ratio for rendering
+                });
+            }
+        }
+    } else if (opts.pattern === 'chevron') {
+        // Chevron: V formation pointing up
+        const stepX = tileWidth * 2 + grout;
+        const stepY = tileHeight / 2 + grout;
+
+        for (let row = -1; row < Math.ceil(height / stepY) + 2; row++) {
+            for (let col = -1; col < Math.ceil(width / stepX) + 1; col++) {
+                const baseX = col * stepX;
+                const baseY = row * stepY;
+                const offsetX = (row % 2) * (stepX / 2);
+
+                // Left tile of V
+                let color = opts.colorMode === 'mono' ? colors[0] :
+                    opts.colorMode === 'alternating' ? colors[row % colors.length] :
+                        colors[Math.floor(rng.nextFloat() * colors.length)];
+
+                shapes.push({
+                    index: index++,
+                    type: 'rect' as ShapeData['type'],
+                    x: baseX + offsetX + tileWidth / 2,
+                    y: baseY + tileHeight / 4,
+                    size: tileWidth,
+                    rotation: Math.PI / 4,
+                    color,
+                    stroke: false,
+                    speedFactor: 1,
+                    phaseOffset: 0,
+                    points: Math.round(opts.tileRatio * 10),
+                });
+
+                // Right tile of V
+                shapes.push({
+                    index: index++,
+                    type: 'rect' as ShapeData['type'],
+                    x: baseX + offsetX + tileWidth * 1.5,
+                    y: baseY + tileHeight / 4,
+                    size: tileWidth,
+                    rotation: -Math.PI / 4,
+                    color,
+                    stroke: false,
+                    speedFactor: 1,
+                    phaseOffset: 0,
+                    points: Math.round(opts.tileRatio * 10),
+                });
+            }
+        }
+    } else if (opts.pattern === 'basket-weave') {
+        // Basket weave: alternating 2x horizontal / 2x vertical
+        const cellSize = tileHeight + grout;
+
+        for (let row = -1; row < Math.ceil(height / cellSize) + 1; row++) {
+            for (let col = -1; col < Math.ceil(width / cellSize) + 1; col++) {
+                const isHorizontal = (row + col) % 2 === 0;
+                const baseX = col * cellSize;
+                const baseY = row * cellSize;
+
+                let color = opts.colorMode === 'mono' ? colors[0] :
+                    opts.colorMode === 'alternating' ? colors[(row + col) % colors.length] :
+                        colors[Math.floor(rng.nextFloat() * colors.length)];
+
+                if (isHorizontal) {
+                    // Two horizontal tiles
+                    for (let i = 0; i < 2; i++) {
+                        shapes.push({
+                            index: index++,
+                            type: 'rect' as ShapeData['type'],
+                            x: baseX + tileHeight / 2,
+                            y: baseY + tileWidth / 2 + i * (tileWidth + grout / 2),
+                            size: tileWidth,
+                            rotation: 0,
+                            color,
+                            stroke: false,
+                            speedFactor: 1,
+                            phaseOffset: 0,
+                            points: Math.round(opts.tileRatio * 10),
+                        });
+                    }
+                } else {
+                    // Two vertical tiles
+                    for (let i = 0; i < 2; i++) {
+                        shapes.push({
+                            index: index++,
+                            type: 'rect' as ShapeData['type'],
+                            x: baseX + tileWidth / 2 + i * (tileWidth + grout / 2),
+                            y: baseY + tileHeight / 2,
+                            size: tileWidth,
+                            rotation: Math.PI / 2,
+                            color,
+                            stroke: false,
+                            speedFactor: 1,
+                            phaseOffset: 0,
+                            points: Math.round(opts.tileRatio * 10),
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    return shapes;
+};
+
 // Generates the abstract data model for the pattern
 export const generateShapeData = (width: number, height: number, config: LayerConfig): ShapeData[] => {
     const rng = new RNG(config.seed);
     const baseSize = Math.min(width, height) * (config.scale / 10);
 
-    if (config.style === 'isometric') return generateIsometric(width, height, baseSize, config, rng);
-    if (config.style === 'grid') return generateGrid(width, height, baseSize, config, rng);
-    if (config.style === 'hex') return generateHex(width, height, baseSize, config, rng);
-    if (config.style === 'waves') return generateWaves(width, height, config, rng);
-    if (config.style === 'mosaic') return generateMosaic(width, height, baseSize, config, rng);
-    if (config.style === 'radial') return generateRadial(width, height, baseSize, config, rng);
+    let shapes: ShapeData[];
 
-    // Default Scatter Styles
-    return generateStandardScatter(width, height, baseSize, config, rng);
+    if (config.style === 'isometric') shapes = generateIsometric(width, height, baseSize, config, rng);
+    else if (config.style === 'grid') shapes = generateGrid(width, height, baseSize, config, rng);
+    else if (config.style === 'hex') shapes = generateHex(width, height, baseSize, config, rng);
+    else if (config.style === 'waves') shapes = generateWaves(width, height, config, rng);
+    else if (config.style === 'mosaic') shapes = generateMosaic(width, height, baseSize, config, rng);
+    else if (config.style === 'radial') shapes = generateRadial(width, height, baseSize, config, rng);
+    else if (config.style === 'truchet') shapes = generateTruchet(width, height, config, rng);
+    else if (config.style === 'guilloche') shapes = generateGuilloche(width, height, config, rng);
+    else if (config.style === 'herringbone') shapes = generateHerringbone(width, height, config, rng);
+    else shapes = generateStandardScatter(width, height, baseSize, config, rng);
+
+    // Apply symmetry transformation as post-process
+    const symmetryGroup = config.symmetryGroup || 'none';
+    if (symmetryGroup !== 'none') {
+        shapes = applySymmetry(shapes, symmetryGroup, width, height);
+    }
+
+    return shapes;
 };
 
 // Hit Testing - Updated to loop through LAYERS (Reverse order for Z-index)

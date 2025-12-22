@@ -327,7 +327,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStartFree }) => {
           <p className="text-slate-600 max-w-2xl mx-auto mb-8">
             Need more than 10 seats? We offer custom team plans with centralized billing and dedicated support.
           </p>
-          <a href="mailto:sales@voralab.com" className="text-indigo-600 font-bold hover:underline">Contact Sales &rarr;</a>
+          <a href="mailto:admin@voralab.online" className="text-indigo-600 font-bold hover:underline">Contact Sales &rarr;</a>
         </div>
       </main>
 

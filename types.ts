@@ -2,7 +2,7 @@
 
 export type AspectRatio = '1:1' | '16:9' | '9:16' | '4:5' | '3:4';
 
-export type PatternStyle = 'geometric' | 'organic' | 'grid' | 'bauhaus' | 'confetti' | 'custom-image' | 'radial' | 'typo' | 'mosaic' | 'hex' | 'waves' | 'memphis' | 'isometric' | 'seasonal-cny' | 'seasonal-christmas' | 'seasonal-newyear' | 'seasonal-valentine';
+export type PatternStyle = 'geometric' | 'organic' | 'grid' | 'bauhaus' | 'confetti' | 'custom-image' | 'radial' | 'typo' | 'mosaic' | 'hex' | 'waves' | 'memphis' | 'isometric' | 'truchet' | 'guilloche' | 'herringbone' | 'seasonal-cny' | 'seasonal-christmas' | 'seasonal-newyear' | 'seasonal-valentine';
 
 export type CompositionType = 'random' | 'center' | 'frame' | 'diagonal' | 'thirds' | 'bottom' | 'cross' | 'ring' | 'x-shape' | 'split-v' | 'split-h' | 'corners';
 
@@ -76,7 +76,8 @@ export interface ShapeOverride {
 }
 
 export interface ShapeData {
-  type: 'circle' | 'rect' | 'triangle' | 'arc' | 'line' | 'image' | 'star' | 'polygon' | 'blob' | 'char' | 'wave' | 'zigzag' | 'cross' | 'donut' | 'pill' | 'cube' | 'lantern' | 'dragon' | 'angpao' | 'cloud-cn' | 'firecracker' | 'fan' | 'xmas-tree' | 'gift' | 'snowflake' | 'bell' | 'candycane' | 'santa-hat' | 'firework' | 'champagne' | 'clock-ny' | 'balloon' | 'party-hat' | 'party-popper' | 'starburst' | 'heart' | 'rose' | 'love-letter' | 'cupid-arrow' | 'bow' | 'ring' | 'crescent' | 'star-islamic' | 'mosque' | 'lantern-ramadan' | 'ketupat' | 'dates';
+  type: 'circle' | 'rect' | 'triangle' | 'arc' | 'line' | 'image' | 'star' | 'polygon' | 'blob' | 'char' | 'wave' | 'zigzag' | 'cross' | 'donut' | 'pill' | 'cube' | 'truchet-tile' | 'guilloche-curve' | 'lantern' | 'dragon' | 'angpao' | 'cloud-cn' | 'firecracker' | 'fan' | 'xmas-tree' | 'gift' | 'snowflake' | 'bell' | 'candycane' | 'santa-hat' | 'firework' | 'champagne' | 'clock-ny' | 'balloon' | 'party-hat' | 'party-popper' | 'starburst' | 'heart' | 'rose' | 'love-letter' | 'cupid-arrow' | 'bow' | 'ring' | 'crescent' | 'star-islamic' | 'mosque' | 'lantern-ramadan' | 'ketupat' | 'dates';
+  pointsData?: number[]; // For guilloche curve points
   x: number;
   y: number;
   size: number;
@@ -118,6 +119,36 @@ export interface CompositionOptions {
   margin: number; // For frame (0-50 percentage)
 }
 
+export interface TruchetOptions {
+  mazeDensity: number; // 4-20 (number of arcs per row)
+  arcWeight: number; // 1-10 (stroke thickness)
+  concentricCount: number; // 1-3 (nested arcs per tile)
+  doubleStroke: boolean;
+}
+
+export type GuillocheType = 'hypotrochoid' | 'epitrochoid' | 'mixed';
+
+export interface GuillocheOptions {
+  curveType: GuillocheType;
+  majorRadius: number;  // R: 50-200 (outer circle radius)
+  minorRadius: number;  // r: 10-100 (inner rolling circle)
+  penDistance: number;  // d: 10-150 (pen distance from center)
+  layerCount: number;   // 1-7 (stacked curves)
+  strokeWeight: number; // 1-5 (line thickness)
+}
+
+export type HerringbonePattern = 'herringbone' | 'chevron' | 'basket-weave';
+export type HerringboneColorMode = 'mono' | 'alternating' | 'random';
+
+export interface HerringboneOptions {
+  pattern: HerringbonePattern;
+  tileRatio: number;    // 1.5-4.0 (length/width ratio)
+  groutSize: number;    // 0-10px gap between tiles
+  colorMode: HerringboneColorMode;
+}
+
+export type SymmetryGroup = 'none' | 'pm' | 'pmm' | 'p4m';
+
 export interface LayerConfig {
   seed: number;
   style: PatternStyle;
@@ -135,6 +166,10 @@ export interface LayerConfig {
   overrides: Record<number, ShapeOverride>; // Key is the shape index
   styleOptions: StyleOptions;
   compositionOptions: CompositionOptions;
+  truchetOptions: TruchetOptions; // Truchet maze configuration
+  guillocheOptions: GuillocheOptions; // Guilloché curve configuration
+  herringboneOptions: HerringboneOptions; // Herringbone/Chevron tile configuration
+  symmetryGroup: SymmetryGroup; // Wallpaper symmetry group
 }
 
 export interface Layer {

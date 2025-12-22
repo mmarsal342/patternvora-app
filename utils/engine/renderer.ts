@@ -128,10 +128,14 @@ export const drawShape = (
             ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
             shape.stroke ? ctx.stroke() : ctx.fill();
         } else if (shape.type === 'rect') {
+            // Support rectangular tiles: if points > 10, it's a tileRatio encoding (points = ratio * 10)
+            const ratio = shape.points && shape.points > 10 ? shape.points / 10 : 1;
+            const w = size;
+            const h = size * ratio;
             if (shape.stroke) {
-                ctx.strokeRect(-size / 2, -size / 2, size, size);
+                ctx.strokeRect(-w / 2, -h / 2, w, h);
             } else {
-                ctx.fillRect(-size / 2, -size / 2, size, size);
+                ctx.fillRect(-w / 2, -h / 2, w, h);
             }
         } else if (shape.type === 'triangle') {
             ctx.beginPath();
@@ -293,6 +297,86 @@ export const drawShape = (
             ctx.arc(-w / 2 + r, 0, r, Math.PI / 2, -Math.PI / 2);
             ctx.closePath();
             shape.stroke ? ctx.stroke() : ctx.fill();
+        } else if (shape.type === 'truchet-tile') {
+            // CONNECTOR-BASED TRUCHET TILES
+            // Tile types: 1=arc-a, 2=arc-b
+            const tileType = shape.points || 1;
+
+            // Decode packed seed: doubleStroke * 64 + arcWeight * 4 + concentricCount
+            const packedSeed = shape.seed || 0;
+            const doubleStroke = packedSeed >= 64;
+            const arcWeight = Math.floor((packedSeed % 64) / 4);
+            const concentricCount = Math.max(1, Math.min(3, (packedSeed % 4) || 1));
+
+            const r = size / 2;
+
+            // Dynamic stroke width based on arcWeight (1-10)
+            const baseWidth = Math.max(2, (arcWeight / 10) * size * 0.15);
+            ctx.lineCap = 'round';
+
+            // Stroke offset for double stroke mode
+            const strokeOffset = doubleStroke ? baseWidth * 0.6 : 0;
+            ctx.lineWidth = doubleStroke ? baseWidth * 0.5 : baseWidth;
+
+            // Helper to draw arc with optional double stroke
+            const drawArc = (cx: number, cy: number, radius: number, startAngle: number, endAngle: number) => {
+                if (doubleStroke) {
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, radius - strokeOffset, startAngle, endAngle);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, radius + strokeOffset, startAngle, endAngle);
+                    ctx.stroke();
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, radius, startAngle, endAngle);
+                    ctx.stroke();
+                }
+            };
+
+            // Draw concentric arcs based on concentricCount
+            const arcSpacing = r / (concentricCount + 1);
+
+            for (let i = 0; i < concentricCount; i++) {
+                const arcRadius = r - (arcSpacing * i);
+
+                if (tileType === 1) {
+                    // Arc-A: N↔E and S↔W
+                    drawArc(r, -r, arcRadius, Math.PI / 2, Math.PI);
+                    drawArc(-r, r, arcRadius, -Math.PI / 2, 0);
+                } else if (tileType === 2) {
+                    // Arc-B: N↔W and E↔S
+                    drawArc(-r, -r, arcRadius, 0, Math.PI / 2);
+                    drawArc(r, r, arcRadius, Math.PI, Math.PI * 1.5);
+                }
+            }
+        } else if (shape.type === 'guilloche-curve') {
+            // Render guilloche parametric curve from stored points
+            const pointsData = (shape as any).pointsData as number[] | undefined;
+            if (pointsData && pointsData.length >= 4) {
+                // Stroke weight from seed field
+                const strokeWeight = shape.seed || 2;
+                ctx.lineWidth = strokeWeight;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                // Draw the curve as a polyline - translate back since we're at origin
+                ctx.save();
+                ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform to draw absolute coords
+
+                ctx.beginPath();
+                ctx.moveTo(pointsData[0], pointsData[1]);
+
+                for (let i = 2; i < pointsData.length; i += 2) {
+                    ctx.lineTo(pointsData[i], pointsData[i + 1]);
+                }
+
+                // Don't closePath() - let curve end naturally (avoids ugly straight line when curve doesn't perfectly close)
+                ctx.strokeStyle = shape.color;
+                ctx.stroke();
+
+                ctx.restore();
+            }
         } else if (SEASONAL_SHAPES.includes(shape.type as any)) {
             // Draw seasonal shapes (CNY, Valentine, etc.)
             drawSeasonalShape(ctx, shape.type as any, size, shape.color, shape.stroke);

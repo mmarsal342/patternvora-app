@@ -209,7 +209,7 @@ const PrivacyPolicy: React.FC = () => {
 
             <h2 className="text-xl font-bold text-slate-900 mt-8 mb-4">6. Contact</h2>
             <p className="text-slate-600">
-                For any privacy concerns, please contact us at contact@voralab.com.
+                For any privacy concerns, please contact us at admin@voralab.online.
             </p>
         </div>
     );

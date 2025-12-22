@@ -63,6 +63,46 @@ const MotionPanel: React.FC = () => {
                             </div>
                         </div>
 
+                        {/* Motion Quality Info */}
+                        {(() => {
+                            const getMotionInfo = (primary: string, intensity: number) => {
+                                if (primary === 'scan') {
+                                    return {
+                                        type: 'warning' as const,
+                                        text: 'Scan motion is mathematically loopable but perceptually sensitive. Visible seams may appear at higher intensities. Best for still patterns or short loops.'
+                                    };
+                                }
+                                if (primary === 'orbit' && intensity > 2) {
+                                    return {
+                                        type: 'warning' as const,
+                                        text: 'Orbit at intensity >2 creates fast circular motion. Loop boundaries may be noticeable. Try intensity ≤1.5 for seamless loops.'
+                                    };
+                                }
+                                if (primary === 'float' || (primary === 'orbit' && intensity <= 2)) {
+                                    return {
+                                        type: 'success' as const,
+                                        text: 'This motion creates seamlessly loopable animations at any duration.'
+                                    };
+                                }
+                                return null;
+                            };
+
+                            const info = getMotionInfo(anim.primary, anim.intensity);
+                            if (!info) return null;
+
+                            const bgColor = info.type === 'warning' ? 'bg-amber-50' : 'bg-emerald-50';
+                            const borderColor = info.type === 'warning' ? 'border-amber-200' : 'border-emerald-200';
+                            const textColor = info.type === 'warning' ? 'text-amber-700' : 'text-emerald-700';
+                            const icon = info.type === 'warning' ? '⚠️' : '✅';
+
+                            return (
+                                <div className={`${bgColor} ${borderColor} border ${textColor} text-[10px] leading-relaxed p-2.5 rounded-lg mt-0.5`}>
+                                    <span className="mr-1">{icon}</span>
+                                    {info.text}
+                                </div>
+                            );
+                        })()}
+
                         <div className="flex gap-3">
                             <div className="flex-1">
                                 <RangeControl

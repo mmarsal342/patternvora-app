@@ -276,6 +276,9 @@ const StylePanel: React.FC = () => {
                             <option value="bauhaus">Bauhaus Construct</option>
                             <option value="confetti">Confetti</option>
                             <option value="radial">Radial Mandala</option>
+                            <option value="truchet">Truchet Maze</option>
+                            <option value="guilloche">Guilloché (Spirograph)</option>
+                            <option value="herringbone">Herringbone / Chevron</option>
                             <option value="typo">Typo Texture</option>
                             <optgroup label="💕 Seasonal">
                                 <option value="seasonal-cny">🐉 Chinese New Year</option>
@@ -326,6 +329,254 @@ const StylePanel: React.FC = () => {
                     />
                 )}
 
+                {/* Truchet Maze Specific Options */}
+                {activeLayerConfig.style === 'truchet' && (
+                    <div className="space-y-3 p-3 bg-indigo-50 rounded-lg border border-indigo-100">
+                        <div className="flex items-center gap-1 mb-2">
+                            <span className="text-xs font-semibold text-indigo-700 uppercase tracking-wide">🎲 Maze Options</span>
+                        </div>
+
+                        {/* Maze Density Slider */}
+                        <RangeControl
+                            label="Maze Density"
+                            value={activeLayerConfig.truchetOptions?.mazeDensity || 10}
+                            onChange={(v) => updateState({
+                                truchetOptions: {
+                                    ...activeLayerConfig.truchetOptions,
+                                    mazeDensity: v
+                                }
+                            }, true)}
+                            min={4} max={20} step={1}
+                            displayValue={(activeLayerConfig.truchetOptions?.mazeDensity || 10).toString()}
+                        />
+
+                        {/* Arc Weight Slider */}
+                        <RangeControl
+                            label="Arc Weight"
+                            value={activeLayerConfig.truchetOptions?.arcWeight || 5}
+                            onChange={(v) => updateState({
+                                truchetOptions: {
+                                    ...activeLayerConfig.truchetOptions,
+                                    arcWeight: v
+                                }
+                            }, true)}
+                            min={1} max={10} step={1}
+                            displayValue={(activeLayerConfig.truchetOptions?.arcWeight || 5).toString()}
+                        />
+
+                        {/* Concentric Count Dropdown */}
+                        <div className="space-y-1">
+                            <label className="text-[10px] font-semibold text-indigo-600 uppercase">Concentric Arcs</label>
+                            <select
+                                value={activeLayerConfig.truchetOptions?.concentricCount || 1}
+                                onChange={(e) => updateState({
+                                    truchetOptions: {
+                                        ...activeLayerConfig.truchetOptions,
+                                        concentricCount: parseInt(e.target.value)
+                                    }
+                                }, true)}
+                                className="w-full bg-white border border-indigo-200 rounded p-2 text-sm text-slate-700"
+                            >
+                                <option value={1}>Single Arc</option>
+                                <option value={2}>Double (2 nested)</option>
+                                <option value={3}>Triple (3 nested)</option>
+                            </select>
+                        </div>
+
+                        {/* Double Stroke Toggle */}
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                id="doubleStroke"
+                                checked={activeLayerConfig.truchetOptions?.doubleStroke || false}
+                                onChange={(e) => updateState({
+                                    truchetOptions: {
+                                        ...activeLayerConfig.truchetOptions,
+                                        doubleStroke: e.target.checked
+                                    }
+                                }, true)}
+                                className="rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500"
+                            />
+                            <label htmlFor="doubleStroke" className="text-[10px] font-semibold text-indigo-600 uppercase cursor-pointer">
+                                Double Stroke
+                            </label>
+                        </div>
+                    </div>
+                )}
+
+                {/* Guilloché / Spirograph Specific Options */}
+                {activeLayerConfig.style === 'guilloche' && (
+                    <div className="space-y-3 p-3 bg-purple-50 rounded-lg border border-purple-100">
+                        <div className="flex items-center gap-1 mb-2">
+                            <span className="text-xs font-semibold text-purple-700 uppercase tracking-wide">🌀 Guilloché Options</span>
+                        </div>
+
+                        {/* Curve Type Dropdown */}
+                        <div className="space-y-1">
+                            <label className="text-[10px] font-semibold text-purple-600 uppercase">Curve Type</label>
+                            <select
+                                value={activeLayerConfig.guillocheOptions?.curveType || 'hypotrochoid'}
+                                onChange={(e) => updateState({
+                                    guillocheOptions: {
+                                        ...activeLayerConfig.guillocheOptions,
+                                        curveType: e.target.value as any
+                                    }
+                                }, true)}
+                                className="w-full bg-white border border-purple-200 rounded p-2 text-sm text-slate-700"
+                            >
+                                <option value="hypotrochoid">Hypotrochoid (Inside)</option>
+                                <option value="epitrochoid">Epitrochoid (Outside)</option>
+                                <option value="mixed">Mixed (Alternating)</option>
+                            </select>
+                        </div>
+
+                        {/* Major Radius */}
+                        <RangeControl
+                            label="Major Radius"
+                            value={activeLayerConfig.guillocheOptions?.majorRadius || 100}
+                            onChange={(v) => updateState({
+                                guillocheOptions: {
+                                    ...activeLayerConfig.guillocheOptions,
+                                    majorRadius: v
+                                }
+                            }, true)}
+                            min={50} max={200} step={5}
+                            displayValue={(activeLayerConfig.guillocheOptions?.majorRadius || 100).toString()}
+                        />
+
+                        {/* Minor Radius */}
+                        <RangeControl
+                            label="Minor Radius"
+                            value={activeLayerConfig.guillocheOptions?.minorRadius || 40}
+                            onChange={(v) => updateState({
+                                guillocheOptions: {
+                                    ...activeLayerConfig.guillocheOptions,
+                                    minorRadius: v
+                                }
+                            }, true)}
+                            min={10} max={100} step={5}
+                            displayValue={(activeLayerConfig.guillocheOptions?.minorRadius || 40).toString()}
+                        />
+
+                        {/* Pen Distance */}
+                        <RangeControl
+                            label="Pen Distance"
+                            value={activeLayerConfig.guillocheOptions?.penDistance || 60}
+                            onChange={(v) => updateState({
+                                guillocheOptions: {
+                                    ...activeLayerConfig.guillocheOptions,
+                                    penDistance: v
+                                }
+                            }, true)}
+                            min={10} max={150} step={5}
+                            displayValue={(activeLayerConfig.guillocheOptions?.penDistance || 60).toString()}
+                        />
+
+                        {/* Layer Count */}
+                        <RangeControl
+                            label="Layer Count"
+                            value={activeLayerConfig.guillocheOptions?.layerCount || 3}
+                            onChange={(v) => updateState({
+                                guillocheOptions: {
+                                    ...activeLayerConfig.guillocheOptions,
+                                    layerCount: v
+                                }
+                            }, true)}
+                            min={1} max={7} step={1}
+                            displayValue={(activeLayerConfig.guillocheOptions?.layerCount || 3).toString()}
+                        />
+
+                        {/* Stroke Weight */}
+                        <RangeControl
+                            label="Stroke Weight"
+                            value={activeLayerConfig.guillocheOptions?.strokeWeight || 2}
+                            onChange={(v) => updateState({
+                                guillocheOptions: {
+                                    ...activeLayerConfig.guillocheOptions,
+                                    strokeWeight: v
+                                }
+                            }, true)}
+                            min={1} max={5} step={0.5}
+                            displayValue={(activeLayerConfig.guillocheOptions?.strokeWeight || 2).toString()}
+                        />
+                    </div>
+                )}
+
+                {/* Herringbone / Chevron Specific Options */}
+                {activeLayerConfig.style === 'herringbone' && (
+                    <div className="space-y-3 p-3 bg-amber-50 rounded-lg border border-amber-100">
+                        <div className="flex items-center gap-1 mb-2">
+                            <span className="text-xs font-semibold text-amber-700 uppercase tracking-wide">🧱 Tile Options</span>
+                        </div>
+
+                        {/* Pattern Type Dropdown */}
+                        <div className="space-y-1">
+                            <label className="text-[10px] font-semibold text-amber-600 uppercase">Pattern</label>
+                            <select
+                                value={activeLayerConfig.herringboneOptions?.pattern || 'herringbone'}
+                                onChange={(e) => updateState({
+                                    herringboneOptions: {
+                                        ...activeLayerConfig.herringboneOptions,
+                                        pattern: e.target.value as any
+                                    }
+                                }, true)}
+                                className="w-full bg-white border border-amber-200 rounded p-2 text-sm text-slate-700"
+                            >
+                                <option value="herringbone">Herringbone (Zigzag)</option>
+                                <option value="chevron">Chevron (V-Shape)</option>
+                                <option value="basket-weave">Basket Weave</option>
+                            </select>
+                        </div>
+
+                        {/* Tile Ratio */}
+                        <RangeControl
+                            label="Tile Ratio"
+                            value={activeLayerConfig.herringboneOptions?.tileRatio || 2.5}
+                            onChange={(v) => updateState({
+                                herringboneOptions: {
+                                    ...activeLayerConfig.herringboneOptions,
+                                    tileRatio: v
+                                }
+                            }, true)}
+                            min={1.5} max={4} step={0.5}
+                            displayValue={(activeLayerConfig.herringboneOptions?.tileRatio || 2.5).toFixed(1)}
+                        />
+
+                        {/* Grout Size */}
+                        <RangeControl
+                            label="Grout Size"
+                            value={activeLayerConfig.herringboneOptions?.groutSize || 2}
+                            onChange={(v) => updateState({
+                                herringboneOptions: {
+                                    ...activeLayerConfig.herringboneOptions,
+                                    groutSize: v
+                                }
+                            }, true)}
+                            min={0} max={10} step={1}
+                            displayValue={(activeLayerConfig.herringboneOptions?.groutSize || 2) + 'px'}
+                        />
+
+                        {/* Color Mode Dropdown */}
+                        <div className="space-y-1">
+                            <label className="text-[10px] font-semibold text-amber-600 uppercase">Color Mode</label>
+                            <select
+                                value={activeLayerConfig.herringboneOptions?.colorMode || 'alternating'}
+                                onChange={(e) => updateState({
+                                    herringboneOptions: {
+                                        ...activeLayerConfig.herringboneOptions,
+                                        colorMode: e.target.value as any
+                                    }
+                                }, true)}
+                                className="w-full bg-white border border-amber-200 rounded p-2 text-sm text-slate-700"
+                            >
+                                <option value="mono">Mono (Single Color)</option>
+                                <option value="alternating">Alternating</option>
+                                <option value="random">Random</option>
+                            </select>
+                        </div>
+                    </div>
+                )}
+
                 <div className="space-y-1">
                     <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Composition</label>
                     <div className="relative">
@@ -353,6 +604,29 @@ const StylePanel: React.FC = () => {
                     {isCompositionDisabled && (
                         <p className="text-[10px] text-amber-600 flex items-center gap-1 mt-1 bg-amber-50 p-1.5 rounded">
                             <Grid size={10} /> Override active: This style controls layout.
+                        </p>
+                    )}
+                </div>
+
+                {/* Symmetry / Kaleidoscope */}
+                <div className="space-y-1">
+                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Symmetry</label>
+                    <div className="relative">
+                        <select
+                            value={activeLayerConfig.symmetryGroup || 'none'}
+                            onChange={(e) => updateState({ symmetryGroup: e.target.value as any }, true)}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 appearance-none"
+                        >
+                            <option value="none">None</option>
+                            <option value="pm">🪞 Mirror (2x)</option>
+                            <option value="pmm">✨ Double Mirror (4x)</option>
+                            <option value="p4m">🔮 Kaleidoscope (8x)</option>
+                        </select>
+                        <ChevronDown size={14} className="absolute right-3 top-3 text-slate-500 pointer-events-none" />
+                    </div>
+                    {activeLayerConfig.symmetryGroup && activeLayerConfig.symmetryGroup !== 'none' && (
+                        <p className="text-[10px] text-purple-600 flex items-center gap-1 mt-1 bg-purple-50 p-1.5 rounded">
+                            🌀 Shapes will be mirrored/rotated around center
                         </p>
                     )}
                 </div>
