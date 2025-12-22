@@ -332,8 +332,14 @@ const StylePanel: React.FC = () => {
                 {/* Truchet Maze Specific Options */}
                 {activeLayerConfig.style === 'truchet' && (
                     <div className="space-y-3 p-3 bg-indigo-50 rounded-lg border border-indigo-100">
-                        <div className="flex items-center gap-1 mb-2">
+                        <div className="flex items-center justify-between mb-2">
                             <span className="text-xs font-semibold text-indigo-700 uppercase tracking-wide">🎲 Maze Options</span>
+                            <span
+                                className="text-[9px] text-indigo-500 bg-indigo-100 px-2 py-1 rounded cursor-help"
+                                title="💡 Best Seamless: Density 5 or 10, Single Arc, Single or Double Stroke"
+                            >
+                                ⓘ Tip
+                            </span>
                         </div>
 
                         {/* Maze Density Slider */}
@@ -407,8 +413,14 @@ const StylePanel: React.FC = () => {
                 {/* Guilloché / Spirograph Specific Options */}
                 {activeLayerConfig.style === 'guilloche' && (
                     <div className="space-y-3 p-3 bg-purple-50 rounded-lg border border-purple-100">
-                        <div className="flex items-center gap-1 mb-2">
+                        <div className="flex items-center justify-between mb-2">
                             <span className="text-xs font-semibold text-purple-700 uppercase tracking-wide">🌀 Guilloché Options</span>
+                            <span
+                                className="text-[9px] text-purple-500 bg-purple-100 px-2 py-1 rounded cursor-help"
+                                title="💡 Perfect for: Certificates, currency designs, security patterns. Try Layer Count 3-5 for intricate designs."
+                            >
+                                ⓘ Tip
+                            </span>
                         </div>
 
                         {/* Curve Type Dropdown */}
@@ -505,8 +517,14 @@ const StylePanel: React.FC = () => {
                 {/* Herringbone / Chevron Specific Options */}
                 {activeLayerConfig.style === 'herringbone' && (
                     <div className="space-y-3 p-3 bg-amber-50 rounded-lg border border-amber-100">
-                        <div className="flex items-center gap-1 mb-2">
+                        <div className="flex items-center justify-between mb-2">
                             <span className="text-xs font-semibold text-amber-700 uppercase tracking-wide">🧱 Tile Options</span>
+                            <span
+                                className="text-[9px] text-amber-500 bg-amber-100 px-2 py-1 rounded cursor-help"
+                                title="💡 Best Seamless: Tile Ratio 2.5, Grout 2px. Chevron pattern tiles perfectly at any ratio."
+                            >
+                                ⓘ Tip
+                            </span>
                         </div>
 
                         {/* Pattern Type Dropdown */}
@@ -609,27 +627,38 @@ const StylePanel: React.FC = () => {
                 </div>
 
                 {/* Symmetry / Kaleidoscope */}
-                <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Symmetry</label>
-                    <div className="relative">
-                        <select
-                            value={activeLayerConfig.symmetryGroup || 'none'}
-                            onChange={(e) => updateState({ symmetryGroup: e.target.value as any }, true)}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 appearance-none"
-                        >
-                            <option value="none">None</option>
-                            <option value="pm">🪞 Mirror (2x)</option>
-                            <option value="pmm">✨ Double Mirror (4x)</option>
-                            <option value="p4m">🔮 Kaleidoscope (8x)</option>
-                        </select>
-                        <ChevronDown size={14} className="absolute right-3 top-3 text-slate-500 pointer-events-none" />
-                    </div>
-                    {activeLayerConfig.symmetryGroup && activeLayerConfig.symmetryGroup !== 'none' && (
-                        <p className="text-[10px] text-purple-600 flex items-center gap-1 mt-1 bg-purple-50 p-1.5 rounded">
-                            🌀 Shapes will be mirrored/rotated around center
-                        </p>
-                    )}
-                </div>
+                {(() => {
+                    const isSymmetryDisabled = ['truchet', 'guilloche', 'herringbone'].includes(activeLayerConfig.style);
+                    return (
+                        <div className="space-y-1">
+                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Symmetry</label>
+                            <div className="relative">
+                                <select
+                                    value={isSymmetryDisabled ? 'none' : (activeLayerConfig.symmetryGroup || 'none')}
+                                    onChange={(e) => updateState({ symmetryGroup: e.target.value as any }, true)}
+                                    disabled={isSymmetryDisabled}
+                                    className={`w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 appearance-none ${isSymmetryDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                >
+                                    <option value="none">None</option>
+                                    <option value="pm">🪞 Mirror (2x)</option>
+                                    <option value="pmm">✨ Double Mirror (4x)</option>
+                                    <option value="p4m">🔮 Kaleidoscope (8x)</option>
+                                </select>
+                                <ChevronDown size={14} className="absolute right-3 top-3 text-slate-500 pointer-events-none" />
+                            </div>
+                            {isSymmetryDisabled && (
+                                <p className="text-[10px] text-slate-500 flex items-center gap-1 mt-1 bg-slate-100 p-1.5 rounded">
+                                    🚫 Symmetry not available for {activeLayerConfig.style} patterns
+                                </p>
+                            )}
+                            {!isSymmetryDisabled && activeLayerConfig.symmetryGroup && activeLayerConfig.symmetryGroup !== 'none' && (
+                                <p className="text-[10px] text-purple-600 flex items-center gap-1 mt-1 bg-purple-50 p-1.5 rounded">
+                                    🌀 Shapes will be mirrored/rotated around center
+                                </p>
+                            )}
+                        </div>
+                    );
+                })()}
 
                 {/* Composition Specific Controls */}
                 {!isCompositionDisabled && activeLayerConfig.composition === 'diagonal' && (

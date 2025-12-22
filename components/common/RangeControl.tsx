@@ -9,12 +9,13 @@ interface RangeControlProps {
     step: number;
     displayValue: string;
     description?: string;
+    tooltip?: string;
 }
 
-const RangeControl: React.FC<RangeControlProps> = ({ label, value, onChange, min, max, step, displayValue, description }) => (
+const RangeControl: React.FC<RangeControlProps> = ({ label, value, onChange, min, max, step, displayValue, description, tooltip }) => (
     <div>
         <div className="flex justify-between items-center mb-1.5">
-            <span className="text-xs font-medium text-slate-600">{label}</span>
+            <span className="text-xs font-medium text-slate-600" title={tooltip}>{label}</span>
             <span className="text-[10px] text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">{displayValue}</span>
         </div>
         <input

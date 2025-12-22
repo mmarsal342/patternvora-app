@@ -10,25 +10,41 @@ const MotionPanel: React.FC = () => {
     const { activeLayerConfig, updateAnimation } = useSidebar();
     const anim = activeLayerConfig.animation;
 
+    // These pattern types don't support motion animation
+    const isMotionUnsupported = ['truchet', 'guilloche', 'herringbone'].includes(activeLayerConfig.style);
+
     return (
         <CollapsibleSection title="Motion" icon={<Film size={16} />} defaultOpen={false}>
             <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                {/* Show warning if pattern doesn't support motion */}
+                {isMotionUnsupported && (
+                    <div className="bg-slate-100 border border-slate-200 text-slate-500 text-[10px] p-3 rounded-lg">
+                        <span className="font-bold">🚫 Motion Unavailable</span>
+                        <p className="mt-1">
+                            {activeLayerConfig.style === 'truchet' && 'Truchet Maze uses tile-based rendering and cannot be animated.'}
+                            {activeLayerConfig.style === 'guilloche' && 'Guilloché uses curve-based rendering and cannot be animated.'}
+                            {activeLayerConfig.style === 'herringbone' && 'Herringbone uses fixed tile layout and cannot be animated.'}
+                        </p>
+                    </div>
+                )}
+
+                <div className={`flex items-center justify-between ${isMotionUnsupported ? 'opacity-50 pointer-events-none' : ''}`}>
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Animation</span>
                     <div className="flex items-center gap-2">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${anim.enabled ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-400'}`}>
-                            {anim.enabled ? 'ON' : 'OFF'}
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${anim.enabled && !isMotionUnsupported ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-400'}`}>
+                            {anim.enabled && !isMotionUnsupported ? 'ON' : 'OFF'}
                         </span>
                         <input
                             type="checkbox"
                             className="toggle"
-                            checked={anim.enabled}
+                            checked={anim.enabled && !isMotionUnsupported}
                             onChange={(e) => updateAnimation({ enabled: e.target.checked })}
+                            disabled={isMotionUnsupported}
                         />
                     </div>
                 </div>
 
-                {anim.enabled && (
+                {anim.enabled && !isMotionUnsupported && (
                     <>
                         <div>
                             <label className="text-xs text-slate-500 mb-1 block">Movement (Primary)</label>
@@ -108,6 +124,7 @@ const MotionPanel: React.FC = () => {
                                 <RangeControl
                                     label="Duration" value={anim.duration} onChange={(v) => updateAnimation({ duration: v })}
                                     min={2} max={20} step={1} displayValue={anim.duration + 's'}
+                                    tooltip="💡 For social media: 3-5s works best. For seamless loops: even numbers (4s, 6s, 8s) tile better."
                                 />
                             </div>
                             <div className="w-1/3">
@@ -154,6 +171,7 @@ const MotionPanel: React.FC = () => {
                                 <RangeControl
                                     label="Intensity / Amplitude" value={anim.intensity} onChange={(v) => updateAnimation({ intensity: v })}
                                     min={0.1} max={3.0} step={0.1} displayValue={anim.intensity.toFixed(1) + 'x'}
+                                    tooltip="💡 Lower (0.5-1.0) = subtle, elegant motion. Higher (1.5-3.0) = dynamic, energetic. For loops, keep ≤1.5."
                                 />
                             )}
 

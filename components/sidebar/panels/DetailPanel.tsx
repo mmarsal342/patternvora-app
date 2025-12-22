@@ -23,10 +23,12 @@ const DetailPanel: React.FC = () => {
                 <RangeControl
                     label="Complexity" value={activeLayerConfig.complexity} onChange={(v) => updateState({ complexity: v })}
                     min={10} max={200} step={1} displayValue={activeLayerConfig.complexity.toString()} description="More shapes"
+                    tooltip="💡 Higher = more shapes. For seamless tiles, 30-80 works best. Very high values may slow down export."
                 />
                 <RangeControl
                     label="Scale" value={activeLayerConfig.scale} onChange={(v) => updateState({ scale: v })}
                     min={0.5} max={3} step={0.1} displayValue={activeLayerConfig.scale.toFixed(1) + 'x'} description="Size of elements"
+                    tooltip="💡 Scale affects shape sizes. For microstock: 1.0-1.5 is ideal. Higher values = fewer, larger shapes visible."
                 />
                 <RangeControl
                     label="Stroke Width" value={activeLayerConfig.strokeWidth} onChange={(v) => updateState({ strokeWidth: v })}
@@ -65,6 +67,7 @@ const DetailPanel: React.FC = () => {
                 <RangeControl
                     label="Texture" value={activeLayerConfig.texture} onChange={(v) => updateState({ texture: v })}
                     min={0} max={50} step={1} displayValue={activeLayerConfig.texture.toString()} description="Grain opacity"
+                    tooltip="💡 Adds film grain effect. 10-20 gives subtle vintage look. Great for print designs."
                 />
             </div>
         </CollapsibleSection>
