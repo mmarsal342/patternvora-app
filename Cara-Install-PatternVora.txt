@@ -1,0 +1,97 @@
+========================================
+CARA MENGGUNAKAN PATTERNVORA SEBAGAI APLIKASI
+========================================
+
+PatternVora adalah web app yang bisa diinstall sebagai aplikasi di semua perangkat.
+Akses di: https://patternvora.com
+
+========================================
+🖥️ DESKTOP - WINDOWS
+========================================
+
+Menggunakan Google Chrome:
+1. Buka https://patternvora.com di Chrome
+2. Klik ikon menu (3 titik) di pojok kanan atas
+3. Pilih "Install PatternVora..." atau "Save and share" > "Install"
+4. Klik "Install" pada popup konfirmasi
+5. PatternVora akan muncul di Start Menu dan Desktop
+
+Menggunakan Microsoft Edge:
+1. Buka https://patternvora.com di Edge
+2. Klik ikon menu (3 titik) di pojok kanan atas
+3. Pilih "Apps" > "Install PatternVora"
+4. Klik "Install"
+5. Aplikasi tersedia di Start Menu
+
+========================================
+🍎 DESKTOP - MAC
+========================================
+
+Menggunakan Google Chrome:
+1. Buka https://patternvora.com di Chrome
+2. Klik ikon menu (3 titik) di pojok kanan atas
+3. Pilih "Install PatternVora..."
+4. Klik "Install"
+5. Aplikasi muncul di Launchpad dan folder Applications
+
+Menggunakan Safari:
+1. Buka https://patternvora.com di Safari
+2. Klik menu "File" di menu bar
+3. Pilih "Add to Dock"
+4. PatternVora akan tersedia di Dock
+
+========================================
+📱 MOBILE - ANDROID
+========================================
+
+Menggunakan Chrome:
+1. Buka https://patternvora.com di Chrome
+2. Tap menu (3 titik) di pojok kanan atas
+3. Pilih "Install app" atau "Add to Home screen"
+4. Tap "Install" atau "Add"
+5. Ikon PatternVora muncul di Home Screen
+
+Menggunakan Samsung Internet:
+1. Buka https://patternvora.com
+2. Tap menu (3 garis) di bawah
+3. Pilih "Add page to" > "Home screen"
+4. Tap "Add"
+
+========================================
+📱 MOBILE - IPHONE (iOS)
+========================================
+
+Menggunakan Safari:
+1. Buka https://patternvora.com di Safari
+2. Tap ikon Share (kotak dengan panah ke atas) di toolbar bawah
+3. Scroll ke bawah dan tap "Add to Home Screen"
+4. Beri nama (atau biarkan default) dan tap "Add"
+5. Ikon PatternVora muncul di Home Screen
+
+CATATAN: Di iPhone, HARUS menggunakan Safari. Browser lain (Chrome, Firefox) 
+tidak mendukung Add to Home Screen di iOS.
+
+========================================
+✨ KEUNTUNGAN INSTALL SEBAGAI APLIKASI
+========================================
+
+- Akses cepat tanpa buka browser
+- Tampilan fullscreen tanpa address bar
+- Bisa dibuka offline (setelah pertama kali load)
+- Performa lebih baik
+- Terasa seperti native app
+
+========================================
+❓ TROUBLESHOOTING
+========================================
+
+Tidak muncul opsi Install?
+- Pastikan sudah login ke browser
+- Refresh halaman dan tunggu beberapa detik
+- Pastikan pakai HTTPS (bukan HTTP)
+
+Aplikasi tidak update?
+- Tutup dan buka ulang aplikasi
+- Clear cache browser jika perlu
+
+========================================

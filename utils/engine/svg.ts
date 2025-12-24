@@ -247,48 +247,56 @@ const getSingleShapeSVG = (
 const generateLayerSVG = (width: number, height: number, config: LayerConfig, layerId: string): string => {
     let content = '';
 
+    // Check if in mosaic mode - if so, skip regular patterns entirely
+    const isMosaicMode = config.text.enabled && config.text.content && config.text.maskingMode === 'mosaic';
+
     // Background Rect for Layer (not for clip mode)
     if (!config.transparentBackground && config.text.maskingMode !== 'clip') {
         content += `<rect width="100%" height="100%" fill="${config.palette.bg}"/>`;
     }
 
-    const shapes = generateShapeData(width, height, config);
+    // Only render regular pattern shapes if NOT in mosaic mode
+    if (!isMosaicMode) {
+        const shapes = generateShapeData(width, height, config);
 
-    for (const shape of shapes) {
-        const override = config.overrides[shape.index] || {};
-        if (override.hidden) continue;
+        for (const shape of shapes) {
+            const override = config.overrides[shape.index] || {};
+            if (override.hidden) continue;
 
-        if (override.x !== undefined) shape.x = (override.x / 100) * width;
-        if (override.y !== undefined) shape.y = (override.y / 100) * height;
-        if (override.size !== undefined) shape.size *= override.size;
-        if (override.rotation !== undefined) shape.rotation = override.rotation;
-        if (override.color !== undefined) shape.color = override.color;
+            if (override.x !== undefined) shape.x = (override.x / 100) * width;
+            if (override.y !== undefined) shape.y = (override.y / 100) * height;
+            if (override.size !== undefined) shape.size *= override.size;
+            if (override.rotation !== undefined) shape.rotation = override.rotation;
+            if (override.color !== undefined) shape.color = override.color;
 
-        // 1. Draw Original
-        // Passing width/height now allows waves to render correctly here
-        content += getSingleShapeSVG(shape, config, width, height, 0, 0);
+            // 1. Draw Original
+            // Passing width/height now allows waves to render correctly here
+            content += getSingleShapeSVG(shape, config, width, height, 0, 0);
 
-        // 2. Wrapping Checks
-        const radius = shape.type === 'wave' ? shape.size : Math.max(shape.size / 1.5, 1);
+            // 2. Wrapping Checks
+            const radius = shape.type === 'wave' ? shape.size : Math.max(shape.size / 1.5, 1);
 
-        const wrapsRight = shape.x + radius > width;
-        const wrapsLeft = shape.x - radius < 0;
-        const wrapsBottom = shape.y + radius > height;
-        const wrapsTop = shape.y - radius < 0;
+            const wrapsRight = shape.x + radius > width;
+            const wrapsLeft = shape.x - radius < 0;
+            const wrapsBottom = shape.y + radius > height;
+            const wrapsTop = shape.y - radius < 0;
 
-        if (wrapsRight) content += getSingleShapeSVG(shape, config, width, height, -width, 0);
-        if (wrapsLeft) content += getSingleShapeSVG(shape, config, width, height, width, 0);
-        if (wrapsBottom) content += getSingleShapeSVG(shape, config, width, height, 0, -height);
-        if (wrapsTop) content += getSingleShapeSVG(shape, config, width, height, 0, height);
+            if (wrapsRight) content += getSingleShapeSVG(shape, config, width, height, -width, 0);
+            if (wrapsLeft) content += getSingleShapeSVG(shape, config, width, height, width, 0);
+            if (wrapsBottom) content += getSingleShapeSVG(shape, config, width, height, 0, -height);
+            if (wrapsTop) content += getSingleShapeSVG(shape, config, width, height, 0, height);
 
-        // Corners
-        if (wrapsRight && wrapsBottom) content += getSingleShapeSVG(shape, config, width, height, -width, -height);
-        if (wrapsRight && wrapsTop) content += getSingleShapeSVG(shape, config, width, height, -width, height);
-        if (wrapsLeft && wrapsBottom) content += getSingleShapeSVG(shape, config, width, height, width, -height);
-        if (wrapsLeft && wrapsTop) content += getSingleShapeSVG(shape, config, width, height, width, height);
+            // Corners
+            if (wrapsRight && wrapsBottom) content += getSingleShapeSVG(shape, config, width, height, -width, -height);
+            if (wrapsRight && wrapsTop) content += getSingleShapeSVG(shape, config, width, height, -width, height);
+            if (wrapsLeft && wrapsBottom) content += getSingleShapeSVG(shape, config, width, height, width, -height);
+            if (wrapsLeft && wrapsTop) content += getSingleShapeSVG(shape, config, width, height, width, height);
+        }
+
+        // --- PER LAYER TEXT SYSTEM (SVG) ---
     }
 
-    // --- PER LAYER TEXT SYSTEM (SVG) ---
+    // Handle text modes
     if (config.text.enabled && config.text.content) {
         if (config.text.maskingMode === 'clip') {
             // CLIP MODE: Pattern clipped to text shape
@@ -304,7 +312,7 @@ const generateLayerSVG = (width: number, height: number, config: LayerConfig, la
             const backgroundRect = `<rect width="100%" height="100%" fill="${config.palette.bg}"/>`;
             return `${maskDef}<g mask="url(#${maskId})">${backgroundRect}${content}</g>`;
         } else if (config.text.maskingMode === 'mosaic') {
-            // MOSAIC MODE: Individual shapes forming text
+            // MOSAIC MODE: Individual shapes forming text (no regular patterns)
             const mosaicShapes = generateMosaicTextFill(width, height, {
                 text: {
                     content: config.text.content,
