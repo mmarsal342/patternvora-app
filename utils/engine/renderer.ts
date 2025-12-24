@@ -404,16 +404,17 @@ export const drawShape = (
             ctx.closePath();
             shape.stroke ? ctx.stroke() : ctx.fill();
         } else if (shape.type === 'arrow') {
-            // Arrow pointing up
-            const w = size, h = size * 0.8;
+            // Arrow/Chevron pointing up - more prominent design
+            const w = size * 1.2, h = size;
+            const stemW = w * 0.35; // Stem width
             ctx.beginPath();
             ctx.moveTo(0, -h / 2);           // Top point
-            ctx.lineTo(w / 2, h / 6);        // Right wing
-            ctx.lineTo(w / 4, h / 6);        // Right inner
-            ctx.lineTo(w / 4, h / 2);        // Right bottom
-            ctx.lineTo(-w / 4, h / 2);       // Left bottom
-            ctx.lineTo(-w / 4, h / 6);       // Left inner
-            ctx.lineTo(-w / 2, h / 6);       // Left wing
+            ctx.lineTo(w / 2, 0);            // Right wing tip
+            ctx.lineTo(stemW / 2, 0);        // Right inner corner
+            ctx.lineTo(stemW / 2, h / 2);    // Right bottom
+            ctx.lineTo(-stemW / 2, h / 2);   // Left bottom
+            ctx.lineTo(-stemW / 2, 0);       // Left inner corner
+            ctx.lineTo(-w / 2, 0);           // Left wing tip
             ctx.closePath();
             shape.stroke ? ctx.stroke() : ctx.fill();
         } else if (shape.type === 'spiral') {
