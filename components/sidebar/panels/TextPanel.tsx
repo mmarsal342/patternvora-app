@@ -1,9 +1,9 @@
-
 import React, { useRef } from 'react';
 import { Type, ChevronDown, Upload } from 'lucide-react';
 import { useSidebar } from '../SidebarContext';
 import CollapsibleSection from '../../common/CollapsibleSection';
 import RangeControl from '../../common/RangeControl';
+import Tooltip from '../../common/Tooltip';
 import { DEFAULT_FONTS } from '../../../types';
 
 const TextPanel: React.FC = () => {
@@ -104,7 +104,9 @@ const TextPanel: React.FC = () => {
                         {/* Pattern Fill Mode */}
                         <div className="bg-indigo-50 p-3 rounded-md border border-indigo-100 space-y-3">
                             <div>
-                                <label className="text-xs font-semibold text-indigo-800 uppercase tracking-wide block mb-1">Pattern Fill Mode</label>
+                                <Tooltip content="Normal = text on top. Clip = pattern fills text shape. Mosaic = small shapes form the text." position="top">
+                                    <label className="text-xs font-semibold text-indigo-800 uppercase tracking-wide block mb-1 cursor-help border-b border-dotted border-indigo-300 inline-block">Pattern Fill Mode</label>
+                                </Tooltip>
                                 <div className="relative">
                                     <select
                                         value={textConfig.maskingMode ?? 'none'}
@@ -129,6 +131,7 @@ const TextPanel: React.FC = () => {
                                     onChange={(v) => updateText({ mosaicDensity: v })}
                                     min={0.5} max={2.5} step={0.1}
                                     displayValue={textConfig.mosaicDensity.toFixed(1) + 'x'}
+                                    tooltip="Higher = smaller, denser shapes forming the text"
                                 />
                             )}
                         </div>

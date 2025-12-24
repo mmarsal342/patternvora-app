@@ -1,0 +1,559 @@
+================================================================================
+                    PANDUAN LENGKAP MENGGUNAKAN PATTERNVORA
+                          Buat Pattern Profesional dalam Hitungan Detik
+================================================================================
+
+Akses PatternVora di: https://patternvora.com
+
+================================================================================
+🎨 BAGIAN 1: MENGENAL INTERFACE PATTERNVORA
+================================================================================
+
+PatternVora menggunakan layout 2 kolom:
+
+1. CANVAS AREA (Kiri)
+   - Preview pattern secara real-time
+   - Klik shape untuk edit individual (Edit Mode)
+   - Drag shape untuk pindahkan posisi
+   - History filmstrip di bagian bawah canvas
+
+2. SIDEBAR (Kanan)
+   Panel-panel kontrol tersusun dari atas ke bawah:
+   
+   LAYERS PANEL
+   - Manage multiple layers
+   - Add/delete/duplicate layer
+   - Opacity & blend mode per layer
+   - Lock/unlock layer
+   
+   PRESETS PANEL
+   - Browse saved presets
+   - Import/export preset file
+   
+   CANVAS PANEL
+   - Aspect ratio selector
+   
+   STYLE PANEL
+   - Pattern style selector
+   - Composition layout
+   - Style-specific options
+   
+   TEXT PANEL
+   - Text overlay settings
+   - Pattern fill mode (Normal/Clip/Mosaic)
+   
+   MOTION PANEL
+   - Animation controls
+   - Primary & secondary animation
+   
+   COLORS PANEL
+   - Palette selection
+   - Extract from image
+   - Custom colors
+   
+   DETAILS PANEL
+   - Complexity (jumlah shapes)
+   - Scale (ukuran shapes)
+   - Stroke mode & width
+   - Texture intensity
+   
+   FOOTER (Export & Actions)
+   - Shuffle Layer / Shuffle All
+   - Export PNG/JPG/SVG/MP4
+   - Edit Shapes mode
+   - Save to Presets
+   - Batch Studio (ZIP)
+   - Reset Pattern
+
+================================================================================
+🎭 BAGIAN 2: PATTERN STYLES
+================================================================================
+
+PatternVora memiliki berbagai style pattern:
+
+CORE STYLES (Available in Shuffle):
+--------------------------------
+
+GEOMETRIC
+- Shape: Polygon, circle, square, star, hexagon
+- Cocok untuk: Corporate, tech, modern design
+
+ORGANIC  
+- Shape: Blob, pill, semicircle
+- Cocok untuk: Natural, wellness, beauty brands
+
+BAUHAUS
+- Shape: Arc, circle, rect, triangle, semicircle
+- Cocok untuk: Retro, artistic, gallery
+
+MEMPHIS
+- Shape: Mix colorful geometric + cross, star
+- Cocok untuk: Playful, 90s vibes, youth brands
+
+CONFETTI
+- Shape: Star, circle, triangle scattered
+- Cocok untuk: Celebration, party, festive
+
+GRID
+- Shape: Organized grid layout
+- Cocok untuk: Minimalist, structured, tech
+
+MOSAIC
+- Shape: Tile-like arrangement
+- Cocok untuk: Artistic, decorative
+
+RADIAL
+- Shape: Circular/spiral arrangement
+- Cocok untuk: Energy, dynamic, cosmic
+
+HEX
+- Shape: Honeycomb hexagon pattern
+- Cocok untuk: Tech, science, network
+
+ISOMETRIC
+- Shape: 3D cube illusion
+- Cocok untuk: Gaming, tech, modern
+
+TYPO
+- Shape: Random characters/letters
+- Cocok untuk: Editorial, magazine style
+
+SPECIALTY STYLES (Manual Selection):
+-----------------------------------
+
+WAVES
+- Shape: Flowing wave ribbons
+- Cocok untuk: Music, flow, calm
+
+TRUCHET
+- Shape: Connected maze pattern
+- Options: Arc type, maze density, double stroke
+- Cocok untuk: Artistic, complex, unique
+
+GUILLOCHE
+- Shape: Spirograph curves
+- Options: Curve type, radius, layer count
+- Cocok untuk: Premium, currency-style, secure
+
+HERRINGBONE
+- Pattern types: Herringbone, Chevron, Basket-weave
+- Options: Tile ratio, grout size
+- Cocok untuk: Flooring, fashion, classic
+
+SEASONAL STYLES:
+---------------
+- seasonal-cny (Chinese New Year)
+- seasonal-christmas
+- seasonal-newyear
+- seasonal-valentine
+
+CUSTOM IMAGE
+- Upload your own images as shapes (max 5)
+- Toggle "Original Colors" untuk keep/recolor
+
+================================================================================
+🎯 BAGIAN 3: COMPOSITION (LAYOUT)
+================================================================================
+
+Pilih bagaimana shape didistribusikan:
+
+RANDOM
+- Distribusi acak di seluruh canvas
+- Paling versatile
+
+CENTER
+- Shapes terpusat di tengah, fade ke pinggir
+- Cocok untuk focal point
+
+FRAME
+- Shapes di pinggir canvas, kosong di tengah
+- Cocok untuk frame/border design
+
+DIAGONAL
+- Mengikuti garis diagonal
+- Cocok untuk dynamic design
+
+THIRDS
+- Mengikuti rule of thirds
+- Cocok untuk balanced layout
+
+BOTTOM
+- Shapes lebih banyak di bagian bawah
+- Cocok untuk footer decoration
+
+CROSS
+- Membentuk pola silang (+)
+- Cocok untuk centered designs
+
+RING
+- Membentuk cincin/donut di tengah
+- Cocok untuk badge, logo background
+
+X-SHAPE
+- Membentuk pola X dari corner ke corner
+- Cocok untuk dynamic backgrounds
+
+SPLIT-V
+- Dibagi vertikal (kiri-kanan)
+- Cocok untuk two-tone designs
+
+SPLIT-H
+- Dibagi horizontal (atas-bawah)
+- Cocok untuk header/footer split
+
+CORNERS
+- Shapes hanya di 4 sudut
+- Cocok untuk corner decoration
+
+================================================================================
+📝 BAGIAN 4: TEXT OVERLAY
+================================================================================
+
+Fitur text overlay punya 3 mode:
+
+MODE 1: NORMAL (Text on Top)
+- Text ditampilkan di atas pattern dengan warna solid
+- Bisa atur warna, opacity, blend mode
+- Cocok untuk watermark, branding
+
+MODE 2: CLIP (Pattern Inside Text)
+- Pattern di-crop/mask ke dalam text
+- Text jadi "window" ke pattern
+- Background tampil, pattern hanya di area text
+- Cocok untuk typographic art
+
+MODE 3: MOSAIC (Shapes Form Text) - NEW!
+- Shapes kecil disusun membentuk text
+- Efek pointillism/mosaic art
+- Atur Mosaic Density untuk kepadatan shapes
+- Tidak ada regular pattern, hanya mosaic shapes
+- Cocok untuk artistic typography
+
+CARA PAKAI:
+1. Expand "Text Overlay" panel
+2. Centang "Enable Text (Current Layer)"
+3. Ketik text yang diinginkan
+4. Pilih font dari dropdown
+5. Pilih "Pattern Fill Mode": Normal/Clip/Mosaic
+6. Atur Size dan Opacity
+7. Jika Mosaic: atur Mosaic Density (0.5x - 2.5x)
+
+================================================================================
+🎬 BAGIAN 5: ANIMASI & VIDEO EXPORT
+================================================================================
+
+PatternVora bisa export video animasi loop!
+
+JENIS ANIMASI PRIMARY:
+- None: Tidak ada animasi
+- Orbit: Shapes berputar mengelilingi center
+- Float: Shapes melayang naik-turun
+- Scan: Efek scanning left-to-right
+
+JENIS ANIMASI SECONDARY:
+- None: Tidak ada
+- Pulse: Shapes membesar-mengecil
+- Spin: Individual shapes rotate
+
+ANIMATION SETTINGS:
+- Duration: Panjang video (detik)
+- Speed: Kecepatan animasi
+- Intensity: Intensitas movement
+
+CARA BUAT VIDEO:
+1. Expand "Motion" panel
+2. Toggle ON "Animation"
+3. Pilih Primary Animation (Orbit/Float/Scan)
+4. Optional: Pilih Secondary Animation (Pulse/Spin)
+5. Atur Duration, Speed, Intensity
+6. Klik tombol "MP4" di footer
+7. Konfirmasi recording tips
+8. Tunggu processing (progress bar akan tampil)
+
+TIPS VIDEO:
+- Duration 3-5 detik cukup untuk seamless loop
+- Jangan minimize browser saat recording
+- Chrome recommended untuk best quality
+- Video auto seamless loop!
+
+================================================================================
+📤 BAGIAN 6: EXPORT OPTIONS
+================================================================================
+
+EXPORT QUALITY OPTIONS:
+- SD (1000px) - Fast, good for preview
+- HD (2000px) - Good balance
+- 4K (4096px) - Maximum quality [PRO]
+
+FORMAT EXPORT:
+
+PNG
+- Transparent background support
+- Best for web & design software
+- Lossless quality
+
+JPG
+- Smaller file size
+- No transparency (white background)
+- Good for photos/print
+
+SVG
+- Vector format, infinite scale
+- Editable in Illustrator/Figma
+- Perfect for logos, print
+- Option: "Stock-Ready" clips to canvas
+
+MP4
+- Animated video
+- Seamless loop
+- Requires animation enabled
+- Good for social media, ads
+
+ADDITIONAL ACTIONS:
+- Shuffle Layer: Randomize active layer
+- Shuffle All: Randomize all unlocked layers + palette
+- Remix (dice icon): Keep style, randomize seed only
+- Edit Shapes: Enter edit mode for individual shape control
+- Save to Presets: Save current config (limit varies by tier)
+- Batch Studio: Generate multiple variations as ZIP
+- Reset/New Pattern: Start fresh
+
+================================================================================
+🎨 BAGIAN 7: WARNA & PALETTE
+================================================================================
+
+COLORS PANEL:
+
+Curated Palettes
+- Klik palette untuk apply
+- Banyak pilihan siap pakai
+
+Extract from Image
+- Klik "Extract from image"
+- Upload gambar referensi
+- Otomatis extract dominant colors!
+
+Custom Colors
+- Klik individual color untuk edit
+- Color picker akan muncul
+- Edit setiap warna secara manual
+
+Background Color
+- Toggle "Use Palette BG"
+- Atau set custom background color
+- Support transparent background
+
+TIPS WARNA:
+- Gunakan 3-5 warna untuk balance
+- Pastikan background kontras dengan shapes
+- Seasonal themes punya palette built-in
+
+================================================================================
+💾 BAGIAN 8: PRESETS & HISTORY
+================================================================================
+
+PRESETS PANEL (Top of Sidebar):
+
+Save Preset
+- Klik "Save to Presets" di footer
+- Beri nama preset
+- Config tersimpan ke cloud (jika login)
+- Limit: 10 presets (Free), 50 presets (Pro)
+
+Load Preset
+- Klik preset card di Presets panel
+- Otomatis apply ke active layer
+
+Delete Preset
+- Click delete icon pada preset card
+
+Import/Export
+- Export preset sebagai JSON file
+- Share dengan orang lain
+- Import preset dari file
+
+HISTORY (pada canvas):
+- Filmstrip di bawah canvas
+- Setiap perubahan auto-saved
+- Klik thumbnail untuk jump ke state tersebut
+- Unlimited undo via history!
+
+================================================================================
+🖼️ BAGIAN 9: LAYERS SYSTEM
+================================================================================
+
+LAYERS PANEL (Top of Sidebar):
+
+PatternVora support multiple layers!
+
+ADD LAYER
+- Klik "+" button
+- New layer dengan random config
+
+SELECT LAYER
+- Klik layer card untuk select
+- Selected layer = "Active Layer"
+- Semua panel controls affect active layer
+
+LAYER CONTROLS (per layer):
+- Visibility toggle (eye icon)
+- Lock/unlock (prevent accidental edits)
+- Duplicate layer
+- Delete layer
+- Opacity slider
+- Blend mode selector
+
+BLEND MODES:
+- Normal, Multiply, Screen, Overlay
+- Darken, Lighten, Color-dodge, Color-burn
+- Difference, Exclusion, Hue, Saturation
+- Color, Luminosity
+
+LAYER ORDER:
+- Drag to reorder
+- Bottom = rendered first (background)
+- Top = rendered last (foreground)
+
+TIPS LAYERS:
+- Layer bawah: background pattern sederhana
+- Layer atas: detail/accent dengan transparency
+- Combine blend modes untuk efek unik!
+- Lock layer yang sudah final
+
+================================================================================
+🔧 BAGIAN 10: FITUR ADVANCED (STYLE OPTIONS)
+================================================================================
+
+Beberapa styles punya options tambahan:
+
+TRUCHET OPTIONS:
+- Tile Type: Arc, Diagonal, Straight, Zigzag
+- Maze Density: Jumlah tiles
+- Arc Weight: Ketebalan garis
+- Concentric: Nested arcs effect
+- Double Stroke: Garis ganda
+- Connector Mode: Toggle connection style
+
+GUILLOCHE OPTIONS:
+- Curve Type: Hypotrochoid, Epitrochoid, Mixed
+- Major Radius: Ukuran spiral utama
+- Minor Radius: Ukuran spiral secondary
+- Distance: Jarak pen dari center
+- Frequency: Kerapatan curves
+- Layer Count: Jumlah curves stacked
+
+HERRINGBONE OPTIONS:
+- Pattern: Herringbone, Chevron, Basket-weave
+- Tile Ratio: Panjang tiles
+- Grout Size: Gap antar tiles
+- Grout Color: Warna gap
+
+DETAILS PANEL:
+- Complexity: 1-200+ (jumlah shapes)
+- Scale: 0.1-3.0 (ukuran shapes)
+- Stroke Mode: Fill, Outline, Mixed
+- Stroke Width: Ketebalan outline
+- Texture: 0-100 (noise texture overlay)
+
+SYMMETRY GROUPS: (di Style Panel)
+- none: No symmetry
+- pm: Mirror horizontal
+- pmm: Mirror both axes
+- p4m: 4-way rotational + mirror
+
+================================================================================
+📱 BAGIAN 11: TIPS & BEST PRACTICES
+================================================================================
+
+UNTUK SOCIAL MEDIA:
+- Instagram Post: Aspect Ratio 1:1
+- Instagram Story: Aspect Ratio 9:16
+- Facebook: Aspect Ratio 1.91:1
+- YouTube Thumbnail: Aspect Ratio 16:9
+- Export HD atau 4K untuk sharp quality
+
+UNTUK MICROSTOCK (Adobe Stock, Shutterstock):
+- Export 4K (4096px) untuk max resolution
+- Enable "Stock-Ready" checkbox pada SVG
+- Avoid seasonal/trademark shapes
+- Buat variasi dengan Shuffle & Batch Studio
+- 10+ variasi dari 1 design = portfolio cepat
+
+UNTUK PRINT:
+- Export SVG untuk vector (infinite scale)
+- Atau export 4K PNG minimum
+- Pattern otomatis seamless/tileable!
+- CMYK conversion di Illustrator/Photoshop
+
+PERFORMANCE TIPS:
+- Complexity tinggi = rendering lambat
+- Truchet/Guilloche intensive on GPU
+- Kurangi complexity saat editing preview
+- Naikkan complexity sebelum final export
+- Close other tabs saat video recording
+
+================================================================================
+❓ TROUBLESHOOTING
+================================================================================
+
+Pattern tidak muncul / blank canvas?
+- Refresh halaman (Cmd+R / Ctrl+R)
+- Clear browser cache
+- Pastikan JavaScript enabled
+- Try different browser (Chrome recommended)
+
+Export gagal / stuck?
+- Kurangi complexity
+- Close other browser tabs
+- Pastikan browser up-to-date
+- Try smaller export size first
+
+Video export sangat lama?
+- Normal untuk high complexity + long duration
+- Jangan tutup atau minimize tab
+- Progress bar menunjukkan status
+- Gunakan "Fast" quality mode untuk preview
+- Reduce duration atau complexity
+
+Text tidak tampil?
+- Pastikan font ter-load (tunggu 2-3 detik)
+- Try font "Inter" atau "Outfit" (always available)
+- Check opacity slider tidak 0
+
+Shapes tidak bisa di-drag?
+- Pastikan layer tidak locked
+- Enable "Edit Shapes" mode di footer
+- Klik shape dulu untuk select
+
+================================================================================
+🚀 QUICK ACTIONS & SHORTCUTS
+================================================================================
+
+FOOTER BUTTONS:
+- Shuffle Layer: Randomize active layer style + colors
+- Shuffle All: Randomize ALL unlocked layers
+- Dice icon: Remix seed only (keep style)
+- Edit Shapes: Toggle individual shape editing
+- Save to Presets: Quick save current config
+- Batch Studio: Generate ZIP dengan banyak variasi
+- Reset: Mulai dari awal
+
+CANVAS INTERACTIONS:
+- Click shape (Edit Mode): Select untuk edit
+- Drag shape: Pindahkan posisi
+- History thumbnails: Click untuk time travel
+
+PRO TIPS:
+- Seed number sama = pattern identical (reproducible)
+- Save preset sebelum major experiments
+- Layer locking prevents accidental changes
+- Blend modes + transparency = unique effects
+- Batch Studio untuk portfolio building cepat
+
+================================================================================
+
+Selamat berkreasi dengan PatternVora! 🎨
+Website: https://patternvora.com
+Support: support@voralab.com
+
+================================================================================
