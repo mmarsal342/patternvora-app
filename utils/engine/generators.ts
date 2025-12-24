@@ -203,13 +203,11 @@ export const generateGrid = (width: number, height: number, baseSize: number, co
         return undefined;
     };
 
-    // Filter allowed types for Grid if specified
     const getDefaultTypes = (): ShapeData['type'][] => ['rect', 'polygon', 'cross', 'circle', 'diamond', 'hexagon'];
-    let allowedTypes = getDefaultTypes();
-    if (config.styleOptions.shapeTypes.length > 0) {
-        allowedTypes = allowedTypes.filter(t => config.styleOptions.shapeTypes.includes(t));
-        if (allowedTypes.length === 0) allowedTypes = getDefaultTypes();
-    }
+    // User selection OVERRIDES style defaults
+    let allowedTypes: ShapeData['type'][] = config.styleOptions.shapeTypes.length > 0
+        ? config.styleOptions.shapeTypes as ShapeData['type'][]
+        : getDefaultTypes();
 
     for (let i = 0; i < cols; i++) {
         for (let j = 0; j < rows; j++) {
@@ -320,13 +318,11 @@ export const generateMosaic = (width: number, height: number, baseSize: number, 
         return undefined;
     };
 
-    // Filter Allowed Shapes
     const getDefaultTypes = (): ShapeData['type'][] => ['rect', 'polygon', 'circle', 'triangle', 'hexagon'];
-    let allowedTypes = getDefaultTypes();
-    if (config.styleOptions.shapeTypes.length > 0) {
-        allowedTypes = allowedTypes.filter(t => config.styleOptions.shapeTypes.includes(t));
-        if (allowedTypes.length === 0) allowedTypes = getDefaultTypes();
-    }
+    // User selection OVERRIDES style defaults
+    let allowedTypes: ShapeData['type'][] = config.styleOptions.shapeTypes.length > 0
+        ? config.styleOptions.shapeTypes as ShapeData['type'][]
+        : getDefaultTypes();
 
     for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
@@ -378,13 +374,11 @@ export const generateRadial = (width: number, height: number, baseSize: number, 
     const rings = Math.floor(config.complexity / 10) + 2;
     let globalIndex = 0;
 
-    // Filter Allowed Shapes
     const getDefaultTypes = (): ShapeData['type'][] => ['arc', 'donut', 'star', 'circle', 'polygon', 'spiral', 'semicircle', 'thin-ring'];
-    let allowedTypes = getDefaultTypes();
-    if (config.styleOptions.shapeTypes.length > 0) {
-        allowedTypes = allowedTypes.filter(t => config.styleOptions.shapeTypes.includes(t));
-        if (allowedTypes.length === 0) allowedTypes = getDefaultTypes();
-    }
+    // User selection OVERRIDES style defaults
+    let allowedTypes: ShapeData['type'][] = config.styleOptions.shapeTypes.length > 0
+        ? config.styleOptions.shapeTypes as ShapeData['type'][]
+        : getDefaultTypes();
 
     for (let r = 0; r < rings; r++) {
         const radius = (r / rings) * maxDist;
@@ -430,9 +424,9 @@ export const generateStandardScatter = (width: number, height: number, baseSize:
     else if ((config.style as string) === 'seasonal-ramadan') allowedTypes = ['crescent', 'star-islamic', 'mosque', 'lantern-ramadan', 'ketupat', 'dates'];
 
     // Filter if user has selected specific shapes
+    // User selection OVERRIDES style defaults (not intersection)
     if (config.styleOptions.shapeTypes.length > 0) {
-        const filtered = allowedTypes.filter(t => config.styleOptions.shapeTypes.includes(t));
-        if (filtered.length > 0) allowedTypes = filtered;
+        allowedTypes = config.styleOptions.shapeTypes as ShapeData['type'][];
     }
 
     for (let i = 0; i < config.complexity; i++) {
