@@ -6,6 +6,7 @@ interface TooltipProps {
     position?: 'top' | 'bottom' | 'left' | 'right';
     delay?: number;
     disabled?: boolean;
+    className?: string;
 }
 
 const Tooltip: React.FC<TooltipProps> = ({
@@ -13,7 +14,8 @@ const Tooltip: React.FC<TooltipProps> = ({
     children,
     position = 'top',
     delay = 300,
-    disabled = false
+    disabled = false,
+    className = ''
 }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [coords, setCoords] = useState({ x: 0, y: 0 });
@@ -116,7 +118,7 @@ const Tooltip: React.FC<TooltipProps> = ({
                 onMouseLeave={hideTooltip}
                 onFocus={showTooltip}
                 onBlur={hideTooltip}
-                className="inline-block"
+                className={className || 'inline-block'}
             >
                 {children}
             </div>

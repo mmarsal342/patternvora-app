@@ -190,20 +190,20 @@ const SidebarLayout: React.FC<Omit<SidebarProps, keyof SidebarContextType>> = (p
                     <div className="px-4 pb-4 space-y-3 animate-in slide-in-from-bottom-2 duration-200">
                         {/* Randomize Controls */}
                         <div className="flex gap-2">
-                            <Tooltip content="Randomize style & colors for this layer" position="top">
+                            <Tooltip content="Randomize style & colors for this layer" position="top" className="flex-1">
                                 <button
                                     onClick={handleRandomize}
-                                    className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-colors active:scale-95 border border-slate-200"
+                                    className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-colors active:scale-95 border border-slate-200"
                                 >
                                     <RefreshCw size={14} />
                                     <span className="sm:hidden">Shuffle</span>
                                     <span className="hidden sm:inline">Shuffle Layer</span>
                                 </button>
                             </Tooltip>
-                            <Tooltip content="Randomize ALL unlocked layers + new palette" position="top">
+                            <Tooltip content="Randomize ALL unlocked layers + new palette" position="top" className="flex-1">
                                 <button
                                     onClick={handleRandomizeAll}
-                                    className="flex-1 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl shadow-lg shadow-indigo-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-transform active:scale-95"
+                                    className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl shadow-lg shadow-indigo-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-transform active:scale-95"
                                 >
                                     <Wand2 size={14} className="fill-white/20" />
                                     <span className="sm:hidden">All</span>
