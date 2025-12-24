@@ -1,7 +1,7 @@
 
 import { AppState, ShapeData, LayerConfig, TextConfig, ShapeOverride } from '../../types';
 import { adjustColor } from './math';
-import { generateShapeData } from './generators';
+import { generateShapeData, generateMosaicTextFill } from './generators';
 import { applyAnimation } from './animator';
 import { drawSeasonalShape, SEASONAL_SHAPES } from './shapes';
 
@@ -476,7 +476,7 @@ export const drawText = (
         ctx.textBaseline = 'middle';
         ctx.translate(tx, ty);
 
-        if (textConfig.masking) {
+        if (textConfig.maskingMode === 'clip') {
             ctx.fillStyle = '#000000';
             ctx.globalAlpha = 1;
         } else {
@@ -565,8 +565,8 @@ const renderLayer = (
         if (wrapsLeft && wrapsTop) drawShape(ctx, shape, width, height, config, loadedImages, progress, width, height);
     };
 
-    if (config.text.enabled && config.text.content && config.text.masking) {
-        // --- MASKING MODE ---
+    if (config.text.enabled && config.text.content && config.text.maskingMode === 'clip') {
+        // --- CLIP MASKING MODE (pattern clipped to text) ---
         ctx.save();
         ctx.globalCompositeOperation = 'source-over';
         drawText(ctx, width, height, config.text);
@@ -585,6 +585,46 @@ const renderLayer = (
                 ctx.save();
                 ctx.globalAlpha = config.texture / 200;
                 ctx.globalCompositeOperation = 'source-atop';
+                ctx.fillStyle = noisePattern;
+                ctx.fillRect(0, 0, width, height);
+                ctx.restore();
+            }
+        }
+
+    } else if (config.text.enabled && config.text.content && config.text.maskingMode === 'mosaic') {
+        // --- MOSAIC MODE (shapes packed inside text) ---
+        if (!config.transparentBackground) {
+            ctx.fillStyle = config.palette.bg;
+            ctx.fillRect(0, 0, width, height);
+        }
+
+        // Generate shapes that fill the text
+        const mosaicShapes = generateMosaicTextFill(width, height, {
+            text: {
+                content: config.text.content,
+                fontFamily: config.text.fontFamily,
+                fontSize: config.text.fontSize,
+                x: config.text.x,
+                y: config.text.y
+            },
+            density: config.text.mosaicDensity,
+            config
+        });
+
+        // Render mosaic shapes (they're already positioned inside text)
+        mosaicShapes.forEach(shape => {
+            if (config.animation.enabled) {
+                applyAnimation(shape, progress, width, height, config.animation);
+            }
+            drawShape(ctx, shape, width, height, config, loadedImages, progress, 0, 0);
+        });
+
+        if (config.texture > 0 && noisePatternSource) {
+            const noisePattern = ctx.createPattern(noisePatternSource, 'repeat');
+            if (noisePattern) {
+                ctx.save();
+                ctx.globalAlpha = config.texture / 200;
+                ctx.globalCompositeOperation = 'overlay';
                 ctx.fillStyle = noisePattern;
                 ctx.fillRect(0, 0, width, height);
                 ctx.restore();

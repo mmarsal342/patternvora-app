@@ -1,6 +1,6 @@
 
 import { AppState, FontDef, LayerConfig, TextConfig, ShapeData } from '../../types';
-import { generateShapeData } from './generators';
+import { generateShapeData, generateMosaicTextFill } from './generators';
 import { adjustColor } from './math';
 import { getSeasonalShapeSVG, isSeasonalShape } from './shapes/svg';
 
@@ -247,8 +247,8 @@ const getSingleShapeSVG = (
 const generateLayerSVG = (width: number, height: number, config: LayerConfig, layerId: string): string => {
     let content = '';
 
-    // Background Rect for Layer
-    if (!config.transparentBackground && (!config.text.enabled || !config.text.masking)) {
+    // Background Rect for Layer (not for clip mode)
+    if (!config.transparentBackground && config.text.maskingMode !== 'clip') {
         content += `<rect width="100%" height="100%" fill="${config.palette.bg}"/>`;
     }
 
@@ -290,7 +290,8 @@ const generateLayerSVG = (width: number, height: number, config: LayerConfig, la
 
     // --- PER LAYER TEXT SYSTEM (SVG) ---
     if (config.text.enabled && config.text.content) {
-        if (config.text.masking) {
+        if (config.text.maskingMode === 'clip') {
+            // CLIP MODE: Pattern clipped to text shape
             const maskId = `textMask-${layerId}`;
             const maskDef = `
                 <defs>
@@ -302,7 +303,25 @@ const generateLayerSVG = (width: number, height: number, config: LayerConfig, la
             `;
             const backgroundRect = `<rect width="100%" height="100%" fill="${config.palette.bg}"/>`;
             return `${maskDef}<g mask="url(#${maskId})">${backgroundRect}${content}</g>`;
+        } else if (config.text.maskingMode === 'mosaic') {
+            // MOSAIC MODE: Individual shapes forming text
+            const mosaicShapes = generateMosaicTextFill(width, height, {
+                text: {
+                    content: config.text.content,
+                    fontFamily: config.text.fontFamily,
+                    fontSize: config.text.fontSize,
+                    x: config.text.x,
+                    y: config.text.y
+                },
+                density: config.text.mosaicDensity,
+                config
+            });
+
+            for (const shape of mosaicShapes) {
+                content += getSingleShapeSVG(shape, config, width, height, 0, 0);
+            }
         } else {
+            // NORMAL MODE: Text on top
             content += getSVGTextNodes(width, height, config.text);
         }
     }

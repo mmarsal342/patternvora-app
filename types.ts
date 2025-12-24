@@ -19,6 +19,8 @@ export type FontDef = {
   type: 'google' | 'custom' | 'system';
 };
 
+export type TextMaskingMode = 'clip' | 'mosaic';
+
 export type TextConfig = {
   enabled: boolean;
   content: string;
@@ -30,7 +32,8 @@ export type TextConfig = {
   opacity: number;
   blendMode: GlobalCompositeOperation;
   renderMode: 'font' | 'shape';
-  masking: boolean; // Pattern inside text
+  maskingMode: TextMaskingMode | null; // null = disabled, 'clip' = pattern clipped to text, 'mosaic' = pattern fills text
+  mosaicDensity: number; // 0.5 - 2.0 controls shape packing density
 };
 
 export type CustomAsset = {

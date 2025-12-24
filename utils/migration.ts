@@ -14,7 +14,8 @@ export const DEFAULT_TEXT_CONFIG: TextConfig = {
     opacity: 1,
     blendMode: 'source-over',
     renderMode: 'font',
-    masking: false
+    maskingMode: null,
+    mosaicDensity: 1
 };
 
 export const DEFAULT_STYLE_OPTIONS: StyleOptions = {
@@ -98,17 +99,32 @@ export const migrateToV2 = (oldState: any): AppState => {
     // If it's already V2, return as is (but ensure transparency, text, and new options prop exists)
     if (oldState.version === 2 && Array.isArray(oldState.layers)) {
         // Hotfix for existing V2 states that might miss the new props
-        const layers = oldState.layers.map((l: Layer) => ({
-            ...l,
-            config: {
-                ...l.config,
-                transparentBackground: l.config.transparentBackground ?? false,
-                strokeMode: l.config.strokeMode ?? 'random',
-                text: l.config.text || { ...DEFAULT_TEXT_CONFIG },
-                styleOptions: l.config.styleOptions || { ...DEFAULT_STYLE_OPTIONS },
-                compositionOptions: l.config.compositionOptions || { ...DEFAULT_COMPOSITION_OPTIONS }
+        const layers = oldState.layers.map((l: Layer) => {
+            // Migrate old masking boolean to new maskingMode
+            let textConfig: TextConfig = l.config.text ? { ...l.config.text } : { ...DEFAULT_TEXT_CONFIG };
+            if ('masking' in textConfig && !('maskingMode' in textConfig)) {
+                const oldMasking = (textConfig as any).masking;
+                (textConfig as any).maskingMode = oldMasking ? 'clip' : null;
+                (textConfig as any).mosaicDensity = 1;
+                delete (textConfig as any).masking;
             }
-        }));
+            // Ensure mosaicDensity exists
+            if (textConfig.mosaicDensity === undefined) {
+                textConfig.mosaicDensity = 1;
+            }
+
+            return {
+                ...l,
+                config: {
+                    ...l.config,
+                    transparentBackground: l.config.transparentBackground ?? false,
+                    strokeMode: l.config.strokeMode ?? 'random',
+                    text: textConfig,
+                    styleOptions: l.config.styleOptions || { ...DEFAULT_STYLE_OPTIONS },
+                    compositionOptions: l.config.compositionOptions || { ...DEFAULT_COMPOSITION_OPTIONS }
+                }
+            };
+        });
 
         const { text, ...rest } = oldState;
         return { ...rest, layers };
