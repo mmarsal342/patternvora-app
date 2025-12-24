@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 interface TooltipProps {
     content: string;
@@ -123,23 +124,23 @@ const Tooltip: React.FC<TooltipProps> = ({
                 {children}
             </div>
 
-            {isVisible && (
+            {isVisible && createPortal(
                 <div
                     ref={tooltipRef}
                     className={`
-                        fixed z-[100] px-3 py-2 
+                        fixed z-[9999] px-3 py-2 
                         bg-slate-800 text-white text-xs font-medium
                         rounded-lg shadow-lg shadow-slate-900/20
                         max-w-[200px] text-center leading-relaxed
                         pointer-events-none
-                        animate-in fade-in zoom-in-95 duration-150
                         ${arrowStyles[position]}
                     `}
                     style={positionStyles[position]}
                     role="tooltip"
                 >
                     {content}
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );
