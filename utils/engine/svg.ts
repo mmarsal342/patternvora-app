@@ -180,6 +180,59 @@ const getSingleShapeSVG = (
         const r = size / 2;
         const d = `M ${r} 0 C ${r} ${r * 0.5} ${r * 0.5} ${r} 0 ${r} C ${-r * 0.5} ${r} ${-r} ${r * 0.5} ${-r} 0 C ${-r} ${-r * 0.5} ${-r * 0.5} ${-r} 0 ${-r} C ${r * 0.5} ${-r} ${r} ${-r * 0.5} ${r} 0 Z`;
         content += `<path d="${d}" fill="${color}" />`;
+    } else if (shape.type === 'diamond') {
+        // Diamond / Rhombus
+        const s = size / 2;
+        content += `<polygon points="0,${-s} ${s},0 0,${s} ${-s},0" ${getFillOrStroke()} />`;
+    } else if (shape.type === 'hexagon') {
+        // Fixed hexagon (6 sides)
+        const r = size / 2;
+        let points = "";
+        for (let i = 0; i < 6; i++) {
+            const angle = (i / 6) * Math.PI * 2 - Math.PI / 2;
+            points += `${Math.cos(angle) * r},${Math.sin(angle) * r} `;
+        }
+        content += `<polygon points="${points.trim()}" ${getFillOrStroke()} />`;
+    } else if (shape.type === 'semicircle') {
+        // Semi-circle
+        const r = size / 2;
+        content += isStroke
+            ? `<path d="M ${-r} 0 A ${r} ${r} 0 0 1 ${r} 0" fill="none" stroke="${color}" stroke-width="${Math.max(2, strokeWidth * 2)}" />`
+            : `<path d="M ${-r} 0 A ${r} ${r} 0 0 1 ${r} 0 Z" fill="${color}" />`;
+    } else if (shape.type === 'arrow') {
+        // Arrow/Chevron pointing up
+        const w = size * 1.2, h = size;
+        const stemW = w * 0.35;
+        const d = `M 0 ${-h / 2} L ${w / 2} 0 L ${stemW / 2} 0 L ${stemW / 2} ${h / 2} L ${-stemW / 2} ${h / 2} L ${-stemW / 2} 0 L ${-w / 2} 0 Z`;
+        content += `<path d="${d}" ${getFillOrStroke()} />`;
+    } else if (shape.type === 'spiral') {
+        // Spiral curve
+        const turns = 2.5;
+        const steps = 80;
+        let d = '';
+        for (let i = 0; i <= steps; i++) {
+            const t = (i / steps) * turns * Math.PI * 2;
+            const r = (i / steps) * size / 2;
+            const x = Math.cos(t) * r;
+            const y = Math.sin(t) * r;
+            if (i === 0) d = `M ${x} ${y}`;
+            else d += ` L ${x} ${y}`;
+        }
+        content += `<path d="${d}" fill="none" stroke="${color}" stroke-width="${Math.max(2, size / 12)}" stroke-linecap="round" />`;
+    } else if (shape.type === 'squiggle') {
+        // Random wavy line
+        const waves = 3 + ((shape.seed || 0) % 3);
+        const segmentWidth = size / waves;
+        let d = `M ${-size / 2} 0`;
+        for (let i = 1; i <= waves; i++) {
+            const x = -size / 2 + i * segmentWidth;
+            const cpY = (i % 2 === 0 ? -1 : 1) * size / 3;
+            d += ` Q ${x - segmentWidth / 2} ${cpY} ${x} 0`;
+        }
+        content += `<path d="${d}" fill="none" stroke="${color}" stroke-width="${Math.max(3, size / 10)}" stroke-linecap="round" />`;
+    } else if (shape.type === 'thin-ring') {
+        // Thin circle outline
+        content += `<circle r="${size / 2}" fill="none" stroke="${color}" stroke-width="${Math.max(1, size / 8)}" />`;
     } else if (shape.type === 'image' && shape.assetId) {
         const asset = config.customImage.assets.find(a => a.id === shape.assetId);
         if (asset) {

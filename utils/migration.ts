@@ -75,7 +75,15 @@ export const DEFAULT_LAYER_CONFIG: LayerConfig = {
         groutSize: 2,
         colorMode: 'alternating'
     },
-    symmetryGroup: 'none'
+    symmetryGroup: 'none',
+    structure: {
+        regularity: 0,
+        sizeVariation: 50,
+        rotationLock: 'free',
+        distributionMode: 'scatter',
+        minSpacing: 0,
+        colorDistribution: 'random'
+    }
 };
 
 export const INITIAL_V2_STATE: AppState = {
@@ -159,7 +167,8 @@ export const migrateToV2 = (oldState: any): AppState => {
         truchetOptions: { mazeDensity: 10, arcWeight: 5, concentricCount: 1, doubleStroke: false },
         guillocheOptions: { curveType: 'hypotrochoid', majorRadius: 100, minorRadius: 40, penDistance: 60, layerCount: 3, strokeWeight: 2 },
         herringboneOptions: { pattern: 'herringbone', tileRatio: 2.5, groutSize: 2, colorMode: 'alternating' },
-        symmetryGroup: 'none'
+        symmetryGroup: 'none',
+        structure: { regularity: 0, sizeVariation: 50, rotationLock: 'free', distributionMode: 'scatter', minSpacing: 0, colorDistribution: 'random' }
     };
 
     return {

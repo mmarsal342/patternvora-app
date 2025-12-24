@@ -152,6 +152,21 @@ export interface HerringboneOptions {
 
 export type SymmetryGroup = 'none' | 'pm' | 'pmm' | 'p4m';
 
+export type RotationLock = 'free' | '45deg' | '90deg';
+
+export type DistributionMode = 'scatter' | 'flow' | 'cluster' | 'wave' | 'spiral';
+
+export type ColorDistribution = 'random' | 'gradient-h' | 'gradient-v' | 'gradient-radial' | 'zones' | 'alternating';
+
+export interface StructureConfig {
+  regularity: number;              // 0-100 (0=random, 100=perfect grid)
+  sizeVariation: number;           // 0-100 (0=uniform, 100=max variation)
+  rotationLock: RotationLock;
+  distributionMode: DistributionMode;
+  minSpacing: number;              // 0-50 (minimum gap between shapes as % of size)
+  colorDistribution: ColorDistribution;
+}
+
 export interface LayerConfig {
   seed: number;
   style: PatternStyle;
@@ -173,6 +188,7 @@ export interface LayerConfig {
   guillocheOptions: GuillocheOptions; // Guilloché curve configuration
   herringboneOptions: HerringboneOptions; // Herringbone/Chevron tile configuration
   symmetryGroup: SymmetryGroup; // Wallpaper symmetry group
+  structure: StructureConfig; // Structure/order controls
 }
 
 export interface Layer {

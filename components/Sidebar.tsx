@@ -18,6 +18,7 @@ import ColorPanel from './sidebar/panels/ColorPanel';
 import DetailPanel from './sidebar/panels/DetailPanel';
 import TextPanel from './sidebar/panels/TextPanel';
 import MotionPanel from './sidebar/panels/MotionPanel';
+import StructurePanel from './sidebar/panels/StructurePanel';
 
 import PresetsPanel from './sidebar/panels/PresetsPanel';
 import SeasonalBanner from './SeasonalBanner';
@@ -160,6 +161,7 @@ const SidebarLayout: React.FC<Omit<SidebarProps, keyof SidebarContextType>> = (p
                 </div>
                 <CanvasPanel />
                 <StylePanel />
+                <StructurePanel />
 
                 <TextPanel />
                 <MotionPanel />
