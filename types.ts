@@ -76,7 +76,7 @@ export interface ShapeOverride {
 }
 
 export interface ShapeData {
-  type: 'circle' | 'rect' | 'triangle' | 'arc' | 'line' | 'image' | 'star' | 'polygon' | 'blob' | 'char' | 'wave' | 'zigzag' | 'cross' | 'donut' | 'pill' | 'cube' | 'truchet-tile' | 'guilloche-curve' | 'lantern' | 'dragon' | 'angpao' | 'cloud-cn' | 'firecracker' | 'fan' | 'xmas-tree' | 'gift' | 'snowflake' | 'bell' | 'candycane' | 'santa-hat' | 'firework' | 'champagne' | 'clock-ny' | 'balloon' | 'party-hat' | 'party-popper' | 'starburst' | 'heart' | 'rose' | 'love-letter' | 'cupid-arrow' | 'bow' | 'ring' | 'crescent' | 'star-islamic' | 'mosque' | 'lantern-ramadan' | 'ketupat' | 'dates';
+  type: 'circle' | 'rect' | 'triangle' | 'arc' | 'line' | 'image' | 'star' | 'polygon' | 'blob' | 'char' | 'wave' | 'zigzag' | 'cross' | 'donut' | 'pill' | 'cube' | 'truchet-tile' | 'guilloche-curve' | 'diamond' | 'hexagon' | 'semicircle' | 'arrow' | 'spiral' | 'squiggle' | 'thin-ring' | 'lantern' | 'dragon' | 'angpao' | 'cloud-cn' | 'firecracker' | 'fan' | 'xmas-tree' | 'gift' | 'snowflake' | 'bell' | 'candycane' | 'santa-hat' | 'firework' | 'champagne' | 'clock-ny' | 'balloon' | 'party-hat' | 'party-popper' | 'starburst' | 'heart' | 'rose' | 'love-letter' | 'cupid-arrow' | 'bow' | 'ring' | 'crescent' | 'star-islamic' | 'mosque' | 'lantern-ramadan' | 'ketupat' | 'dates';
   pointsData?: number[]; // For guilloche curve points
   x: number;
   y: number;

@@ -204,7 +204,7 @@ export const generateGrid = (width: number, height: number, baseSize: number, co
     };
 
     // Filter allowed types for Grid if specified
-    const getDefaultTypes = (): ShapeData['type'][] => ['rect', 'polygon', 'cross', 'circle'];
+    const getDefaultTypes = (): ShapeData['type'][] => ['rect', 'polygon', 'cross', 'circle', 'diamond', 'hexagon'];
     let allowedTypes = getDefaultTypes();
     if (config.styleOptions.shapeTypes.length > 0) {
         allowedTypes = allowedTypes.filter(t => config.styleOptions.shapeTypes.includes(t));
@@ -321,7 +321,7 @@ export const generateMosaic = (width: number, height: number, baseSize: number, 
     };
 
     // Filter Allowed Shapes
-    const getDefaultTypes = (): ShapeData['type'][] => ['rect', 'polygon', 'circle', 'triangle'];
+    const getDefaultTypes = (): ShapeData['type'][] => ['rect', 'polygon', 'circle', 'triangle', 'hexagon'];
     let allowedTypes = getDefaultTypes();
     if (config.styleOptions.shapeTypes.length > 0) {
         allowedTypes = allowedTypes.filter(t => config.styleOptions.shapeTypes.includes(t));
@@ -379,7 +379,7 @@ export const generateRadial = (width: number, height: number, baseSize: number, 
     let globalIndex = 0;
 
     // Filter Allowed Shapes
-    const getDefaultTypes = (): ShapeData['type'][] => ['arc', 'donut', 'star', 'circle', 'polygon'];
+    const getDefaultTypes = (): ShapeData['type'][] => ['arc', 'donut', 'star', 'circle', 'polygon', 'spiral', 'semicircle', 'thin-ring'];
     let allowedTypes = getDefaultTypes();
     if (config.styleOptions.shapeTypes.length > 0) {
         allowedTypes = allowedTypes.filter(t => config.styleOptions.shapeTypes.includes(t));
@@ -416,11 +416,11 @@ export const generateStandardScatter = (width: number, height: number, baseSize:
     // Determine allowed shapes based on Style and StyleOptions
     let allowedTypes: ShapeData['type'][] = ['circle'];
 
-    if (config.style === 'geometric') allowedTypes = ['polygon', 'star', 'cross', 'donut', 'circle', 'rect', 'triangle'];
-    else if (config.style === 'organic') allowedTypes = ['blob', 'pill', 'arc', 'circle'];
-    else if (config.style === 'bauhaus') allowedTypes = ['arc', 'circle', 'rect', 'line', 'triangle'];
-    else if (config.style === 'confetti') allowedTypes = ['star', 'zigzag', 'circle', 'triangle'];
-    else if (config.style === 'memphis') allowedTypes = ['circle', 'rect', 'triangle', 'zigzag', 'cross', 'donut', 'pill', 'star'];
+    if (config.style === 'geometric') allowedTypes = ['polygon', 'star', 'cross', 'donut', 'circle', 'rect', 'triangle', 'diamond', 'hexagon', 'thin-ring'];
+    else if (config.style === 'organic') allowedTypes = ['blob', 'pill', 'arc', 'circle', 'semicircle', 'spiral', 'squiggle'];
+    else if (config.style === 'bauhaus') allowedTypes = ['arc', 'circle', 'rect', 'line', 'triangle', 'semicircle'];
+    else if (config.style === 'confetti') allowedTypes = ['star', 'zigzag', 'circle', 'triangle', 'arrow', 'squiggle'];
+    else if (config.style === 'memphis') allowedTypes = ['circle', 'rect', 'triangle', 'zigzag', 'cross', 'donut', 'pill', 'star', 'arrow', 'squiggle'];
     else if (config.style === 'typo') allowedTypes = ['char'];
     // Seasonal Styles
     else if ((config.style as string) === 'seasonal-cny') allowedTypes = ['lantern', 'dragon', 'angpao', 'cloud-cn', 'firecracker', 'fan'];

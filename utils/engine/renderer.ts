@@ -377,6 +377,79 @@ export const drawShape = (
 
                 ctx.restore();
             }
+        } else if (shape.type === 'diamond') {
+            // Diamond / Rhombus
+            const s = size / 2;
+            ctx.beginPath();
+            ctx.moveTo(0, -s);
+            ctx.lineTo(s, 0);
+            ctx.lineTo(0, s);
+            ctx.lineTo(-s, 0);
+            ctx.closePath();
+            shape.stroke ? ctx.stroke() : ctx.fill();
+        } else if (shape.type === 'hexagon') {
+            // Fixed hexagon (6 sides)
+            const r = size / 2;
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const angle = (i / 6) * Math.PI * 2 - Math.PI / 2;
+                ctx.lineTo(Math.cos(angle) * r, Math.sin(angle) * r);
+            }
+            ctx.closePath();
+            shape.stroke ? ctx.stroke() : ctx.fill();
+        } else if (shape.type === 'semicircle') {
+            // Semi-circle
+            ctx.beginPath();
+            ctx.arc(0, 0, size / 2, 0, Math.PI);
+            ctx.closePath();
+            shape.stroke ? ctx.stroke() : ctx.fill();
+        } else if (shape.type === 'arrow') {
+            // Arrow pointing up
+            const w = size, h = size * 0.8;
+            ctx.beginPath();
+            ctx.moveTo(0, -h / 2);           // Top point
+            ctx.lineTo(w / 2, h / 6);        // Right wing
+            ctx.lineTo(w / 4, h / 6);        // Right inner
+            ctx.lineTo(w / 4, h / 2);        // Right bottom
+            ctx.lineTo(-w / 4, h / 2);       // Left bottom
+            ctx.lineTo(-w / 4, h / 6);       // Left inner
+            ctx.lineTo(-w / 2, h / 6);       // Left wing
+            ctx.closePath();
+            shape.stroke ? ctx.stroke() : ctx.fill();
+        } else if (shape.type === 'spiral') {
+            // Spiral curve
+            ctx.beginPath();
+            const turns = 2.5;
+            const steps = 80;
+            for (let i = 0; i <= steps; i++) {
+                const t = (i / steps) * turns * Math.PI * 2;
+                const r = (i / steps) * size / 2;
+                if (i === 0) ctx.moveTo(Math.cos(t) * r, Math.sin(t) * r);
+                else ctx.lineTo(Math.cos(t) * r, Math.sin(t) * r);
+            }
+            ctx.lineWidth = Math.max(2, size / 12);
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        } else if (shape.type === 'squiggle') {
+            // Random wavy line
+            ctx.beginPath();
+            ctx.moveTo(-size / 2, 0);
+            const waves = 3 + ((shape.seed || 0) % 3);
+            const segmentWidth = size / waves;
+            for (let i = 1; i <= waves; i++) {
+                const x = -size / 2 + i * segmentWidth;
+                const cpY = (i % 2 === 0 ? -1 : 1) * size / 3;
+                ctx.quadraticCurveTo(x - segmentWidth / 2, cpY, x, 0);
+            }
+            ctx.lineWidth = Math.max(3, size / 10);
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        } else if (shape.type === 'thin-ring') {
+            // Thin circle outline
+            ctx.beginPath();
+            ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
+            ctx.lineWidth = Math.max(1, size / 8);
+            ctx.stroke();
         } else if (SEASONAL_SHAPES.includes(shape.type as any)) {
             // Draw seasonal shapes (CNY, Valentine, etc.)
             drawSeasonalShape(ctx, shape.type as any, size, shape.color, shape.stroke);
