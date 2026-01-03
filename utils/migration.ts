@@ -83,6 +83,12 @@ export const DEFAULT_LAYER_CONFIG: LayerConfig = {
         distributionMode: 'scatter',
         minSpacing: 0,
         colorDistribution: 'random'
+    },
+    shapeFill: {
+        enabled: false,
+        sourceImage: null,
+        density: 1,
+        colorMode: 'raw'
     }
 };
 
@@ -168,7 +174,8 @@ export const migrateToV2 = (oldState: any): AppState => {
         guillocheOptions: { curveType: 'hypotrochoid', majorRadius: 100, minorRadius: 40, penDistance: 60, layerCount: 3, strokeWeight: 2 },
         herringboneOptions: { pattern: 'herringbone', tileRatio: 2.5, groutSize: 2, colorMode: 'alternating' },
         symmetryGroup: 'none',
-        structure: { regularity: 0, sizeVariation: 50, rotationLock: 'free', distributionMode: 'scatter', minSpacing: 0, colorDistribution: 'random' }
+        structure: { regularity: 0, sizeVariation: 50, rotationLock: 'free', distributionMode: 'scatter', minSpacing: 0, colorDistribution: 'random' },
+        shapeFill: { enabled: false, sourceImage: null, density: 1, colorMode: 'raw' }
     };
 
     return {

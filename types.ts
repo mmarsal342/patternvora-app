@@ -167,6 +167,15 @@ export interface StructureConfig {
   colorDistribution: ColorDistribution;
 }
 
+export type ShapeFillColorMode = 'raw' | 'palette';
+
+export interface ShapeFillConfig {
+  enabled: boolean;
+  sourceImage: string | null;  // Base64 data URL of PNG
+  density: number;             // 0.5 - 2.0
+  colorMode: ShapeFillColorMode;
+}
+
 export interface LayerConfig {
   seed: number;
   style: PatternStyle;
@@ -189,6 +198,7 @@ export interface LayerConfig {
   herringboneOptions: HerringboneOptions; // Herringbone/Chevron tile configuration
   symmetryGroup: SymmetryGroup; // Wallpaper symmetry group
   structure: StructureConfig; // Structure/order controls
+  shapeFill: ShapeFillConfig; // Mosaic shape fill configuration
 }
 
 export interface Layer {
