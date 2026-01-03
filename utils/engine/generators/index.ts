@@ -20,8 +20,8 @@ import { applyStructureControls } from './structure';
 
 // Re-export utilities for external use
 export { getStrokeValue, getPosition } from './utils';
-export { generateMosaicTextFill } from './mosaic';
-export type { MosaicTextFillParams } from './mosaic';
+export type { MosaicTextFillParams, MosaicShapeFillParams } from './mosaic';
+export { generateMosaicTextFill, generateMosaicShapeFill } from './mosaic';
 export type { TruchetTileType } from './types';
 
 // Generates the abstract data model for the pattern

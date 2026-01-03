@@ -51,7 +51,7 @@ export const renderToCanvas = (
         // Pass transient overrides ONLY if this is the active layer (optimized for editing)
         const overridesForLayer = (layer.id === state.activeLayerId) ? transientOverrides : undefined;
 
-        renderLayer(layerCtx, width, height, layer.config, loadedImages, layerProgress, noisePatternSource, overridesForLayer);
+        renderLayer(layerCtx, width, height, layer.config, loadedImages, layerProgress, noisePatternSource, overridesForLayer, layer.id);
 
         ctx.save();
         ctx.globalAlpha = layer.opacity;

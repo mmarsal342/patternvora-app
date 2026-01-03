@@ -1,7 +1,7 @@
 // Layer rendering and text drawing
 
 import { TextConfig, LayerConfig, ShapeData, ShapeOverride } from '../../../types';
-import { generateShapeData, generateMosaicTextFill } from '../generators';
+import { generateShapeData, generateMosaicTextFill, generateMosaicShapeFill } from '../generators';
 import { applyAnimation } from '../animator';
 import { drawShape } from './shapes';
 
@@ -50,9 +50,16 @@ export const renderLayer = (
     loadedImages: Record<string, HTMLImageElement | ImageBitmap>,
     progress: number,
     noisePatternSource: HTMLCanvasElement | OffscreenCanvas | null,
-    transientOverrides?: Record<number, Partial<ShapeOverride>>
+    transientOverrides?: Record<number, Partial<ShapeOverride>>,
+    layerId?: string
 ) => {
-    const shapes = generateShapeData(width, height, config);
+    // Determine which shapes to generate
+    let shapes: ShapeData[] = [];
+
+    // Fallback to standard generation if not shape fill or regular mode
+    if (shapes.length === 0 && !config.shapeFill?.enabled) {
+        shapes = generateShapeData(width, height, config);
+    }
 
     // SEAMLESS WRAPPING LOGIC
     // We iterate through shapes and check if they overlap the canvas edges.
@@ -123,6 +130,7 @@ export const renderLayer = (
         ctx.fillRect(0, 0, width, height);
 
         ctx.globalCompositeOperation = 'source-atop';
+        if (shapes.length === 0) shapes = generateShapeData(width, height, config);
         shapes.forEach(shape => renderShapeWithWrapping(shape));
 
         if (config.texture > 0 && noisePatternSource) {
@@ -138,7 +146,7 @@ export const renderLayer = (
         }
 
     } else if (config.text.enabled && config.text.content && config.text.maskingMode === 'mosaic') {
-        // --- MOSAIC MODE (shapes packed inside text) ---
+        // --- MOSAIC TEXT MODE (shapes packed inside text) ---
         if (!config.transparentBackground) {
             ctx.fillStyle = config.palette.bg;
             ctx.fillRect(0, 0, width, height);
@@ -177,6 +185,59 @@ export const renderLayer = (
             }
         }
 
+    } else if (config.shapeFill?.enabled && config.shapeFill?.sourceImage && layerId) {
+        // --- SHAPE FILL MODE (shapes packed inside PNG) ---
+        if (!config.transparentBackground) {
+            ctx.fillStyle = config.palette.bg;
+            ctx.fillRect(0, 0, width, height);
+        }
+
+        let mosaicShapes: ShapeData[] = [];
+        const imageKey = `shape_fill_${layerId}`;
+        const img = loadedImages[imageKey];
+
+        if (img) {
+            // Note: In a real app we might want to cache this ImageData if it doesn't change
+            // But getting it from a loaded HTMLImageElement is reasonably fast
+            const osc = new OffscreenCanvas(img.width, img.height);
+            const oscCtx = osc.getContext('2d') as OffscreenCanvasRenderingContext2D;
+            if (oscCtx) {
+                oscCtx.drawImage(img, 0, 0);
+                const imageData = oscCtx.getImageData(0, 0, img.width, img.height);
+
+                // Import this from generators
+                mosaicShapes = generateMosaicShapeFill(width, height, {
+                    imageData,
+                    imageWidth: img.width,
+                    imageHeight: img.height,
+                    density: config.shapeFill.density,
+                    colorMode: config.shapeFill.colorMode,
+                    config
+                });
+            }
+        }
+
+        // Render shapes
+        mosaicShapes.forEach(shape => {
+            if (config.animation.enabled) {
+                applyAnimation(shape, progress, width, height, config.animation);
+            }
+            drawShape(ctx, shape, width, height, config, loadedImages, progress, 0, 0);
+        });
+
+        // Apply noise texture
+        if (config.texture > 0 && noisePatternSource) {
+            const noisePattern = ctx.createPattern(noisePatternSource, 'repeat');
+            if (noisePattern) {
+                ctx.save();
+                ctx.globalAlpha = config.texture / 200;
+                ctx.globalCompositeOperation = 'overlay';
+                ctx.fillStyle = noisePattern;
+                ctx.fillRect(0, 0, width, height);
+                ctx.restore();
+            }
+        }
+
     } else {
         // --- STANDARD MODE (Layering) ---
         if (!config.transparentBackground) {
@@ -184,6 +245,7 @@ export const renderLayer = (
             ctx.fillRect(0, 0, width, height);
         }
 
+        if (shapes.length === 0) shapes = generateShapeData(width, height, config);
         shapes.forEach(shape => renderShapeWithWrapping(shape));
 
         if (config.texture > 0 && noisePatternSource) {
@@ -197,7 +259,6 @@ export const renderLayer = (
                 ctx.restore();
             }
         }
-
         if (config.text.enabled && config.text.content) {
             drawText(ctx, width, height, config.text);
         }
