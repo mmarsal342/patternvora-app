@@ -1,16 +1,18 @@
 import React, { useRef, useState } from 'react';
-import { Layers, ChevronDown, ChevronUp, Grid, X, Plus, Lock, Circle, Square, Triangle, Hexagon, Star, Spline, Minus, Activity, MousePointer2, Image as ImageIcon, Lamp, Flame, Gift, Cloud, Sparkles, Fan, TreePine, Snowflake, Bell, Candy, PartyPopper, Wine, Clock, CircleDot, Heart, Flower2, Mail, Ribbon, Moon, Building2, Diamond } from 'lucide-react';
+import { Layers, ChevronDown, ChevronUp, Grid, X, Plus, Lock, Circle, Square, Triangle, Hexagon, Star, Spline, Minus, Activity, MousePointer2, Image as ImageIcon, Lamp, Flame, Gift, Cloud, Sparkles, Fan, TreePine, Snowflake, Bell, Candy, PartyPopper, Wine, Clock, CircleDot, Heart, Flower2, Mail, Ribbon, Moon, Building2, Diamond, Shapes, HelpCircle } from 'lucide-react';
 import { useSidebar } from '../SidebarContext';
 import CollapsibleSection from '../../common/CollapsibleSection';
-import { PatternStyle, CompositionType } from '../../../types';
+import { PatternStyle, CompositionType, ShapeFillColorMode } from '../../../types';
 import RangeControl from '../../common/RangeControl';
 
 const StylePanel: React.FC = () => {
     const { activeLayerConfig, updateState } = useSidebar();
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const shapeFillInputRef = useRef<HTMLInputElement>(null);
 
     // Auto-open if assets exist, otherwise start closed to save space
     const [isAssetsOpen, setIsAssetsOpen] = useState(activeLayerConfig.customImage.assets.length > 0);
+    const [isShapeFillOpen, setIsShapeFillOpen] = useState(activeLayerConfig.shapeFill?.enabled ?? false);
 
     const hasOverrides = Object.keys(activeLayerConfig.overrides).length > 0;
     const styleOptions = activeLayerConfig.styleOptions;
@@ -77,6 +79,39 @@ const StylePanel: React.FC = () => {
         }
 
         updateState(updates, true);
+    };
+
+    // Shape Fill Handlers
+    const handleShapeFillUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (event.target?.result) {
+                    updateState({
+                        shapeFill: {
+                            ...activeLayerConfig.shapeFill,
+                            enabled: true,
+                            sourceImage: event.target.result as string
+                        }
+                    }, true);
+                    setIsShapeFillOpen(true);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+        // Reset input so same file can be re-uploaded
+        if (shapeFillInputRef.current) shapeFillInputRef.current.value = '';
+    };
+
+    const handleRemoveShapeFill = () => {
+        updateState({
+            shapeFill: {
+                ...activeLayerConfig.shapeFill,
+                enabled: false,
+                sourceImage: null
+            }
+        }, true);
     };
 
     const toggleShapeType = (shape: string) => {
@@ -252,6 +287,93 @@ const StylePanel: React.FC = () => {
                             )}
                         </div>
                         <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileUpload} />
+                    </div>
+                )}
+            </div>
+
+            {/* Shape Fill Accordion */}
+            <div className={`mb-4 border rounded-lg overflow-hidden transition-all ${hasOverrides ? 'opacity-50 pointer-events-none' : 'border-purple-200'}`}>
+                <button
+                    onClick={() => setIsShapeFillOpen(!isShapeFillOpen)}
+                    className="w-full flex items-center justify-between p-3 bg-purple-50 hover:bg-purple-100 transition-colors"
+                >
+                    <div className="flex items-center gap-2 text-xs font-semibold text-purple-700 uppercase tracking-wide">
+                        <Shapes size={14} className="text-purple-500" />
+                        <span>Shape Fill</span>
+                        {activeLayerConfig.shapeFill?.enabled && (
+                            <span className="bg-purple-200 text-purple-700 px-1.5 py-0.5 rounded-full text-[9px] font-bold">ON</span>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span
+                            className="text-purple-400 hover:text-purple-600 cursor-help"
+                            title="Fill a PNG silhouette with pattern shapes. Upload a PNG with transparent background (100-2000px). Simple icons work best. Colors are sampled from the image."
+                        >
+                            <HelpCircle size={12} />
+                        </span>
+                        {isShapeFillOpen ? <ChevronUp size={14} className="text-purple-400" /> : <ChevronDown size={14} className="text-purple-400" />}
+                    </div>
+                </button>
+
+                {isShapeFillOpen && (
+                    <div className="p-3 bg-white border-t border-purple-200 animate-in slide-in-from-top-2 duration-150">
+                        {!activeLayerConfig.shapeFill?.sourceImage ? (
+                            <button
+                                onClick={() => shapeFillInputRef.current?.click()}
+                                className="w-full p-4 border-2 border-dashed border-purple-300 rounded-lg flex flex-col items-center justify-center gap-2 text-purple-400 hover:border-purple-500 hover:text-purple-600 hover:bg-purple-50 transition-colors"
+                            >
+                                <Plus size={24} />
+                                <span className="text-xs font-semibold">Upload PNG</span>
+                                <span className="text-[9px] text-purple-300">Transparent background required</span>
+                            </button>
+                        ) : (
+                            <>
+                                <div className="relative group mb-3">
+                                    <div className="aspect-square bg-slate-100 rounded-lg border border-purple-200 overflow-hidden flex items-center justify-center">
+                                        <img
+                                            src={activeLayerConfig.shapeFill.sourceImage}
+                                            alt="Shape Fill Source"
+                                            className="max-w-full max-h-full object-contain p-2"
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={handleRemoveShapeFill}
+                                        className="absolute top-2 right-2 bg-rose-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-600"
+                                    >
+                                        <X size={12} />
+                                    </button>
+                                </div>
+
+                                <RangeControl
+                                    label="Density"
+                                    value={activeLayerConfig.shapeFill?.density || 1}
+                                    onChange={(v) => updateState({
+                                        shapeFill: { ...activeLayerConfig.shapeFill, density: v }
+                                    }, true)}
+                                    min={0.5} max={2} step={0.1}
+                                    displayValue={(activeLayerConfig.shapeFill?.density || 1).toFixed(1) + 'x'}
+                                />
+
+                                <div className="mt-3 space-y-1">
+                                    <label className="text-[10px] font-semibold text-purple-600 uppercase">Color Mode</label>
+                                    <div className="flex bg-purple-100 rounded-lg p-1">
+                                        <button
+                                            className={`flex-1 py-1.5 text-[10px] font-medium rounded-md transition-all ${activeLayerConfig.shapeFill?.colorMode === 'raw' ? 'bg-white text-purple-700 shadow-sm' : 'text-purple-500 hover:text-purple-700'}`}
+                                            onClick={() => updateState({ shapeFill: { ...activeLayerConfig.shapeFill, colorMode: 'raw' } }, true)}
+                                        >
+                                            🎨 From Image
+                                        </button>
+                                        <button
+                                            className={`flex-1 py-1.5 text-[10px] font-medium rounded-md transition-all ${activeLayerConfig.shapeFill?.colorMode === 'palette' ? 'bg-white text-purple-700 shadow-sm' : 'text-purple-500 hover:text-purple-700'}`}
+                                            onClick={() => updateState({ shapeFill: { ...activeLayerConfig.shapeFill, colorMode: 'palette' } }, true)}
+                                        >
+                                            🎭 From Palette
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                        <input type="file" ref={shapeFillInputRef} className="hidden" accept="image/png" onChange={handleShapeFillUpload} />
                     </div>
                 )}
             </div>
