@@ -137,6 +137,14 @@ export const generateMosaicTextFill = (
         return pixels[idx + 3] > 128;
     };
 
+    // Helper to get random asset ID if custom assets are available
+    const getRandomAssetId = () => {
+        if (config.customImage.assets.length > 0) {
+            return rng.nextItem(config.customImage.assets).id;
+        }
+        return undefined;
+    };
+
     // Determine shape types based on style
     let allowedTypes: ShapeData['type'][] = ['circle', 'rect', 'triangle'];
 
@@ -182,7 +190,7 @@ export const generateMosaicTextFill = (
             // Random chance to skip for variation
             if (rng.nextFloat() > 0.85) continue;
 
-            const shapeType = rng.nextItem(allowedTypes);
+            const shapeType = config.customImage.assets.length > 0 ? 'image' : rng.nextItem(allowedTypes);
             const sizeVariation = rng.nextRange(0.6, 1.2);
 
             shapes.push({
@@ -197,7 +205,8 @@ export const generateMosaicTextFill = (
                 speedFactor: Math.floor(rng.nextRange(1, 3)),
                 phaseOffset: rng.nextFloat() * Math.PI * 2,
                 points: Math.floor(rng.nextRange(4, 7)),
-                seed: rng.nextRange(0, 1000)
+                seed: rng.nextRange(0, 1000),
+                assetId: getRandomAssetId()
             });
         }
     }
