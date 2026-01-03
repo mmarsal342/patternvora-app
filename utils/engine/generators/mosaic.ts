@@ -213,3 +213,129 @@ export const generateMosaicTextFill = (
 
     return shapes;
 };
+
+// --- MOSAIC SHAPE FILL GENERATOR ---
+// Generates shapes that are packed inside a PNG silhouette
+// Colors are sampled from the original image pixels
+
+export interface MosaicShapeFillParams {
+    imageData: ImageData;  // Pre-loaded image data from source PNG
+    imageWidth: number;    // Original image dimensions
+    imageHeight: number;
+    density: number;       // 0.5 - 2.0
+    colorMode: 'raw' | 'palette';
+    config: LayerConfig;
+}
+
+export const generateMosaicShapeFill = (
+    width: number,
+    height: number,
+    params: MosaicShapeFillParams
+): ShapeData[] => {
+    const { imageData, imageWidth, imageHeight, density, colorMode, config } = params;
+    const rng = new RNG(config.seed);
+    const pixels = imageData.data;
+
+    // Calculate scaling to fit image within canvas (centered)
+    const scaleX = width / imageWidth;
+    const scaleY = height / imageHeight;
+    const scale = Math.min(scaleX, scaleY) * 0.8; // 80% of available space
+
+    const scaledWidth = imageWidth * scale;
+    const scaledHeight = imageHeight * scale;
+    const offsetX = (width - scaledWidth) / 2;
+    const offsetY = (height - scaledHeight) / 2;
+
+    // Function to check if a point (in canvas coords) is inside the shape
+    // and get the color at that point
+    const getPixelInfo = (canvasX: number, canvasY: number): { inside: boolean; color: string } => {
+        // Convert canvas coords to image coords
+        const imgX = Math.floor((canvasX - offsetX) / scale);
+        const imgY = Math.floor((canvasY - offsetY) / scale);
+
+        if (imgX < 0 || imgX >= imageWidth || imgY < 0 || imgY >= imageHeight) {
+            return { inside: false, color: '#000000' };
+        }
+
+        const idx = (imgY * imageWidth + imgX) * 4;
+        const alpha = pixels[idx + 3];
+
+        if (alpha <= 128) {
+            return { inside: false, color: '#000000' };
+        }
+
+        // Get RGB color
+        const r = pixels[idx];
+        const g = pixels[idx + 1];
+        const b = pixels[idx + 2];
+        const color = `rgb(${r},${g},${b})`;
+
+        return { inside: true, color };
+    };
+
+    // Determine shape types based on style
+    let allowedTypes: ShapeData['type'][] = ['circle', 'rect', 'triangle'];
+
+    if (config.style === 'geometric') allowedTypes = ['polygon', 'circle', 'rect', 'triangle', 'diamond', 'hexagon'];
+    else if (config.style === 'organic') allowedTypes = ['blob', 'circle', 'semicircle'];
+    else if (config.style === 'bauhaus') allowedTypes = ['arc', 'circle', 'rect', 'triangle', 'semicircle'];
+    else if (config.style === 'confetti') allowedTypes = ['star', 'circle', 'triangle'];
+    else if (config.style === 'memphis') allowedTypes = ['circle', 'rect', 'triangle', 'cross', 'star'];
+
+    // Override with user selection if specified
+    if (config.styleOptions.shapeTypes.length > 0) {
+        allowedTypes = config.styleOptions.shapeTypes as ShapeData['type'][];
+    }
+
+    const shapes: ShapeData[] = [];
+
+    // Calculate base shape size based on image size and density
+    const avgDimension = (scaledWidth + scaledHeight) / 2;
+    const baseShapeSize = Math.max(8, (avgDimension / 30) / density);
+    const gridStep = baseShapeSize * 0.75; // Slight overlap for coverage
+
+    let index = 0;
+
+    // Grid-based sampling with jitter
+    for (let y = offsetY; y < offsetY + scaledHeight; y += gridStep) {
+        for (let x = offsetX; x < offsetX + scaledWidth; x += gridStep) {
+            // Add random jitter for organic look
+            const jitterX = (rng.nextFloat() - 0.5) * gridStep * 0.5;
+            const jitterY = (rng.nextFloat() - 0.5) * gridStep * 0.5;
+            const sampleX = x + jitterX;
+            const sampleY = y + jitterY;
+
+            // Check if point is inside shape and get color
+            const pixelInfo = getPixelInfo(sampleX, sampleY);
+            if (!pixelInfo.inside) continue;
+
+            // Random chance to skip for variation
+            if (rng.nextFloat() > 0.85) continue;
+
+            const shapeType = rng.nextItem(allowedTypes);
+            const sizeVariation = rng.nextRange(0.6, 1.2);
+
+            // Determine color based on mode
+            const shapeColor = colorMode === 'raw'
+                ? pixelInfo.color
+                : rng.nextItem(config.palette.colors);
+
+            shapes.push({
+                index: index++,
+                type: shapeType,
+                x: sampleX,
+                y: sampleY,
+                size: baseShapeSize * sizeVariation * config.scale,
+                rotation: rng.nextRange(0, 360),
+                color: shapeColor,
+                stroke: getStrokeValue(config.strokeMode, shapeType, rng, 0.7),
+                speedFactor: Math.floor(rng.nextRange(1, 3)),
+                phaseOffset: rng.nextFloat() * Math.PI * 2,
+                points: Math.floor(rng.nextRange(4, 7)),
+                seed: rng.nextRange(0, 1000)
+            });
+        }
+    }
+
+    return shapes;
+};
