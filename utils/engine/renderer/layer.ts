@@ -4,6 +4,7 @@ import { TextConfig, LayerConfig, ShapeData, ShapeOverride } from '../../../type
 import { generateShapeData, generateMosaicTextFill, generateMosaicShapeFill } from '../generators';
 import { applyAnimation } from '../animator';
 import { drawShape } from './shapes';
+import { createOffscreenCanvas } from './utils';
 
 export const drawText = (
     ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
@@ -196,11 +197,13 @@ export const renderLayer = (
         const imageKey = `shape_fill_${layerId}`;
         const img = loadedImages[imageKey];
 
+
+
         if (img) {
             // Note: In a real app we might want to cache this ImageData if it doesn't change
             // But getting it from a loaded HTMLImageElement is reasonably fast
-            const osc = new OffscreenCanvas(img.width, img.height);
-            const oscCtx = osc.getContext('2d') as OffscreenCanvasRenderingContext2D;
+            const osc = createOffscreenCanvas(img.width, img.height);
+            const oscCtx = osc.getContext('2d') as OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D;
             if (oscCtx) {
                 oscCtx.drawImage(img, 0, 0);
                 const imageData = oscCtx.getImageData(0, 0, img.width, img.height);

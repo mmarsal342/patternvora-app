@@ -276,6 +276,14 @@ const App: React.FC = () => {
             const allAssets: CustomAsset[] = [];
             state.layers.forEach(layer => {
                 allAssets.push(...layer.config.customImage.assets);
+
+                // Add Shape Fill source image if enabled
+                if (layer.config.shapeFill?.enabled && layer.config.shapeFill?.sourceImage) {
+                    allAssets.push({
+                        id: `shape_fill_${layer.id}`,
+                        src: layer.config.shapeFill.sourceImage
+                    });
+                }
             });
 
             if (allAssets.length === 0) {

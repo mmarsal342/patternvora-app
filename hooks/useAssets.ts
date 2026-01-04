@@ -42,6 +42,7 @@ export function useAssets(options: UseAssetsOptions): UseAssetsReturn {
                 return;
             }
 
+
             const newImages: Record<string, HTMLImageElement> = { ...loadedImages };
             let hasChanges = false;
 
@@ -53,11 +54,15 @@ export function useAssets(options: UseAssetsOptions): UseAssetsReturn {
                 hasChanges = true;
                 const img = new Image();
                 img.src = asset.src;
+                // Enable CORS if needed (though usually data URLs or local blob URLs)
+                img.crossOrigin = 'Anonymous';
                 img.onload = () => {
                     newImages[asset.id] = img;
                     resolve();
                 };
-                img.onerror = () => resolve();
+                img.onerror = (e) => {
+                    resolve();
+                };
             }));
 
             await Promise.all(promises);
