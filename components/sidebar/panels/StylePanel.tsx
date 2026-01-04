@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Layers, ChevronDown, ChevronUp, Grid, X, Plus, Lock, Circle, Square, Triangle, Hexagon, Star, Spline, Minus, Activity, MousePointer2, Image as ImageIcon, Lamp, Flame, Gift, Cloud, Sparkles, Fan, TreePine, Snowflake, Bell, Candy, PartyPopper, Wine, Clock, CircleDot, Heart, Flower2, Mail, Ribbon, Moon, Building2, Diamond, Shapes, HelpCircle } from 'lucide-react';
+import { Layers, ChevronDown, ChevronUp, Grid, X, Plus, Lock, Circle, Square, Triangle, Hexagon, Star, Spline, Minus, Activity, MousePointer2, Image as ImageIcon, Lamp, Flame, Gift, Cloud, Sparkles, Fan, TreePine, Snowflake, Bell, Candy, PartyPopper, Wine, Clock, CircleDot, Heart, Flower2, Mail, Ribbon, Moon, Building2, Diamond, Shapes, HelpCircle, AlertTriangle } from 'lucide-react';
 import { useSidebar } from '../SidebarContext';
 import CollapsibleSection from '../../common/CollapsibleSection';
 import { PatternStyle, CompositionType, ShapeFillColorMode } from '../../../types';
@@ -317,6 +317,14 @@ const StylePanel: React.FC = () => {
 
                 {isShapeFillOpen && (
                     <div className="p-3 bg-white border-t border-purple-200 animate-in slide-in-from-top-2 duration-150">
+                        {/* Copyright Warning */}
+                        <div className="mb-3 p-2 bg-amber-50 border border-amber-100 rounded flex items-start gap-2 text-amber-800">
+                            <AlertTriangle size={12} className="shrink-0 mt-0.5" />
+                            <span className="text-[10px] leading-tight">
+                                <strong>Copyright Risk:</strong> You are responsible for ensuring you have the rights to use uploaded images.
+                            </span>
+                        </div>
+
                         {!activeLayerConfig.shapeFill?.sourceImage ? (
                             <button
                                 onClick={() => shapeFillInputRef.current?.click()}

@@ -3,11 +3,11 @@ import { ArrowLeft, Check, X } from 'lucide-react';
 
 interface LegalPageProps {
     onBack: () => void;
-    initialTab?: 'tos' | 'privacy' | 'refund';
+    initialTab?: 'tos' | 'privacy' | 'refund' | 'faq';
 }
 
 const LegalPage: React.FC<LegalPageProps> = ({ onBack, initialTab = 'tos' }) => {
-    const [activeTab, setActiveTab] = useState<'tos' | 'privacy' | 'refund'>(initialTab);
+    const [activeTab, setActiveTab] = useState<'tos' | 'privacy' | 'refund' | 'faq'>(initialTab);
 
     return (
         <div className="min-h-screen bg-white">
@@ -30,7 +30,7 @@ const LegalPage: React.FC<LegalPageProps> = ({ onBack, initialTab = 'tos' }) => 
 
             {/* Tab Buttons */}
             <div className="max-w-4xl mx-auto px-6 pt-8">
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                     <button
                         onClick={() => setActiveTab('tos')}
                         className={`px-6 py-3 rounded-lg font-semibold text-sm transition-all ${activeTab === 'tos'
@@ -58,6 +58,15 @@ const LegalPage: React.FC<LegalPageProps> = ({ onBack, initialTab = 'tos' }) => 
                     >
                         Refund Policy
                     </button>
+                    <button
+                        onClick={() => setActiveTab('faq')}
+                        className={`px-6 py-3 rounded-lg font-semibold text-sm transition-all ${activeTab === 'faq'
+                            ? 'bg-indigo-600 text-white'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                            }`}
+                    >
+                        FAQ
+                    </button>
                 </div>
             </div>
 
@@ -67,6 +76,7 @@ const LegalPage: React.FC<LegalPageProps> = ({ onBack, initialTab = 'tos' }) => 
                     {activeTab === 'tos' && <TermsOfService />}
                     {activeTab === 'privacy' && <PrivacyPolicy />}
                     {activeTab === 'refund' && <RefundPolicy />}
+                    {activeTab === 'faq' && <FAQContent />}
                 </div>
             </div>
 
@@ -270,6 +280,41 @@ const RefundPolicy: React.FC = () => {
             <h2 className="text-xl font-bold text-slate-900 mt-8 mb-4">Contact</h2>
             <p className="text-slate-600">
                 Questions about refunds? Email us at <strong>support@patternvora.com</strong> and we'll respond within 24-48 hours.
+            </p>
+        </div>
+    );
+};
+
+const FAQContent: React.FC = () => {
+    return (
+        <div className="prose prose-slate max-w-none">
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">Frequently Asked Questions</h1>
+            <p className="text-sm text-slate-500 mb-8">Common questions about usage rights and features.</p>
+
+            <h2 className="text-xl font-bold text-slate-900 mt-8 mb-4">Mosaic Shape Fill & Copyright</h2>
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6">
+                <h3 className="text-lg font-bold text-amber-800 mb-2">Can I use any image for Shape Fill?</h3>
+                <p className="text-amber-900">
+                    <strong>Caution:</strong> When using the "Shape Fill" feature or "Custom Assets", you are uploading your own images to generate patterns.
+                    You must ensure you adhere to copyright laws.
+                </p>
+                <ul className="list-disc pl-5 space-y-2 text-amber-900 mt-3 text-sm">
+                    <li><strong>Do NOT</strong> upload copyrighted logos (e.g., Apple, Nike) unless you have permission.</li>
+                    <li><strong>Do NOT</strong> use artwork or photos you found on Google Images without checking the license.</li>
+                    <li><strong>SAFE:</strong> Use your own photos, assets you purchased, or public domain (CC0) images.</li>
+                </ul>
+            </div>
+
+            <h3 className="text-lg font-bold text-slate-900 mt-6 mb-2">Do I own the patterns I generate?</h3>
+            <p className="text-slate-600">
+                <strong>Yes!</strong> If you create a pattern using our built-in shapes, you own the export 100%.
+                However, if you use <strong>your own custom image</strong> as part of the pattern (Shape Fill or Custom Asset),
+                your ownership of the final pattern depends on whether you have the rights to that original image.
+            </p>
+
+            <h3 className="text-lg font-bold text-slate-900 mt-6 mb-2">Can I sell the exported SVG/PNG?</h3>
+            <p className="text-slate-600">
+                Yes, you have full commercial rights to resell the assets you generate with PatternVora.
             </p>
         </div>
     );
