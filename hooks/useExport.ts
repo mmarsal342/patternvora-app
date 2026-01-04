@@ -219,11 +219,31 @@ export function useExport(options: UseExportOptions): UseExportReturn {
     const handleDownloadSVG = useCallback(async (clipToCanvas: boolean = false) => {
         if (!checkTierAccess('svg')) return;
 
+        // Check for Mosaic + Custom Asset usage (Raster in vector export)
+        const hasRasterMosaic = state.layers.some(layer => {
+            if (!layer.visible) return false;
+
+            const isShapeFill = layer.config.shapeFill?.enabled;
+            const isTextMosaic = layer.config.text?.enabled && layer.config.text?.maskingMode === 'mosaic';
+            const hasAssets = layer.config.customImage?.assets?.length > 0;
+
+            if ((isShapeFill || isTextMosaic) && hasAssets) {
+                return true;
+            }
+            return false;
+        });
+
+        if (hasRasterMosaic) {
+            alert("SVG Export is unavailable when using Custom Assets in Shape Fill or Mosaic Text modes.\n\nCustom assets are raster images (PNG) and cannot be converted to true vector shapes.");
+            return;
+        }
+
         setIsGeneratingSVG(true);
         try {
             const dims = getDimensions(state.aspectRatio, 1000);
             const allFonts = [...DEFAULT_FONTS, ...customFonts];
-            const svgString = await generateSVG(dims.width, dims.height, state, allFonts, clipToCanvas);
+            // Pass loadedImages to support reading pixel data for Shape Fill
+            const svgString = await generateSVG(dims.width, dims.height, state, allFonts, loadedImages, clipToCanvas);
             const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -233,10 +253,11 @@ export function useExport(options: UseExportOptions): UseExportReturn {
             onExportComplete();
         } catch (error) {
             console.error("Failed to generate SVG", error);
+            alert("Failed to generate SVG. Please try again.");
         } finally {
             setIsGeneratingSVG(false);
         }
-    }, [state, customFonts, checkTierAccess, onExportComplete]);
+    }, [state, customFonts, loadedImages, checkTierAccess, onExportComplete]);
 
     return {
         isExportingPNG,

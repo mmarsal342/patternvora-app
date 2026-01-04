@@ -242,14 +242,26 @@ const SidebarLayout: React.FC<Omit<SidebarProps, keyof SidebarContextType>> = (p
 
                         {/* Export Grid */}
                         <div className="grid grid-cols-2 gap-2">
-                            <button
-                                onClick={() => onDownloadPNG(exportSize)}
-                                disabled={isExportingPNG}
-                                className="py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-70"
+                            {/* PNG Button - Restricted to Transparent Backgrounds */}
+                            <Tooltip
+                                content={(() => {
+                                    const isTransparent = state.layers.every(l => !l.visible || l.config.transparentBackground);
+                                    if (!isTransparent) return "Enable 'Transparent Background' on all visible layers to export PNG (Use JPG for opaque images)";
+                                    return "Export as PNG (lossless transparency)";
+                                })()}
+                                position="top"
                             >
-                                {isExportingPNG ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Download size={14} />}
-                                <span>PNG</span>
-                            </button>
+                                <button
+                                    onClick={() => onDownloadPNG(exportSize)}
+                                    // Disable if not transparent (or already exporting)
+                                    disabled={isExportingPNG || !state.layers.every(l => !l.visible || l.config.transparentBackground)}
+                                    className="py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isExportingPNG ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Download size={14} />}
+                                    <span>PNG</span>
+                                </button>
+                            </Tooltip>
+
                             <button
                                 onClick={() => onDownloadJPG(exportSize)}
                                 disabled={isExportingJPG}

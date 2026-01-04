@@ -1,8 +1,9 @@
 
 import { AppState, FontDef, LayerConfig, TextConfig, ShapeData } from '../../types';
-import { generateShapeData, generateMosaicTextFill } from './generators';
+import { generateShapeData, generateMosaicTextFill, generateMosaicShapeFill } from './generators';
 import { adjustColor } from './math';
 import { getSeasonalShapeSVG, isSeasonalShape } from './shapes/svg';
+import { createOffscreenCanvas } from './renderer/utils';
 
 const getSVGTextNodes = (width: number, height: number, textConfig: TextConfig, forceColor?: string): string => {
     if (!textConfig.enabled || !textConfig.content) return '';
@@ -297,11 +298,11 @@ const getSingleShapeSVG = (
     return `<g ${transform}>${content}</g>`;
 };
 
-const generateLayerSVG = (width: number, height: number, config: LayerConfig, layerId: string): string => {
+const generateLayerSVG = (width: number, height: number, config: LayerConfig, layerId: string, loadedImages: Record<string, HTMLImageElement>): string => {
     let content = '';
 
     // Check if in mosaic mode - if so, skip regular patterns entirely
-    const isMosaicMode = config.text.enabled && config.text.content && config.text.maskingMode === 'mosaic';
+    const isMosaicMode = (config.text.enabled && config.text.content && config.text.maskingMode === 'mosaic') || (config.shapeFill?.enabled && config.shapeFill?.sourceImage);
 
     // Background Rect for Layer (not for clip mode)
     if (!config.transparentBackground && config.text.maskingMode !== 'clip') {
@@ -347,6 +348,35 @@ const generateLayerSVG = (width: number, height: number, config: LayerConfig, la
         }
 
         // --- PER LAYER TEXT SYSTEM (SVG) ---
+    }
+
+    // Handle Shape Fill Mode
+    if (config.shapeFill?.enabled && config.shapeFill?.sourceImage) {
+        const imageKey = `shape_fill_${layerId}`;
+        const img = loadedImages[imageKey];
+
+        if (img) {
+            const osc = createOffscreenCanvas(img.width, img.height);
+            const oscCtx = osc.getContext('2d') as OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D;
+
+            if (oscCtx) {
+                oscCtx.drawImage(img, 0, 0);
+                const imageData = oscCtx.getImageData(0, 0, img.width, img.height);
+
+                const shapeFillShapes = generateMosaicShapeFill(width, height, {
+                    imageData,
+                    imageWidth: img.width,
+                    imageHeight: img.height,
+                    density: config.shapeFill.density,
+                    colorMode: config.shapeFill.colorMode,
+                    config
+                });
+
+                for (const shape of shapeFillShapes) {
+                    content += getSingleShapeSVG(shape, config, width, height, 0, 0);
+                }
+            }
+        }
     }
 
     // Handle text modes
@@ -395,6 +425,7 @@ export const generateSVG = async (
     height: number,
     state: AppState,
     fonts: FontDef[],
+    loadedImages: Record<string, HTMLImageElement>,
     clipToCanvas: boolean = false
 ): Promise<string> => {
     // Build defs section for clipPath if needed
@@ -423,7 +454,7 @@ export const generateSVG = async (
         const blend = layer.blendMode !== 'source-over' ? `style="mix-blend-mode: ${layer.blendMode}"` : '';
 
         svg += `<g id="${layer.id}" ${opacity} ${blend}>`;
-        svg += generateLayerSVG(width, height, layer.config, layer.id);
+        svg += generateLayerSVG(width, height, layer.config, layer.id, loadedImages);
         svg += `</g>`;
     });
 
