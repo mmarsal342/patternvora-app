@@ -294,7 +294,9 @@ const App: React.FC = () => {
             let hasChanges = false;
 
             const promises = allAssets.map(asset => new Promise<void>((resolve) => {
-                if (newImages[asset.id]) {
+                // Check if image already loaded AND src matches (to detect image changes)
+                const existing = newImages[asset.id];
+                if (existing && existing.src === asset.src) {
                     resolve();
                     return;
                 }
