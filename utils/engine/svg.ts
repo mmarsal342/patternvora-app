@@ -355,6 +355,11 @@ const generateLayerSVG = (width: number, height: number, config: LayerConfig, la
         const imageKey = `shape_fill_${layerId}`;
         const img = loadedImages[imageKey];
 
+        console.log('[SVG] Shape Fill Mode detected');
+        console.log('[SVG] Looking for key:', imageKey);
+        console.log('[SVG] Available keys:', Object.keys(loadedImages));
+        console.log('[SVG] Image found:', !!img);
+
         if (img) {
             const osc = createOffscreenCanvas(img.width, img.height);
             const oscCtx = osc.getContext('2d') as OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D;
