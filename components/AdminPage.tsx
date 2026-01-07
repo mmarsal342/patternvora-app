@@ -157,7 +157,7 @@ const UserManagement: React.FC = () => {
         }
     };
 
-    const handleGrantTrial = async (userId: string, duration: '12h' | '24h' | '3d' | '7d') => {
+    const handleGrantTrial = async (userId: string, duration: '12h' | '24h' | '3d' | '7d' | '14d' | '21d' | '30d') => {
         setUpgradingUserId(userId);
         try {
             await api.admin.grantTrial(userId, duration);
@@ -337,7 +337,7 @@ const UserManagement: React.FC = () => {
                                             <select
                                                 onChange={(e) => {
                                                     if (e.target.value) {
-                                                        handleGrantTrial(user.id, e.target.value as '12h' | '24h' | '3d' | '7d');
+                                                        handleGrantTrial(user.id, e.target.value as '12h' | '24h' | '3d' | '7d' | '14d' | '21d' | '30d');
                                                         e.target.value = '';
                                                     }
                                                 }}
@@ -350,6 +350,9 @@ const UserManagement: React.FC = () => {
                                                 <option value="24h">24 Hours</option>
                                                 <option value="3d">3 Days</option>
                                                 <option value="7d">7 Days</option>
+                                                <option value="14d">14 Days</option>
+                                                <option value="21d">21 Days</option>
+                                                <option value="30d">30 Days</option>
                                             </select>
                                         )}
 
