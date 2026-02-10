@@ -249,7 +249,7 @@ export const api = {
         },
 
         // Grant trial PRO access
-        grantTrial: async (userId: string, duration: '12h' | '24h' | '3d' | '7d' | '14d' | '21d' | '30d'): Promise<{ pro_expires_at: string }> => {
+        grantTrial: async (userId: string, duration: '12h' | '24h' | '3d' | '7d' | '14d' | '21d' | '30d' | '35d' | '60d' | '90d'): Promise<{ pro_expires_at: string }> => {
             const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/grant-trial`, {
                 method: 'POST',
                 headers: getHeaders(),
