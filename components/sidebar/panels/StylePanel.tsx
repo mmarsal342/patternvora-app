@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Layers, ChevronDown, ChevronUp, Grid, X, Plus, Lock, Circle, Square, Triangle, Hexagon, Star, Spline, Minus, Activity, MousePointer2, Image as ImageIcon, Lamp, Flame, Gift, Cloud, Sparkles, Fan, TreePine, Snowflake, Bell, Candy, PartyPopper, Wine, Clock, CircleDot, Heart, Flower2, Mail, Ribbon, Moon, Building2, Diamond, Shapes, HelpCircle, AlertTriangle } from 'lucide-react';
+import { Layers, ChevronDown, ChevronUp, Grid, X, Plus, Lock, Circle, Square, Triangle, Hexagon, Star, Spline, Minus, Activity, MousePointer2, Image as ImageIcon, Lamp, Flame, Gift, Cloud, Sparkles, Fan, TreePine, Snowflake, Bell, Candy, PartyPopper, Wine, Clock, CircleDot, Heart, Flower2, Mail, Ribbon, Moon, Building2, Diamond, Shapes, HelpCircle, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { useSidebar } from '../SidebarContext';
 import CollapsibleSection from '../../common/CollapsibleSection';
 import { PatternStyle, CompositionType, ShapeFillColorMode } from '../../../types';
@@ -26,7 +26,8 @@ const StylePanel: React.FC = () => {
                 if (event.target?.result) {
                     const newAsset = {
                         id: Date.now().toString(),
-                        src: event.target.result as string
+                        src: event.target.result as string,
+                        enabled: true
                     };
                     const newAssets = [...activeLayerConfig.customImage.assets, newAsset].slice(0, 5);
 
@@ -66,6 +67,15 @@ const StylePanel: React.FC = () => {
         }
 
         updateState(updates, true);
+    };
+
+    const handleToggleAsset = (id: string) => {
+        const newAssets = activeLayerConfig.customImage.assets.map(a =>
+            a.id === id ? { ...a, enabled: !a.enabled } : a
+        );
+        updateState({
+            customImage: { ...activeLayerConfig.customImage, assets: newAssets }
+        }, true);
     };
 
     const handleClearCustomImage = () => {
@@ -225,7 +235,7 @@ const StylePanel: React.FC = () => {
                         <ImageIcon size={14} className="text-indigo-500" />
                         <span>Custom Assets</span>
                         <span className="bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-full text-[9px] font-bold">
-                            {activeLayerConfig.customImage.assets.length}/5
+                            {activeLayerConfig.customImage.assets.filter(a => a.enabled !== false).length}/{activeLayerConfig.customImage.assets.length}
                         </span>
                     </div>
                     {isAssetsOpen ? <ChevronUp size={14} className="text-slate-400" /> : <ChevronDown size={14} className="text-slate-400" />}
@@ -235,10 +245,17 @@ const StylePanel: React.FC = () => {
                     <div className="p-3 bg-white border-t border-slate-200 animate-in slide-in-from-top-2 duration-150">
                         <div className="grid grid-cols-3 gap-2 mb-2">
                             {activeLayerConfig.customImage.assets.map((asset) => (
-                                <div key={asset.id} className="relative group aspect-square bg-slate-100 rounded-md border border-slate-200 overflow-hidden">
+                                <div key={asset.id} className={`relative group aspect-square bg-slate-100 rounded-md border overflow-hidden cursor-pointer transition-all ${asset.enabled !== false ? 'border-indigo-300 ring-1 ring-indigo-200' : 'border-slate-200 opacity-40 grayscale'}`}
+                                    onClick={() => handleToggleAsset(asset.id)}
+                                    title={asset.enabled !== false ? 'Click to disable this asset' : 'Click to enable this asset'}
+                                >
                                     <img src={asset.src} alt="Asset" className="w-full h-full object-contain p-1" />
+                                    {/* Toggle indicator */}
+                                    <div className={`absolute bottom-0.5 left-0.5 rounded-full p-0.5 ${asset.enabled !== false ? 'bg-indigo-500 text-white' : 'bg-slate-400 text-white'}`}>
+                                        {asset.enabled !== false ? <Eye size={8} /> : <EyeOff size={8} />}
+                                    </div>
                                     <button
-                                        onClick={() => handleRemoveAsset(asset.id)}
+                                        onClick={(e) => { e.stopPropagation(); handleRemoveAsset(asset.id); }}
                                         className="absolute top-1 right-1 bg-rose-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-600"
                                     >
                                         <X size={10} />

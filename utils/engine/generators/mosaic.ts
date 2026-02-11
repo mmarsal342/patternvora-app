@@ -21,9 +21,12 @@ export const generateMosaic = (width: number, height: number, baseSize: number, 
     const occupied = new Set<string>();
     let globalIndex = 0;
 
+    // Filter to only enabled assets
+    const activeAssets = config.customImage.assets.filter(a => a.enabled !== false);
+
     const getRandomAssetId = () => {
-        if (config.customImage.assets.length > 0) {
-            return rng.nextItem(config.customImage.assets).id;
+        if (activeAssets.length > 0) {
+            return rng.nextItem(activeAssets).id;
         }
         return undefined;
     };
@@ -60,7 +63,7 @@ export const generateMosaic = (width: number, height: number, baseSize: number, 
 
             shapes.push({
                 index: globalIndex++,
-                type: config.customImage.assets.length > 0 ? 'image' : rng.nextItem(allowedTypes),
+                type: activeAssets.length > 0 ? 'image' : rng.nextItem(allowedTypes),
                 x: startX + (pixelW / 2),
                 y: startY + (pixelH / 2),
                 size: minDim * (config.scale > 1 ? 0.95 : config.scale * 0.9),
@@ -138,9 +141,11 @@ export const generateMosaicTextFill = (
     };
 
     // Helper to get random asset ID if custom assets are available
+    const activeAssets2 = config.customImage.assets.filter(a => a.enabled !== false);
+
     const getRandomAssetId = () => {
-        if (config.customImage.assets.length > 0) {
-            return rng.nextItem(config.customImage.assets).id;
+        if (activeAssets2.length > 0) {
+            return rng.nextItem(activeAssets2).id;
         }
         return undefined;
     };
@@ -190,7 +195,7 @@ export const generateMosaicTextFill = (
             // Random chance to skip for variation
             if (rng.nextFloat() > 0.85) continue;
 
-            const shapeType = config.customImage.assets.length > 0 ? 'image' : rng.nextItem(allowedTypes);
+            const shapeType = activeAssets2.length > 0 ? 'image' : rng.nextItem(allowedTypes);
             const sizeVariation = rng.nextRange(0.6, 1.2);
 
             shapes.push({
@@ -290,9 +295,11 @@ export const generateMosaicShapeFill = (
     }
 
     // Helper to get random asset ID if custom assets are available
+    const activeAssets3 = config.customImage?.assets?.filter(a => a.enabled !== false) || [];
+
     const getRandomAssetId = () => {
-        if (config.customImage?.assets?.length > 0) {
-            return rng.nextItem(config.customImage.assets).id;
+        if (activeAssets3.length > 0) {
+            return rng.nextItem(activeAssets3).id;
         }
         return undefined;
     };
@@ -322,7 +329,7 @@ export const generateMosaicShapeFill = (
             // Random chance to skip for variation
             if (rng.nextFloat() > 0.85) continue;
 
-            const shapeType = config.customImage.assets.length > 0 ? 'image' : rng.nextItem(allowedTypes);
+            const shapeType = activeAssets3.length > 0 ? 'image' : rng.nextItem(allowedTypes);
             const sizeVariation = rng.nextRange(0.6, 1.2);
 
             // Determine color based on mode

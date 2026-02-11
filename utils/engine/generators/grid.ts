@@ -19,10 +19,13 @@ export const generateGrid = (width: number, height: number, baseSize: number, co
 
     let globalIndex = 0;
 
+    // Filter to only enabled assets
+    const activeAssets = config.customImage.assets.filter(a => a.enabled !== false);
+
     // Helper to get a random asset ID if available
     const getRandomAssetId = () => {
-        if (config.customImage.assets.length > 0) {
-            return rng.nextItem(config.customImage.assets).id;
+        if (activeAssets.length > 0) {
+            return rng.nextItem(activeAssets).id;
         }
         return undefined;
     };
@@ -42,13 +45,13 @@ export const generateGrid = (width: number, height: number, baseSize: number, co
 
             shapes.push({
                 index: globalIndex++,
-                type: config.customImage.assets.length > 0 ? 'image' : rng.nextItem(allowedTypes),
+                type: activeAssets.length > 0 ? 'image' : rng.nextItem(allowedTypes),
                 x: cx,
                 y: cy,
                 size: (Math.min(cellW, cellH) * config.scale) * rng.nextRange(0.2, 0.8),
                 rotation: rng.nextRange(0, 360),
                 color: rng.nextItem(config.palette.colors),
-                stroke: getStrokeValue(config.strokeMode, config.customImage.assets.length > 0 ? 'image' : rng.nextItem(allowedTypes), rng),
+                stroke: getStrokeValue(config.strokeMode, activeAssets.length > 0 ? 'image' : rng.nextItem(allowedTypes), rng),
                 speedFactor: Math.floor(rng.nextRange(1, 4)),
                 phaseOffset: rng.nextFloat() * Math.PI * 2,
                 points: Math.floor(rng.nextRange(5, 8)),

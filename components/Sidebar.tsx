@@ -101,8 +101,8 @@ const SidebarLayout: React.FC<Omit<SidebarProps, keyof SidebarContextType>> = (p
         const randomPalette = PALETTES[Math.floor(Math.random() * PALETTES.length)];
         const styles: PatternStyle[] = ['geometric', 'organic', 'grid', 'bauhaus', 'confetti', 'radial', 'typo', 'mosaic', 'hex', 'memphis', 'isometric']; // 'waves' hidden - still buggy
 
-        // Only include custom-image in shuffle if assets exist
-        if (currentConfig.customImage.assets.length > 0) {
+        // Only include custom-image in shuffle if enabled assets exist
+        if (currentConfig.customImage.assets.filter(a => a.enabled !== false).length > 0) {
             styles.push('custom-image');
         }
 

@@ -34,10 +34,11 @@ export const generateStandardScatter = (width: number, height: number, baseSize:
         let type: ShapeData['type'] = 'circle';
         let assetId: string | undefined;
 
-        if (config.customImage.assets.length > 0) {
+        const activeAssets = config.customImage.assets.filter(a => a.enabled !== false);
+        if (activeAssets.length > 0) {
             type = 'image';
-            // Pick a random asset from the available list
-            assetId = rng.nextItem(config.customImage.assets).id;
+            // Pick a random asset from the available (enabled) list
+            assetId = rng.nextItem(activeAssets).id;
         } else {
             type = rng.nextItem(allowedTypes);
         }

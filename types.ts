@@ -39,6 +39,7 @@ export type TextConfig = {
 export type CustomAsset = {
   id: string;
   src: string; // Base64 data URL
+  enabled: boolean; // Whether this asset is active in pattern generation (default: true)
 };
 
 export type CustomImageConfig = {
