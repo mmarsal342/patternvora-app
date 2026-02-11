@@ -303,6 +303,32 @@ const StylePanel: React.FC = () => {
                                 </button>
                             )}
                         </div>
+
+                        {/* Display Mode Toggle: Pattern vs Single */}
+                        {activeLayerConfig.customImage.assets.length > 0 && (
+                            <div className="mt-3 space-y-1">
+                                <label className="text-[10px] font-semibold text-indigo-600 uppercase">Display Mode</label>
+                                <div className="flex bg-slate-100 rounded-lg p-1">
+                                    <button
+                                        className={`flex-1 py-1.5 text-[10px] font-medium rounded-md transition-all ${(activeLayerConfig.customImage.displayMode || 'pattern') === 'pattern' ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                        onClick={() => updateState({ customImage: { ...activeLayerConfig.customImage, displayMode: 'pattern' } }, true)}
+                                    >
+                                        🔄 Pattern
+                                    </button>
+                                    <button
+                                        className={`flex-1 py-1.5 text-[10px] font-medium rounded-md transition-all ${activeLayerConfig.customImage.displayMode === 'single' ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                        onClick={() => updateState({ customImage: { ...activeLayerConfig.customImage, displayMode: 'single' } }, true)}
+                                    >
+                                        ☝️ Single
+                                    </button>
+                                </div>
+                                {activeLayerConfig.customImage.displayMode === 'single' && (
+                                    <p className="text-[9px] text-indigo-500 bg-indigo-50 p-1.5 rounded mt-1">
+                                        Only 1 asset shown at center. Use Scale to resize.
+                                    </p>
+                                )}
+                            </div>
+                        )}
                         <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileUpload} />
                     </div>
                 )}

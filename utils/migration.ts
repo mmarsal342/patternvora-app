@@ -39,7 +39,7 @@ export const DEFAULT_LAYER_CONFIG: LayerConfig = {
     strokeWidth: 2,
     strokeMode: 'random',
     texture: 0,
-    customImage: { assets: [], originalColors: false },
+    customImage: { assets: [], originalColors: false, displayMode: 'pattern' as const },
     animation: {
         enabled: false,
         primary: 'orbit',
@@ -163,7 +163,7 @@ export const migrateToV2 = (oldState: any): AppState => {
         strokeWidth: oldState.strokeWidth ?? 2,
         strokeMode: oldState.strokeMode ?? 'random',
         texture: oldState.texture ?? 0,
-        customImage: oldState.customImage ?? { assets: [], originalColors: false },
+        customImage: { ...(oldState.customImage ?? { assets: [], originalColors: false }), displayMode: (oldState.customImage?.displayMode ?? 'pattern') },
         animation: oldState.animation ?? DEFAULT_LAYER_CONFIG.animation,
         text: textConfig, // Move global text to Layer 1
         transparentBackground: false,

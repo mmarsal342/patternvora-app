@@ -6,10 +6,10 @@ export const serializeState = (state: AppState): string | null => {
     try {
         // Deep copy to avoid mutating original
         const stateToSave = JSON.parse(JSON.stringify(state));
-        
+
         // V2 Logic: Check layers for custom images
         if (stateToSave.layers && Array.isArray(stateToSave.layers)) {
-            const hasCustomImages = stateToSave.layers.some((layer: Layer) => 
+            const hasCustomImages = stateToSave.layers.some((layer: Layer) =>
                 layer.config.customImage?.assets?.length > 0
             );
 
@@ -18,14 +18,14 @@ export const serializeState = (state: AppState): string | null => {
                 return null;
             }
         } else {
-             // Fallback for V1
-             if (stateToSave.customImage?.assets?.length > 0) {
-                 return null;
-             }
+            // Fallback for V1
+            if (stateToSave.customImage?.assets?.length > 0) {
+                return null;
+            }
         }
 
         const jsonString = JSON.stringify(stateToSave);
-        
+
         // SWITCH TO BASE64 + ENCODE URI COMPONENT
         // 'compressToEncodedURIComponent' creates strings containing '+' which URLSearchParams interprets as spaces.
         // Using standard Base64 and encoding it ensures data integrity across all browsers/servers.
@@ -41,7 +41,7 @@ export const serializeState = (state: AppState): string | null => {
 export const deserializeState = (encoded: string, fallbackState: AppState): AppState | null => {
     try {
         if (!encoded) return null;
-        
+
         // 1. Try Base64 Decompression (New Format)
         // URLSearchParams automatically decodes the URI component, returning the raw Base64 string.
         let jsonString = LZString.decompressFromBase64(encoded);
@@ -49,15 +49,15 @@ export const deserializeState = (encoded: string, fallbackState: AppState): AppS
         // 2. Fallback: Try 'EncodedURIComponent' format (Legacy/Broken Links)
         // If the link was generated with the old method, 'encoded' might contain spaces where '+' should be.
         if (!jsonString) {
-             // Heuristic: If it looks like LZString's uri-safe format (has -$ but no = or / usually)
-             // We fix the spaces (which were + converted by browser) and try decompressing.
-             const fixedEncoded = encoded.replace(/ /g, '+');
-             jsonString = LZString.decompressFromEncodedURIComponent(fixedEncoded);
-             
-             // If that fails, try raw just in case (if browser didn't convert space)
-             if (!jsonString) {
-                 jsonString = LZString.decompressFromEncodedURIComponent(encoded);
-             }
+            // Heuristic: If it looks like LZString's uri-safe format (has -$ but no = or / usually)
+            // We fix the spaces (which were + converted by browser) and try decompressing.
+            const fixedEncoded = encoded.replace(/ /g, '+');
+            jsonString = LZString.decompressFromEncodedURIComponent(fixedEncoded);
+
+            // If that fails, try raw just in case (if browser didn't convert space)
+            if (!jsonString) {
+                jsonString = LZString.decompressFromEncodedURIComponent(encoded);
+            }
         }
 
         if (!jsonString) return null;
@@ -77,7 +77,7 @@ export const deserializeState = (encoded: string, fallbackState: AppState): AppS
                 config: {
                     ...l.config,
                     // Ensure custom images are cleared from URL state to prevent issues
-                    customImage: { assets: [], originalColors: false }
+                    customImage: { assets: [], originalColors: false, displayMode: 'pattern' }
                 }
             }));
         }

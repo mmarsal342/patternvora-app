@@ -37,6 +37,20 @@ export const generateMosaic = (width: number, height: number, baseSize: number, 
         ? config.styleOptions.shapeTypes as ShapeData['type'][]
         : getDefaultTypes();
 
+    // Single display mode: just one asset, centered
+    if (activeAssets.length > 0 && config.customImage.displayMode === 'single') {
+        shapes.push({
+            index: 0, type: 'image',
+            x: width / 2, y: height / 2,
+            size: Math.min(width, height) * config.scale * 0.6,
+            rotation: 0, color: rng.nextItem(config.palette.colors),
+            stroke: false, speedFactor: 1, phaseOffset: 0, points: 0,
+            seed: rng.nextRange(0, 1000),
+            assetId: rng.nextItem(activeAssets).id
+        });
+        return shapes;
+    }
+
     for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
             if (occupied.has(`${x},${y}`)) continue;

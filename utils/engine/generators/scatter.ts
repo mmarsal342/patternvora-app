@@ -29,12 +29,34 @@ export const generateStandardScatter = (width: number, height: number, baseSize:
         allowedTypes = config.styleOptions.shapeTypes as ShapeData['type'][];
     }
 
+    const activeAssets = config.customImage.assets.filter(a => a.enabled !== false);
+
+    // Single display mode: just one asset, centered
+    if (activeAssets.length > 0 && config.customImage.displayMode === 'single') {
+        const assetId = rng.nextItem(activeAssets).id;
+        shapes.push({
+            index: 0,
+            type: 'image',
+            x: width / 2,
+            y: height / 2,
+            size: Math.min(width, height) * config.scale * 0.6,
+            rotation: 0,
+            color: rng.nextItem(config.palette.colors),
+            stroke: false,
+            speedFactor: 1,
+            phaseOffset: 0,
+            points: 0,
+            seed: rng.nextRange(0, 1000),
+            assetId
+        });
+        return shapes;
+    }
+
     for (let i = 0; i < config.complexity; i++) {
         const { x, y } = getPosition(config.composition, width, height, rng, config.compositionOptions);
         let type: ShapeData['type'] = 'circle';
         let assetId: string | undefined;
 
-        const activeAssets = config.customImage.assets.filter(a => a.enabled !== false);
         if (activeAssets.length > 0) {
             type = 'image';
             // Pick a random asset from the available (enabled) list

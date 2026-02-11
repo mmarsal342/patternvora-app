@@ -42,9 +42,12 @@ export type CustomAsset = {
   enabled: boolean; // Whether this asset is active in pattern generation (default: true)
 };
 
+export type CustomImageDisplayMode = 'pattern' | 'single';
+
 export type CustomImageConfig = {
   assets: CustomAsset[]; // Array of uploaded assets (Max 5)
   originalColors: boolean; // If true, render as-is. If false, recolor using palette.
+  displayMode: CustomImageDisplayMode; // 'pattern' = repeat across canvas, 'single' = one instance only
 };
 
 export type PrimaryAnimationType = 'none' | 'orbit' | 'float' | 'scan';

@@ -36,6 +36,20 @@ export const generateGrid = (width: number, height: number, baseSize: number, co
         ? config.styleOptions.shapeTypes as ShapeData['type'][]
         : getDefaultTypes();
 
+    // Single display mode: just one asset, centered
+    if (activeAssets.length > 0 && config.customImage.displayMode === 'single') {
+        shapes.push({
+            index: 0, type: 'image',
+            x: width / 2, y: height / 2,
+            size: Math.min(width, height) * config.scale * 0.6,
+            rotation: 0, color: rng.nextItem(config.palette.colors),
+            stroke: false, speedFactor: 1, phaseOffset: 0, points: 0,
+            seed: rng.nextRange(0, 1000),
+            assetId: rng.nextItem(activeAssets).id
+        });
+        return shapes;
+    }
+
     for (let i = 0; i < cols; i++) {
         for (let j = 0; j < rows; j++) {
             if (rng.nextFloat() > 0.8) { globalIndex++; continue; }
