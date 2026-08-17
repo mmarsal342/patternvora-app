@@ -12,7 +12,6 @@ import VideoExportProgress from './components/VideoExportProgress';
 import { useHistory } from './hooks/useHistory';
 import { useExport, FREE_EXPORT_LIMIT } from './hooks/useExport';
 import { usePresets } from './hooks/usePresets';
-import { useAssets } from './hooks/useAssets';
 import { AppState, TextConfig, CustomImageConfig, AnimationConfig, Preset, FontDef, DEFAULT_FONTS, ShapeOverride, CustomAsset } from './types';
 import { renderToCanvas, generateSVG, getDimensions, createNoisePattern } from './utils/drawingEngine';
 import { extractPaletteFromImage } from './utils/colorExtractor';

@@ -5,7 +5,6 @@ interface ImportMetaEnv {
     readonly PROD: boolean;
     readonly MODE: string;
     readonly VITE_API_URL?: string;
-    readonly GEMINI_API_KEY?: string;
 }
 
 interface ImportMeta {

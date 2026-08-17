@@ -23,21 +23,26 @@ export function usePresets(options: UsePresetsOptions): UsePresetsReturn {
 
     const [presets, setPresets] = useState<Preset[]>([]);
 
+    // Tracks whether the initial load finished, so the empty starting state
+    // never overwrites what is already stored.
+    const [hasLoaded, setHasLoaded] = useState(false);
+
     // Load presets from IndexedDB
     useEffect(() => {
         const load = async () => {
             const loaded = await loadPresetsFromStorage();
             setPresets(loaded);
+            setHasLoaded(true);
         };
         load();
     }, []);
 
-    // Save presets to IndexedDB when changed
+    // Save presets to IndexedDB when changed (including down to an empty list,
+    // so deleting the last preset actually persists)
     useEffect(() => {
-        if (presets.length > 0) {
-            savePresetsToStorage(presets);
-        }
-    }, [presets]);
+        if (!hasLoaded) return;
+        savePresetsToStorage(presets);
+    }, [presets, hasLoaded]);
 
     const handleSavePreset = useCallback((name: string) => {
         const newPreset: Preset = {
